@@ -69,29 +69,74 @@ namespace Formula
                 {
                     if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
                     {
-                        double tempVal = valueStack.Pop();
+                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), number));
+                    }
+                    else
+                    {
+                        valueStack.Push(number);
                     }
                 }
                 else if (var.Equals("+") || var.Equals("-"))
                 {
+                    if (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-"))
+                    {
+                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                    }
+
+                    operatorStack.Push(var);
                 }
                 else if (var.Equals("*") || var.Equals("/"))
                 {
+                    operatorStack.Push(var);
                 }
                 else if (var.Equals("("))
                 {
+                    operatorStack.Push(var);
                 }
                 else if (var.Equals(")"))
                 {
+                    if (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-"))
+                    {
+                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                    }
+
+                    operatorStack.Pop();
+
+                    if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
+                    {
+                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                    }
                 }
             }
 
-            return 0;
+            // This means that the operator stack is empty
+            if (operatorStack.Count == 0)
+            {
+                return valueStack.Pop();
+            }
+
+            // ... else operator stack isn't empty
+            return PopOpStackForSolution(valueStack.Pop(), valueStack.Pop());
         }
 
-        private double PopOpStackForSolution(double val1, double val 2)
+        /// <summary>
+        /// Pops the operator stack and applies popped operator to the two given values and returns the result.
+        /// Throws exception if operator is not +, -, * or /.
+        /// </summary>
+        /// <param name="val1"></param>
+        /// <param name="val2"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private double PopOpStackForSolution(double val1, double val2)
         {
-
+            switch (operatorStack.Pop())
+            {
+                case "+": return val1 + val2;
+                case "-": return val1 - val2;
+                case "*": return val1 * val2;
+                case "/": return val1 / val2;
+                default: throw new Exception("Invalid operator");
+            }
         }
 
         /// <summary>
