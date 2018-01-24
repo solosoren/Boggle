@@ -2,7 +2,7 @@
 
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Formulas;
+using Formula;
 
 namespace FormulaTestCases
 {

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Formulas
+namespace Formula
 {
     /// <summary>
     /// Represents formulas written in standard infix notation using standard precedence
@@ -18,11 +18,12 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
+        private string formula;
 
         // This stack consists of the numbers from the formula.
-        private Stack<int> valueStack = new Stack<int>();
+        private Stack<double> valueStack = new Stack<double>();
 
-        // This stack consists of the perators from the formula.
+        // This stack consists of the operators from the formula.
         private Stack<string> operatorStack = new Stack<string>();
 
         /// <summary>
@@ -47,8 +48,9 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
-
+            this.formula = formula;
         }
+
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
         /// delegate takes a variable name as a parameter and returns its value (if it has one) or throws
@@ -60,10 +62,37 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            double number;
+            foreach (string var in GetTokens(formula))
+            {
+                if (Double.TryParse(var, out number))
+                {
+                    if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
+                    {
+                        double tempVal = valueStack.Pop();
+                    }
+                }
+                else if (var.Equals("+") || var.Equals("-"))
+                {
+                }
+                else if (var.Equals("*") || var.Equals("/"))
+                {
+                }
+                else if (var.Equals("("))
+                {
+                }
+                else if (var.Equals(")"))
+                {
+                }
+            }
+
             return 0;
         }
 
+        private double PopOpStackForSolution(double val1, double val 2)
+        {
 
+        }
 
         /// <summary>
         /// Given a formula, enumerates the tokens that compose it.  Tokens are left paren,
@@ -94,7 +123,7 @@ namespace Formulas
             // it is used.  See below for an example of this.  This pattern is useful for 
             // splitting a string into tokens.
             String splittingPattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) | ({5})",
-                                            lpPattern, rpPattern, opPattern, varPattern, doublePattern, spacePattern);
+                lpPattern, rpPattern, opPattern, varPattern, doublePattern, spacePattern);
 
             // Enumerate matching tokens that don't consist solely of white space.
             // PLEASE NOTE:  Notice the second parameter to Split, which says to ignore embedded white space
