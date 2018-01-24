@@ -1,4 +1,7 @@
 ﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
+// Kunaal Kumar
+// u1063137
+// January 23, 2018.
 
 using System;
 using System.Collections.Generic;
@@ -15,6 +18,7 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
+
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
         /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
@@ -37,6 +41,7 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
+
         }
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
@@ -51,6 +56,8 @@ namespace Formulas
         {
             return 0;
         }
+
+
 
         /// <summary>
         /// Given a formula, enumerates the tokens that compose it.  Tokens are left paren,
