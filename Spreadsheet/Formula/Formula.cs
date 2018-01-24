@@ -19,6 +19,12 @@ namespace Formulas
     public class Formula
     {
 
+        // This stack consists of the numbers from the formula.
+        private Stack<int> valueStack = new Stack<int>();
+
+        // This stack consists of the perators from the formula.
+        private Stack<string> operatorStack = new Stack<string>();
+
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
         /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
