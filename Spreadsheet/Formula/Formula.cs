@@ -107,6 +107,14 @@ namespace Formula
                         valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
                     }
                 }
+                // If it isn't anything above, it must be a variable
+                else
+                {
+                    if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
+                    {
+                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), lookup.Invoke(var)));
+                    }
+                }
             }
 
             // This means that the operator stack is empty
