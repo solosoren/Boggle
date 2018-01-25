@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula", "Formula\Formula.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaSimpleTests", "FormulaSimpleTests\FormulaSimpleTests.csproj", "{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{CAB9452E-688F-4039-B4E1-E6545A7B481E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CAB9452E-688F-4039-B4E1-E6545A7B481E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CAB9452E-688F-4039-B4E1-E6545A7B481E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CAB9452E-688F-4039-B4E1-E6545A7B481E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CAB9452E-688F-4039-B4E1-E6545A7B481E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

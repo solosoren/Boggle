@@ -1,7 +1,7 @@
 ﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
 // Kunaal Kumar
 // u1063137
-// January 23, 2018.
+// January 24, 2018.
 
 using System;
 using System.Collections.Generic;
@@ -183,7 +183,7 @@ namespace Formula
                         valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
                     }
                 }
-                else if(Char.IsLetter(var.ToCharArray()[0]))
+                else if (Char.IsLetter(var.ToCharArray()[0]))
                 {
                     if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
                     {
@@ -218,7 +218,7 @@ namespace Formula
                 case "-": return val1 - val2;
                 case "*": return val1 * val2;
                 case "/":
-                    if(val2 == 0)
+                    if (val2 == 0)
                         throw new FormulaEvaluationException("Can't divide by 0");
                     return val1 / val2;
                 default: throw new Exception("Invalid operator");
