@@ -28,36 +28,112 @@ namespace Formula
 
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
-        /// from non-negative floating-point numbers (using C#-like syntax for double/int literals), 
+        /// from non-negative floating-point numbers (using C#-like syntax for double/int literals),
         /// variable symbols (a letter followed by zero or more letters and/or digits), left and right
         /// parentheses, and the four binary operator symbols +, -, *, and /.  White space is
         /// permitted between tokens, but is not required.
-        /// 
+        ///
         /// Examples of a valid parameter to this constructor are:
         ///     "2.5e9 + x5 / 17"
         ///     "(5 * 2) + 8"
         ///     "x*y-2+35/9"
-        ///     
+        ///
         /// Examples of invalid parameters are:
         ///     "_"
         ///     "-5.3"
         ///     "2 5 + 3"
-        /// 
-        /// If the formula is syntacticaly invalid, throws a FormulaFormatException with an 
+        ///
+        /// If the formula is syntacticaly invalid, throws a FormulaFormatException with an
         /// explanatory Message.
         /// </summary>
         public Formula(String formula)
         {
+            if (formula.Length < 1)
+            {
+                throw new FormulaFormatException("Formula is empty.");
+            }
+
+            if (!ParenthesisEval(formula))
+            {
+                throw new FormulaFormatException("Formula fomrat is invalid.");
+            }
+
             this.formula = formula;
+        }
+
+        private bool ParenthesisEval(string formula)
+        {
+            int open = 0;
+            int close = 0;
+            char firstChar = formula[0];
+            List<string> operators = new List<string> {"+", "-", "*", "/"};
+            char lastChar = formula[formula.Length - 1];
+            string lastToken = "-1";
+            if (!Char.IsLetterOrDigit(firstChar))
+            {
+                if (!firstChar.Equals('('))
+                {
+                    return false;
+                }
+            }
+
+            if (!Char.IsLetterOrDigit(lastChar))
+            {
+                if (!lastChar.Equals(')'))
+                {
+                    return false;
+                }
+            }
+
+            foreach (string token in GetTokens(formula))
+            {
+                if (!lastToken.Equals("-1"))
+                {
+                    if (lastToken.Equals("(") || operators.Contains(lastToken))
+                    {
+                        if (!Int32.TryParse(token, out int tempIntNext))
+                        {
+                            if (!token.Equals("("))
+                            {
+                                if (Char.IsLetterOrDigit(token.ToCharArray()[0]))
+                                    return false;
+                            }
+                        }
+                    }
+
+                    if (lastToken.Equals(")") || Char.IsLetterOrDigit(lastToken.ToCharArray()[0]))
+                    {
+                        if (!operators.Contains(token))
+                        {
+                            if (!token.Equals(")"))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+
+                if (close > open)
+                {
+                    return false;
+                }
+
+                if (token.Equals("(")) open++;
+                if (token.Equals(")")) close++;
+                lastToken = token;
+            }
+
+            return open == close;
         }
 
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
         /// delegate takes a variable name as a parameter and returns its value (if it has one) or throws
         /// an UndefinedVariableException (otherwise).  Uses the standard precedence rules when doing the evaluation.
-        /// 
-        /// If no undefined variables or divisions by zero are encountered when evaluating 
-        /// this Formula, its value is returned.  Otherwise, throws a FormulaEvaluationException  
+        ///
+        /// If no undefined variables or divisions by zero are encountered when evaluating
+        /// this Formula, its value is returned.  Otherwise, throws a FormulaEvaluationException
         /// with an explanatory Message.
         /// </summary>
         public double Evaluate(Lookup lookup)
@@ -173,7 +249,7 @@ namespace Formula
             String spacePattern = @"\s+";
 
             // Overall pattern.  It contains embedded white space that must be ignored when
-            // it is used.  See below for an example of this.  This pattern is useful for 
+            // it is used.  See below for an example of this.  This pattern is useful for
             // splitting a string into tokens.
             String splittingPattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) | ({5})",
                 lpPattern, rpPattern, opPattern, varPattern, doublePattern, spacePattern);
@@ -194,7 +270,7 @@ namespace Formula
     /// <summary>
     /// A Lookup method is one that maps some strings to double values.  Given a string,
     /// such a function can either return a double (meaning that the string maps to the
-    /// double) or throw an UndefinedVariableException (meaning that the string is unmapped 
+    /// double) or throw an UndefinedVariableException (meaning that the string is unmapped
     /// to a value. Exactly how a Lookup method decides which strings map to doubles and which
     /// don't is up to the implementation of the method.
     /// </summary>
