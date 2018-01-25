@@ -69,19 +69,25 @@ namespace Formula
             List<string> operators = new List<string> {"+", "-", "*", "/"};
             char lastChar = formula[formula.Length - 1];
             string lastToken = "-1";
-            if (!Char.IsLetterOrDigit(firstChar))
+            if (!Char.IsLetter(firstChar))
             {
-                if (!firstChar.Equals('('))
+                if (int.TryParse(firstChar.ToString(), out int tempFirstChar))
                 {
-                    return false;
+                    if (!firstChar.Equals('('))
+                    {
+                        return false;
+                    }
                 }
             }
 
-            if (!Char.IsLetterOrDigit(lastChar))
+            if (!Char.IsLetter(lastChar))
             {
-                if (!lastChar.Equals(')'))
+                if (int.TryParse(firstChar.ToString(), out int tempLastChar))
                 {
-                    return false;
+                    if (!lastChar.Equals(')'))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -91,17 +97,18 @@ namespace Formula
                 {
                     if (lastToken.Equals("(") || operators.Contains(lastToken))
                     {
-                        if (!Int32.TryParse(token, out int tempIntNext))
+                        if (!int.TryParse(token, out int tempIntNext))
                         {
                             if (!token.Equals("("))
                             {
-                                if (Char.IsLetterOrDigit(token.ToCharArray()[0]))
+                                if (Char.IsLetter(token.ToCharArray()[0]))
                                     return false;
                             }
                         }
                     }
 
-                    if (lastToken.Equals(")") || Char.IsLetterOrDigit(lastToken.ToCharArray()[0]))
+                    if (lastToken.Equals(")") || Char.IsLetter(lastToken.ToCharArray()[0]) ||
+                        int.TryParse(lastToken, out int tempLastToken))
                     {
                         if (!operators.Contains(token))
                         {
