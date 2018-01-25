@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaSimpleTests", "Formu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaTest", "FormulaTest\FormulaTest.csproj", "{E6E05838-28FD-4E40-8CED-2558C928E5F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication2", "ConsoleApplication2\ConsoleApplication2.csproj", "{7D26538E-3F5A-4EDB-88E0-B2DB02C4174A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,13 +22,16 @@ Global
 		{D43D998C-9797-4CF4-9BB0-6DE22753849A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D43D998C-9797-4CF4-9BB0-6DE22753849A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{707DFAA0-3BB3-4896-AF50-0A4D6D580D06}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E6E05838-28FD-4E40-8CED-2558C928E5F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E6E05838-28FD-4E40-8CED-2558C928E5F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6E05838-28FD-4E40-8CED-2558C928E5F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6E05838-28FD-4E40-8CED-2558C928E5F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D26538E-3F5A-4EDB-88E0-B2DB02C4174A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D26538E-3F5A-4EDB-88E0-B2DB02C4174A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D26538E-3F5A-4EDB-88E0-B2DB02C4174A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D26538E-3F5A-4EDB-88E0-B2DB02C4174A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,10 +21,10 @@ namespace Formulas
         private string formula;
 
         // This stack consists of the numbers from the formula.
-        private Stack<double> valueStack = new Stack<double>();
+        private Stack<double> valueStack;
 
         // This stack consists of the operators from the formula.
-        private Stack<string> operatorStack = new Stack<string>();
+        private Stack<string> operatorStack;
 
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
@@ -58,6 +58,8 @@ namespace Formulas
                 throw new FormulaFormatException("Formula fomrat is invalid.");
             }
 
+            operatorStack = new Stack<string>();
+            valueStack = new Stack<double>();
             this.formula = formula;
         }
 
@@ -71,7 +73,7 @@ namespace Formulas
             string lastToken = "-1";
             if (!Char.IsLetter(firstChar))
             {
-                if (int.TryParse(firstChar.ToString(), out int tempFirstChar))
+                if (!int.TryParse(firstChar.ToString(), out int tempFirstChar))
                 {
                     if (!firstChar.Equals('('))
                     {
@@ -82,7 +84,7 @@ namespace Formulas
 
             if (!Char.IsLetter(lastChar))
             {
-                if (int.TryParse(firstChar.ToString(), out int tempLastChar))
+                if (!int.TryParse(firstChar.ToString(), out int tempLastChar))
                 {
                     if (!lastChar.Equals(')'))
                     {
@@ -150,10 +152,19 @@ namespace Formulas
             {
                 if (Double.TryParse(var, out number))
                 {
-                    if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
+                    if (operatorStack.Count != 0)
                     {
-                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), number));
+                        if (operatorStack.Peek().Equals("*") ||
+                            operatorStack.Peek().Equals("/"))
+                        {
+                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), number));
+                        }
+                        else
+                        {
+                            valueStack.Push(number);
+                        }
                     }
+
                     else
                     {
                         valueStack.Push(number);
@@ -161,10 +172,15 @@ namespace Formulas
                 }
                 else if (var.Equals("+") || var.Equals("-"))
                 {
-                    if (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-"))
+                    if (operatorStack.Count != 0)
                     {
-                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                        if (operatorStack.Peek().Equals("+") ||
+                            operatorStack.Peek().Equals("-"))
+                        {
+                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                        }
                     }
+
 
                     operatorStack.Push(var);
                 }
@@ -178,23 +194,36 @@ namespace Formulas
                 }
                 else if (var.Equals(")"))
                 {
-                    if (operatorStack.Peek().Equals("+") || operatorStack.Peek().Equals("-"))
+                    if (operatorStack.Count != 0)
                     {
-                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                        if (operatorStack.Peek().Equals("+") ||
+                            operatorStack.Peek().Equals("-"))
+                        {
+                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                        }
                     }
+
 
                     operatorStack.Pop();
 
-                    if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
+                    if (operatorStack.Count != 0)
                     {
-                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                        if (operatorStack.Peek().Equals("*") ||
+                            operatorStack.Peek().Equals("/"))
+                        {
+                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                        }
                     }
                 }
                 else if (Char.IsLetter(var.ToCharArray()[0]))
                 {
-                    if (operatorStack.Peek().Equals("*") || operatorStack.Peek().Equals("/"))
+                    if (operatorStack.Count != 0)
                     {
-                        valueStack.Push(PopOpStackForSolution(valueStack.Pop(), lookup.Invoke(var)));
+                        if (operatorStack.Peek().Equals("*") ||
+                            operatorStack.Peek().Equals("/"))
+                        {
+                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), lookup.Invoke(var)));
+                        }
                     }
                 }
             }
