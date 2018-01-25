@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Formula
+namespace Formulas
 {
     /// <summary>
     /// Represents formulas written in standard infix notation using standard precedence
