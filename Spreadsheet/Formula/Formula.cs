@@ -283,7 +283,7 @@ namespace Formulas
             switch (operatorStack.Pop())
             {
                 case "+": return val1 + val2;
-                case "-": return val1 - val2;
+                case "-": return val2 - val1;
                 case "*": return val1 * val2;
                 case "/":
                     if (val2 == 0)
