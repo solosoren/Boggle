@@ -55,7 +55,7 @@ namespace Formulas
 
             if (!ParenthesisEval(formula))
             {
-                throw new FormulaFormatException("Formula fomrat is invalid.");
+                throw new FormulaFormatException("Formula format is invalid.");
             }
 
             operatorStack = new Stack<string>();
@@ -84,7 +84,7 @@ namespace Formulas
 
             if (!Char.IsLetter(lastChar))
             {
-                if (!int.TryParse(firstChar.ToString(), out int tempLastChar))
+                if (!int.TryParse(lastChar.ToString(), out int tempLastChar))
                 {
                     if (!lastChar.Equals(')'))
                     {
@@ -103,7 +103,7 @@ namespace Formulas
                         {
                             if (!token.Equals("("))
                             {
-                                if (Char.IsLetter(token.ToCharArray()[0]))
+                                if (!Char.IsLetter(token.ToCharArray()[0]))
                                     return false;
                             }
                         }
@@ -224,6 +224,14 @@ namespace Formulas
                         {
                             valueStack.Push(PopOpStackForSolution(valueStack.Pop(), lookup.Invoke(var)));
                         }
+                        else
+                        {
+                            valueStack.Push(lookup.Invoke(var));
+                        }
+                    }
+                    else
+                    {
+                        valueStack.Push(lookup.Invoke(var));
                     }
                 }
             }
