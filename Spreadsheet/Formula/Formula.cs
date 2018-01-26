@@ -222,16 +222,40 @@ namespace Formulas
                         if (operatorStack.Peek().Equals("*") ||
                             operatorStack.Peek().Equals("/"))
                         {
-                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), lookup.Invoke(var)));
+                            try
+                            {
+                                valueStack.Push(PopOpStackForSolution(valueStack.Pop(), lookup.Invoke(var)));
+                            }
+                            catch (UndefinedVariableException e)
+                            {
+                                Console.WriteLine(e);
+                                throw;
+                            }
                         }
                         else
                         {
-                            valueStack.Push(lookup.Invoke(var));
+                            try
+                            {
+                                valueStack.Push(lookup.Invoke(var));
+                            }
+                            catch (UndefinedVariableException e)
+                            {
+                                Console.WriteLine(e);
+                                throw;
+                            }
                         }
                     }
                     else
                     {
-                        valueStack.Push(lookup.Invoke(var));
+                        try
+                        {
+                            valueStack.Push(lookup.Invoke(var));
+                        }
+                        catch (UndefinedVariableException e)
+                        {
+                            Console.WriteLine(e);
+                            throw;
+                        }
                     }
                 }
             }
