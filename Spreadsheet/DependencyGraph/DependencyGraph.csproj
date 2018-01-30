@@ -43,6 +43,16 @@
     <Compile Include="DependencyGraph.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="DependencyGraph.csproj">
+      <Project>{862ead85-346f-4d2b-a53c-98074ff813ba}</Project>
+      <Name>DependencyGraph</Name>
+    </ProjectReference>
+    <ProjectReference Include="DependencyGraph.csproj">
+      <Project>{862ead85-346f-4d2b-a53c-98074ff813ba}</Project>
+      <Name>DependencyGraph</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

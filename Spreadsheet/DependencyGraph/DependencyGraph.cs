@@ -1,6 +1,7 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2018.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Dependencies
@@ -48,11 +49,15 @@ namespace Dependencies
     /// </summary>
     public class DependencyGraph
     {
+        private GraphNode Root;
+        private int NumberOfDependencies;
+
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
         {
+            Root = new GraphNode();
         }
 
         /// <summary>
@@ -60,7 +65,7 @@ namespace Dependencies
         /// </summary>
         public int Size
         {
-            get { return 0; }
+            get { return NumberOfDependencies; }
         }
 
         /// <summary>
@@ -68,15 +73,55 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
-            return false;
+            GraphNode temp = TraverseGraphToFind(s);
+            if (temp.Name == null)
+            {
+                return false;
+            }
+            return temp.NumberOfDependents() != 0;
         }
+
+        private GraphNode TraverseGraphToFind(string s)
+        {
+            Queue<GraphNode> toVisit = new Queue<GraphNode>();
+            HashSet<GraphNode> visited = new HashSet<GraphNode>();
+            toVisit.Enqueue(Root);
+            while (toVisit.Count != 0)
+            {
+                GraphNode currentNode = toVisit.Dequeue();
+
+                if (currentNode.Name.Equals(s))
+                {
+                    return currentNode;
+                }
+
+                if (visited.Contains(currentNode))
+                {
+                    continue;
+                }
+
+                visited.Add(currentNode);
+
+                foreach (GraphNode dependee in currentNode.Dependees)
+                {
+                    toVisit.Enqueue(dependee);
+                }
+            }
+            return new GraphNode();
+        }
+
 
         /// <summary>
         /// Reports whether dependees(s) is non-empty.  Requires s != null.
         /// </summary>
         public bool HasDependees(string s)
         {
-            return false;
+            GraphNode temp = TraverseGraphToFind(s);
+            if (temp.Name == null)
+            {
+                return false;
+            }
+            return temp.NumberOfDependees() != 0;
         }
 
         /// <summary>
@@ -129,6 +174,48 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+        }
+    }
+
+    class GraphNode
+    {
+        public string Name { get; set; }
+        public List<GraphNode> Dependents;
+        public List<GraphNode> Dependees;
+        public bool IsSelfDependent { get; set; }
+
+        public GraphNode()
+        {
+            Name = null;
+            Dependents = new List<GraphNode>();
+            Dependees = new List<GraphNode>();
+            IsSelfDependent = false;
+        }
+
+        public GraphNode(string name)
+        {
+            this.Name = name;
+            Dependents = new List<GraphNode>();
+            Dependees = new List<GraphNode>();
+            IsSelfDependent = false;
+        }
+
+        /// <summary>
+        /// Returns the number of dependents for the current GraphNode
+        /// </summary>
+        /// <returns></returns>
+        public int NumberOfDependents()
+        {
+            return Dependents.Count;
+        }
+
+        /// <summary>
+        /// Returns the number of dependees for the current GraphNode
+        /// </summary>
+        /// <returns></returns>
+        public int NumberOfDependees()
+        {
+            return Dependees.Count;
         }
     }
 }
