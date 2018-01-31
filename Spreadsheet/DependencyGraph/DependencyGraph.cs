@@ -88,6 +88,7 @@ namespace Dependencies
             toVisit.Enqueue(Root);
             while (toVisit.Count != 0)
             {
+                // Test comment
                 GraphNode currentNode = toVisit.Dequeue();
 
                 if (currentNode.Name.Equals(s))
