@@ -113,6 +113,11 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (nodeList[s].HasDependent(t) && nodeList[t].HasDependee(s))
+            {
+                return;
+            }
+
             // This means the graph is empty
             if (nodeList.Count == 0)
             {
@@ -122,26 +127,26 @@ namespace Dependencies
             }
 
             // s.Dependents does not contain t
-            if (!nodeList[s].IsADependent(t))
+            if (!nodeList[s].HasDependent(t))
             {
                 // Add t to s.Dependents
                 GraphNode dependentToAdd = new GraphNode(t);
                 nodeList[s].Dependents.Add(dependentToAdd);
 
                 nodeList.Add(t, dependentToAdd);
-                NumberOfDependencies++;
             }
 
             // t.Dependee does not contain s
-            if (!nodeList[t].IsADependee(s))
+            if (!nodeList[t].HasDependee(s))
             {
                 // Add s to t.Dependees
                 GraphNode dependeeToAdd = new GraphNode(s);
                 nodeList[t].Dependees.Add(dependeeToAdd);
 
                 nodeList.Add(s, dependeeToAdd);
-                NumberOfDependencies++;
             }
+
+            NumberOfDependencies++;
 
             // dependees(t) = s
             // dependent(s) = t
@@ -155,11 +160,9 @@ namespace Dependencies
         public void RemoveDependency(string s, string t)
         {
             // s exists in nodeList and so does (s,t)
-            if (nodeList.ContainsKey(s) && nodeList[s].IsADependent(t) && nodeList[t].IsADependee(s))
+            if (nodeList.ContainsKey(s) && nodeList[s].HasDependent(t) && nodeList[t].HasDependee(s))
             {
                 nodeList[s].Dependents.Remove(nodeList[t]);
-                NumberOfDependencies--;
-
                 nodeList[t].Dependees.Remove(nodeList[s]);
                 NumberOfDependencies--;
             }
@@ -172,6 +175,17 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            // Empty Dependents(s)
+            foreach (GraphNode dependent in nodeList[s].Dependents)
+            {
+                RemoveDependency(s, dependent.Name);
+            }
+
+            // Add new Dependents(s)
+            foreach (string dependent in newDependents)
+            {
+                AddDependency(s, dependent);
+            }
         }
 
         /// <summary>
@@ -181,6 +195,17 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            // Empty Dependees(t)
+            foreach (GraphNode dependee in nodeList[t].Dependees)
+            {
+                RemoveDependency(dependee.Name, t);
+            }
+
+            // Add new Dependees(t)
+            foreach (string dependee in newDependees)
+            {
+                AddDependency(dependee, t);
+            }
         }
     }
 
@@ -231,7 +256,7 @@ namespace Dependencies
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public bool IsADependent(string s)
+        public bool HasDependent(string s)
         {
             foreach (GraphNode dependent in Dependents)
             {
@@ -249,7 +274,7 @@ namespace Dependencies
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public bool IsADependee(string s)
+        public bool HasDependee(string s)
         {
             foreach (GraphNode dependee in Dependees)
             {
