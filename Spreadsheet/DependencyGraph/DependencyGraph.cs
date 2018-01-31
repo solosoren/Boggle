@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dependencies
 {
@@ -78,6 +79,7 @@ namespace Dependencies
             {
                 return false;
             }
+
             return temp.NumberOfDependents() != 0;
         }
 
@@ -107,6 +109,7 @@ namespace Dependencies
                     toVisit.Enqueue(dependee);
                 }
             }
+
             return new GraphNode();
         }
 
@@ -119,8 +122,9 @@ namespace Dependencies
             GraphNode temp = TraverseGraphToFind(s);
             if (temp.Name == null)
             {
-                return false;
+                throw new Exception(s + " does not exist");
             }
+
             return temp.NumberOfDependees() != 0;
         }
 
@@ -129,7 +133,16 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return null;
+            GraphNode temp = TraverseGraphToFind(s);
+            if (temp.Name == null)
+            {
+                throw new Exception(s + " does not exist");
+            }
+
+            foreach (GraphNode dependent in temp.Dependents)
+            {
+                yield return dependent.Name;
+            }
         }
 
         /// <summary>
@@ -137,7 +150,16 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            GraphNode temp = TraverseGraphToFind(s);
+            if (temp.Name == null)
+            {
+                throw new Exception(s + " does not exist");
+            }
+
+            foreach (GraphNode dependee in temp.Dependees)
+            {
+                yield return dependee.Name;
+            }
         }
 
         /// <summary>
@@ -147,6 +169,8 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            // t is a dependent of s
+            // s is a dependee of t
         }
 
         /// <summary>
