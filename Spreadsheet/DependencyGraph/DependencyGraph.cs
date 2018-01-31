@@ -122,13 +122,23 @@ namespace Dependencies
             }
 
             // s.Dependents does not contain t
-            if (!nodeList[s].DependentContains(t).Item1)
+            if (!nodeList[s].IsADependent(t))
             {
-                // Add t to s.Dependets
+                // Add t to s.Dependents
                 GraphNode dependentToAdd = new GraphNode(t);
                 nodeList[s].Dependents.Add(dependentToAdd);
 
                 nodeList.Add(t, dependentToAdd);
+            }
+
+            // t.Dependee does not contain s
+            if (!nodeList[t].IsADependee(s))
+            {
+                // Add s to t.Dependees
+                GraphNode dependeeToAdd = new GraphNode(s);
+                nodeList[t].Dependees.Add(dependeeToAdd);
+
+                nodeList.Add(s, dependeeToAdd);
             }
 
             // dependees(t) = s
@@ -205,17 +215,40 @@ namespace Dependencies
             return Dependees.Count;
         }
 
-        public Tuple<bool, GraphNode> DependentContains(string s)
+        /// <summary>
+        /// Checks to see if s is a dependent of the object
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public bool IsADependent(string s)
         {
             foreach (GraphNode dependent in Dependents)
             {
                 if (dependent.Name.Equals(s))
                 {
-                    return Tuple.Create(true, dependent);
+                    return true;
                 }
             }
 
-            return Tuple.Create(false, new GraphNode());
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see if s is a dependee of the object
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public bool IsADependee(string s)
+        {
+            foreach (GraphNode dependee in Dependees)
+            {
+                if (dependee.Name.Equals(s))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
