@@ -48,7 +48,7 @@ namespace Dependencies
     /// </summary>
     public class DependencyGraph
     {
-        private GraphNode Root;
+        private Dictionary<string, GraphNode> nodeList;
         private int NumberOfDependencies;
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Dependencies
         /// </summary>
         public DependencyGraph()
         {
-            Root = new GraphNode();
+            nodeList = new Dictionary<string, GraphNode>();
         }
 
         /// <summary>
@@ -72,43 +72,7 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
-            GraphNode temp = TraverseGraphToFind(s);
-            if (temp.Name == null)
-            {
-                return false;
-            }
-
-            return temp.NumberOfDependents() != 0;
-        }
-
-        private GraphNode TraverseGraphToFind(string s)
-        {
-            Queue<GraphNode> toVisit = new Queue<GraphNode>();
-            HashSet<GraphNode> visited = new HashSet<GraphNode>();
-            toVisit.Enqueue(Root);
-            while (toVisit.Count != 0)
-            {
-                GraphNode currentNode = toVisit.Dequeue();
-
-                if (currentNode.Name.Equals(s))
-                {
-                    return currentNode;
-                }
-
-                if (visited.Contains(currentNode))
-                {
-                    continue;
-                }
-
-                visited.Add(currentNode);
-
-                foreach (GraphNode dependee in currentNode.Dependees)
-                {
-                    toVisit.Enqueue(dependee);
-                }
-            }
-
-            return new GraphNode();
+            return nodeList[s].NumberOfDependents() != 0;
         }
 
 
@@ -117,13 +81,7 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
-            GraphNode temp = TraverseGraphToFind(s);
-            if (temp.Name == null)
-            {
-                throw new Exception(s + " does not exist");
-            }
-
-            return temp.NumberOfDependees() != 0;
+            return nodeList[s].NumberOfDependees() != 0;
         }
 
         /// <summary>
@@ -131,13 +89,7 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            GraphNode temp = TraverseGraphToFind(s);
-            if (temp.Name == null)
-            {
-                throw new Exception(s + " does not exist");
-            }
-
-            foreach (GraphNode dependent in temp.Dependents)
+            foreach (GraphNode dependent in nodeList[s].Dependents)
             {
                 yield return dependent.Name;
             }
@@ -148,13 +100,7 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            GraphNode temp = TraverseGraphToFind(s);
-            if (temp.Name == null)
-            {
-                throw new Exception(s + " does not exist");
-            }
-
-            foreach (GraphNode dependee in temp.Dependees)
+            foreach (GraphNode dependee in nodeList[s].Dependees)
             {
                 yield return dependee.Name;
             }
@@ -167,8 +113,26 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
-            // t is a dependent of s
-            // s is a dependee of t
+            // This means the graph is empty
+            if (nodeList.Count == 0)
+            {
+                // Add s to the graph
+                GraphNode firstNode = new GraphNode(s);
+                nodeList.Add(s, firstNode);
+            }
+
+            // s.Dependents does not contain t
+            if (!nodeList[s].DependentContains(t).Item1)
+            {
+                // Add t to s.Dependets
+                GraphNode dependentToAdd = new GraphNode(t);
+                nodeList[s].Dependents.Add(dependentToAdd);
+
+                nodeList.Add(t, dependentToAdd);
+            }
+
+            // dependees(t) = s
+            // dependent(s) = t
         }
 
         /// <summary>
@@ -211,9 +175,9 @@ namespace Dependencies
             Name = null;
             Dependents = new List<GraphNode>();
             Dependees = new List<GraphNode>();
-            Dependents.Add(new GraphNode("A1"));
             IsSelfDependent = false;
         }
+
 
         public GraphNode(string name)
         {
@@ -239,6 +203,19 @@ namespace Dependencies
         public int NumberOfDependees()
         {
             return Dependees.Count;
+        }
+
+        public Tuple<bool, GraphNode> DependentContains(string s)
+        {
+            foreach (GraphNode dependent in Dependents)
+            {
+                if (dependent.Name.Equals(s))
+                {
+                    return Tuple.Create(true, dependent);
+                }
+            }
+
+            return Tuple.Create(false, new GraphNode());
         }
     }
 }
