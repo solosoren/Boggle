@@ -129,6 +129,7 @@ namespace Dependencies
                 nodeList[s].Dependents.Add(dependentToAdd);
 
                 nodeList.Add(t, dependentToAdd);
+                NumberOfDependencies++;
             }
 
             // t.Dependee does not contain s
@@ -139,6 +140,7 @@ namespace Dependencies
                 nodeList[t].Dependees.Add(dependeeToAdd);
 
                 nodeList.Add(s, dependeeToAdd);
+                NumberOfDependencies++;
             }
 
             // dependees(t) = s
@@ -152,6 +154,15 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            // s exists in nodeList and so does (s,t)
+            if (nodeList.ContainsKey(s) && nodeList[s].IsADependent(t) && nodeList[t].IsADependee(s))
+            {
+                nodeList[s].Dependents.Remove(nodeList[t]);
+                NumberOfDependencies--;
+
+                nodeList[t].Dependees.Remove(nodeList[s]);
+                NumberOfDependencies--;
+            }
         }
 
         /// <summary>
