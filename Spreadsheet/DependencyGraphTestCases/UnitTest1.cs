@@ -185,6 +185,27 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Test to see if adding (s, s) throws an exception
+        /// </summary>
+        [TestMethod]
+        public void TestAddingDependencyWithTheSameName()
+        {
+            graph = new DependencyGraph();
+            try
+            {
+                graph.AddDependency("A", "A");
+                Assert.Fail();
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(true);
+            }
+
+            Assert.IsTrue(graph.Size == 0);
+        }
+
+
+        /// <summary>
         /// Private method to help generate an IEnumerable object.
         /// </summary>
         /// <returns></returns>

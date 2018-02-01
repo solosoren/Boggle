@@ -114,6 +114,11 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (s.Equals(t))
+            {
+                throw new Exception(s + " can't be a dependent and a dependee of itself.");
+            }
+
             GraphNode dependentToAdd = new GraphNode(t);
             GraphNode dependeeToAdd = new GraphNode(s);
             // This means the graph is empty
