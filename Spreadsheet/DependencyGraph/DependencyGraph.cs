@@ -113,37 +113,55 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            GraphNode dependentToAdd = new GraphNode(t);
+            GraphNode dependeeToAdd = new GraphNode(s);
+            // This means the graph is empty
+
+            // Add s to the graph
+            if (!nodeList.ContainsKey(s))
+                nodeList.Add(s, dependeeToAdd);
+            if (!nodeList.ContainsKey(t))
+                nodeList.Add(t, dependentToAdd);
+
+
             if (nodeList[s].HasDependent(t) && nodeList[t].HasDependee(s))
             {
                 return;
-            }
-
-            // This means the graph is empty
-            if (nodeList.Count == 0)
-            {
-                // Add s to the graph
-                GraphNode firstNode = new GraphNode(s);
-                nodeList.Add(s, firstNode);
             }
 
             // s.Dependents does not contain t
             if (!nodeList[s].HasDependent(t))
             {
                 // Add t to s.Dependents
-                GraphNode dependentToAdd = new GraphNode(t);
-                nodeList[s].Dependents.Add(dependentToAdd);
+                // t does not exist in list
+                if (!nodeList.ContainsKey(t))
+                {
+                    // add t to list
+                    nodeList.Add(t, dependentToAdd);
+                    nodeList[s].Dependents.Add(dependentToAdd);
+                }
 
-                nodeList.Add(t, dependentToAdd);
+                else
+                {
+                    nodeList[s].Dependents.Add(nodeList[t]);
+                }
             }
 
             // t.Dependee does not contain s
             if (!nodeList[t].HasDependee(s))
             {
                 // Add s to t.Dependees
-                GraphNode dependeeToAdd = new GraphNode(s);
-                nodeList[t].Dependees.Add(dependeeToAdd);
-
-                nodeList.Add(s, dependeeToAdd);
+                // s does not exist in list
+                if (!nodeList.ContainsKey(s))
+                {
+                    // add s to list
+                    nodeList.Add(s, dependeeToAdd);
+                    nodeList[t].Dependees.Add(dependeeToAdd);
+                }
+                else
+                {
+                    nodeList[t].Dependees.Add(nodeList[s]);
+                }
             }
 
             NumberOfDependencies++;
@@ -160,14 +178,15 @@ namespace Dependencies
         public void RemoveDependency(string s, string t)
         {
             // s exists in nodeList and so does (s,t)
-            if (nodeList.ContainsKey(s) && nodeList[s].HasDependent(t) && nodeList[t].HasDependee(s))
+            if (nodeList.ContainsKey(s) && nodeList.ContainsKey(t) && nodeList[s].HasDependent(t) &&
+                nodeList[t].HasDependee(s))
             {
                 nodeList[s].Dependents.Remove(nodeList[t]);
                 nodeList[t].Dependees.Remove(nodeList[s]);
                 NumberOfDependencies--;
             }
 
-            if (nodeList[s].NumberOfDependents() == 0 && nodeList[s].NumberOfDependents() == 0)
+            if (nodeList[s].NumberOfDependents() == 0 && nodeList[s].NumberOfDependees() == 0)
             {
                 nodeList.Remove(s);
             }
@@ -224,14 +243,12 @@ namespace Dependencies
         public string Name { get; set; }
         public List<GraphNode> Dependents;
         public List<GraphNode> Dependees;
-        public bool IsSelfDependent { get; set; }
 
         public GraphNode()
         {
             Name = null;
             Dependents = new List<GraphNode>();
             Dependees = new List<GraphNode>();
-            IsSelfDependent = false;
         }
 
 
@@ -240,7 +257,6 @@ namespace Dependencies
             this.Name = name;
             Dependents = new List<GraphNode>();
             Dependees = new List<GraphNode>();
-            IsSelfDependent = false;
         }
 
         /// <summary>
