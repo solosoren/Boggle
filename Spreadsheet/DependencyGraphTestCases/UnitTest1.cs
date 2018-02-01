@@ -115,6 +115,76 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
+        /// Test to see that nothing happens if dependency that alreadys exists is added.
+        /// </summary>
+        [TestMethod]
+        public void TestAddDependencyForExisting()
+        {
+            graph = new DependencyGraph();
+            graph.AddDependency("A", "B");
+            graph.AddDependency("A", "B");
+            Assert.IsTrue(graph.Size == 1);
+        }
+
+        /// <summary>
+        /// Test to see if connect to seperate depenedencies works as intended.
+        /// </summary>
+        [TestMethod]
+        public void TestConnectingTwoSeperateDependencies()
+        {
+            graph = new DependencyGraph();
+            graph.AddDependency("A", "B");
+            graph.AddDependency("C", "D");
+            graph.AddDependency("B", "D");
+            Assert.IsTrue(graph.Size == 3);
+        }
+
+        /// <summary>
+        /// Test to see if (t, s) is not added while (s, t) exists in the graph
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public void TestAddOppositeDependency()
+        {
+            graph = new DependencyGraph();
+            graph.AddDependency("A", "B");
+
+            try
+            {
+                graph.AddDependency("B", "A");
+                Assert.Fail();
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(true);
+            }
+
+            Assert.IsTrue(graph.Size == 1);
+        }
+
+        /// <summary>
+        /// Test to see if adding (s, t), (t, u) and (s, u) works
+        /// </summary>
+        [TestMethod]
+        public void TestCircularDependency()
+        {
+            graph = new DependencyGraph();
+            try
+            {
+                graph.AddDependency("A", "B");
+                graph.AddDependency("B", "C");
+                graph.AddDependency("A", "C");
+                Assert.IsTrue(true);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail();
+            }
+
+            Assert.IsTrue(graph.Size == 3);
+        }
+
+        /// <summary>
         /// Private method to help generate an IEnumerable object.
         /// </summary>
         /// <returns></returns>

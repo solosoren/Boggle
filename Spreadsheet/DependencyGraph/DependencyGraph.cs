@@ -130,6 +130,12 @@ namespace Dependencies
                 return;
             }
 
+            if (nodeList[t].HasDependent(s) && nodeList[s].HasDependee(t))
+            {
+                throw new Exception(t + " is a dependee of " + s + " and " + s + " is a dependent of " + t +
+                                    ". To conintue with (" + t + ", " + s + ") remove (" + s + ", " + t + ") first.");
+            }
+
             // s.Dependents does not contain t
             if (!nodeList[s].HasDependent(t))
             {
