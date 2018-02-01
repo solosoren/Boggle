@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dependencies
 {
@@ -205,13 +206,13 @@ namespace Dependencies
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
             // Empty Dependents(s)
-            foreach (GraphNode dependent in nodeList[s].Dependents)
+            foreach (GraphNode dependent in nodeList[s].Dependents.ToList())
             {
                 RemoveDependency(s, dependent.Name);
             }
 
             // Add new Dependents(s)
-            foreach (string dependent in newDependents)
+            foreach (string dependent in newDependents.ToList())
             {
                 AddDependency(s, dependent);
             }
@@ -225,13 +226,13 @@ namespace Dependencies
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
             // Empty Dependees(t)
-            foreach (GraphNode dependee in nodeList[t].Dependees)
+            foreach (GraphNode dependee in nodeList[t].Dependees.ToList())
             {
                 RemoveDependency(dependee.Name, t);
             }
 
             // Add new Dependees(t)
-            foreach (string dependee in newDependees)
+            foreach (string dependee in newDependees.ToList())
             {
                 AddDependency(dependee, t);
             }
