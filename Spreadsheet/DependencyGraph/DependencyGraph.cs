@@ -166,6 +166,16 @@ namespace Dependencies
                 nodeList[t].Dependees.Remove(nodeList[s]);
                 NumberOfDependencies--;
             }
+
+            if (nodeList[s].NumberOfDependents() == 0 && nodeList[s].NumberOfDependents() == 0)
+            {
+                nodeList.Remove(s);
+            }
+
+            if (nodeList[t].NumberOfDependents() == 0 && nodeList[t].NumberOfDependees() == 0)
+            {
+                nodeList.Remove(t);
+            }
         }
 
         /// <summary>
