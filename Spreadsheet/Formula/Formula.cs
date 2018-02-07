@@ -70,6 +70,7 @@ namespace Formulas
             {
                 return "";
             }
+
             if (firstToken[0].Equals('('))
             {
                 return "(";
@@ -77,8 +78,15 @@ namespace Formulas
 
             if (Char.IsLetter(firstToken[0]))
             {
-                return firstToken[0].ToString();
+                if (firstToken.Length > 1 && Char.IsNumber(firstToken[1]))
+                {
+                }
+                else
+                {
+                    return firstToken[0].ToString();
+                }
             }
+
             List<char> operators = new List<char> {'+', '-', '*', '/'};
             for (int i = 0; i < firstToken.Length; i++)
             {
@@ -97,20 +105,47 @@ namespace Formulas
             {
                 return "";
             }
+
             if (lastToken[lastToken.Length - 1].Equals(')'))
             {
                 return ")";
             }
+
+            if (Char.IsLetter(lastToken[lastToken.Length - 1]))
+            {
+                return lastToken[lastToken.Length - 1].ToString();
+            }
+
             List<char> operators = new List<char> {'+', '-', '*', '/'};
             for (int i = lastToken.Length - 1; i >= 0; i--)
             {
                 if (operators.Contains(lastToken[i]))
                 {
-                    return lastToken.Substring(lastToken.Length - i);
+                    return lastToken.Substring(lastToken.Length - (lastToken.Length - i - 1));
                 }
             }
 
+
             return lastToken;
+        }
+
+        private bool StringHasDecimalAndVar(string value)
+        {
+            foreach (char character in value)
+            {
+                if (!Char.IsNumber(character))
+                {
+                    if (!Char.IsLetter(character))
+                    {
+                        if (!character.Equals('.'))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         private bool ParenthesisEval(string formula)
@@ -130,28 +165,24 @@ namespace Formulas
             {
                 return false;
             }
+
             string lastToken = "-1";
-            if (!Char.IsLetter(firstChar[0]))
+            if (!StringHasDecimalAndVar(firstChar))
             {
-                if (!Decimal.TryParse(firstChar, out Decimal tempDoubleNext))
+                if (!firstChar.Equals("("))
                 {
-                    if (!firstChar.Equals("("))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
-            if (!Char.IsLetter(lastNum[0]))
+            if (!StringHasDecimalAndVar(lastNum))
             {
-                if (!Decimal.TryParse(lastNum, out Decimal tempDoubleNext))
+                if (!lastNum.Equals(")"))
                 {
-                    if (!lastNum.Equals(")"))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
+
 
             foreach (string token in GetTokens(formula))
             {
@@ -159,12 +190,11 @@ namespace Formulas
                 {
                     if (lastToken.Equals("(") || operators.Contains(lastToken))
                     {
-                        if (!Decimal.TryParse(token, out Decimal tempDoubleNext))
+                        if (!StringHasDecimalAndVar(token))
                         {
                             if (!token.Equals("("))
                             {
-                                if (!Char.IsLetter(token.ToCharArray()[0]))
-                                    return false;
+                                return false;
                             }
                         }
                     }
