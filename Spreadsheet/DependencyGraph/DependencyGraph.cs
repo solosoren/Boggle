@@ -1,6 +1,7 @@
 ﻿// Skeleton implementation written by Joe Zachary for CS 3500, January 2018.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -73,6 +74,11 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (nodeList.Count == 0)
+            {
+                return false;
+            }
+
             return nodeList[s].NumberOfDependents() != 0;
         }
 
@@ -82,6 +88,11 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (nodeList.Count == 0)
+            {
+                return false;
+            }
+
             return nodeList[s].NumberOfDependees() != 0;
         }
 
@@ -90,6 +101,11 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
+            if (nodeList.Count == 0)
+            {
+                yield break;
+            }
+
             foreach (GraphNode dependent in nodeList[s].Dependents)
             {
                 yield return dependent.Name;
@@ -101,6 +117,11 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
+            if (nodeList.Count == 0)
+            {
+                yield break;
+            }
+
             foreach (GraphNode dependee in nodeList[s].Dependees)
             {
                 yield return dependee.Name;
@@ -114,10 +135,10 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
-            if (s.Equals(t))
-            {
-                throw new Exception(s + " can't be a dependent and a dependee of itself.");
-            }
+//            if (s.Equals(t))
+//            {
+//                throw new Exception(s + " can't be a dependent and a dependee of itself.");
+//            }
 
             GraphNode dependentToAdd = new GraphNode(t);
             GraphNode dependeeToAdd = new GraphNode(s);
@@ -135,11 +156,11 @@ namespace Dependencies
                 return;
             }
 
-            if (nodeList[t].HasDependent(s) && nodeList[s].HasDependee(t))
-            {
-                throw new Exception(t + " is a dependee of " + s + " and " + s + " is a dependent of " + t +
-                                    ". To conintue with (" + t + ", " + s + ") remove (" + s + ", " + t + ") first.");
-            }
+//            if (nodeList[t].HasDependent(s) && nodeList[s].HasDependee(t))
+//            {
+//                throw new Exception(t + " is a dependee of " + s + " and " + s + " is a dependent of " + t +
+//                                    ". To conintue with (" + t + ", " + s + ") remove (" + s + ", " + t + ") first.");
+//            }
 
             // s.Dependents does not contain t
             if (!nodeList[s].HasDependent(t))
@@ -189,6 +210,11 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if (nodeList.Count == 0)
+            {
+                return;
+            }
+
             // s exists in nodeList and so does (s,t)
             if (nodeList.ContainsKey(s) && nodeList.ContainsKey(t) && nodeList[s].HasDependent(t) &&
                 nodeList[t].HasDependee(s))
@@ -216,6 +242,11 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (nodeList.Count == 0)
+            {
+                return;
+            }
+
             // Empty Dependents(s)
             foreach (GraphNode dependent in nodeList[s].Dependents.ToList())
             {
@@ -236,6 +267,11 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            if (nodeList.Count == 0)
+            {
+                return;
+            }
+
             // Empty Dependees(t)
             foreach (GraphNode dependee in nodeList[t].Dependees.ToList())
             {
