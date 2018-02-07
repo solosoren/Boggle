@@ -169,7 +169,7 @@ namespace Formulas
             string lastToken = "-1";
             if (!StringHasDecimalAndVar(firstChar))
             {
-                if (!float.TryParse(firstChar, out float temp))
+                if (!double.TryParse(firstChar, out double temp))
                 {
                     if (!firstChar.Equals("("))
                     {
@@ -180,7 +180,7 @@ namespace Formulas
 
             if (!StringHasDecimalAndVar(lastNum))
             {
-                if (!float.TryParse(lastNum, out float temp))
+                if (!double.TryParse(lastNum, out double temp))
                 {
                     if (!lastNum.Equals(")"))
                     {
@@ -198,7 +198,7 @@ namespace Formulas
                     {
                         if (!StringHasDecimalAndVar(token))
                         {
-                            if (!float.TryParse(token, out float temp))
+                            if (!double.TryParse(token, out double temp))
                             {
                                 if (!token.Equals("("))
                                 {
