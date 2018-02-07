@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Formulas
@@ -63,30 +64,89 @@ namespace Formulas
             this.formula = formula;
         }
 
+        private string GetFirstChar(string firstToken)
+        {
+            if (firstToken.Equals(""))
+            {
+                return "";
+            }
+            if (firstToken[0].Equals('('))
+            {
+                return "(";
+            }
+
+            if (Char.IsLetter(firstToken[0]))
+            {
+                return firstToken[0].ToString();
+            }
+            List<char> operators = new List<char> {'+', '-', '*', '/'};
+            for (int i = 0; i < firstToken.Length; i++)
+            {
+                if (operators.Contains(firstToken[i]))
+                {
+                    return firstToken.Substring(0, i);
+                }
+            }
+
+            return firstToken;
+        }
+
+        private string GetLastChar(string lastToken)
+        {
+            if (lastToken.Equals(""))
+            {
+                return "";
+            }
+            if (lastToken[lastToken.Length - 1].Equals(')'))
+            {
+                return ")";
+            }
+            List<char> operators = new List<char> {'+', '-', '*', '/'};
+            for (int i = lastToken.Length - 1; i >= 0; i--)
+            {
+                if (operators.Contains(lastToken[i]))
+                {
+                    return lastToken.Substring(lastToken.Length - i);
+                }
+            }
+
+            return lastToken;
+        }
+
         private bool ParenthesisEval(string formula)
         {
+            string[] fomrulaArray = formula.Split(' ');
             int open = 0;
             int close = 0;
-            char firstChar = formula[0];
-            List<string> operators = new List<string> {"+", "-", "*", "/"};
-            char lastChar = formula[formula.Length - 1];
-            string lastToken = "-1";
-            if (!Char.IsLetter(firstChar))
+            string firstChar = GetFirstChar(fomrulaArray[0]);
+            if (firstChar.Equals(""))
             {
-                if (!int.TryParse(firstChar.ToString(), out int tempFirstChar))
+                return false;
+            }
+
+            List<string> operators = new List<string> {"+", "-", "*", "/"};
+            string lastNum = GetLastChar(formula.Split(' ')[fomrulaArray.Length - 1]);
+            if (lastNum.Equals(""))
+            {
+                return false;
+            }
+            string lastToken = "-1";
+            if (!Char.IsLetter(firstChar[0]))
+            {
+                if (!Decimal.TryParse(firstChar, out Decimal tempDoubleNext))
                 {
-                    if (!firstChar.Equals('('))
+                    if (!firstChar.Equals("("))
                     {
                         return false;
                     }
                 }
             }
 
-            if (!Char.IsLetter(lastChar))
+            if (!Char.IsLetter(lastNum[0]))
             {
-                if (!int.TryParse(lastChar.ToString(), out int tempLastChar))
+                if (!Decimal.TryParse(lastNum, out Decimal tempDoubleNext))
                 {
-                    if (!lastChar.Equals(')'))
+                    if (!lastNum.Equals(")"))
                     {
                         return false;
                     }
@@ -99,7 +159,7 @@ namespace Formulas
                 {
                     if (lastToken.Equals("(") || operators.Contains(lastToken))
                     {
-                        if (!int.TryParse(token, out int tempIntNext))
+                        if (!Decimal.TryParse(token, out Decimal tempDoubleNext))
                         {
                             if (!token.Equals("("))
                             {
@@ -110,7 +170,7 @@ namespace Formulas
                     }
 
                     if (lastToken.Equals(")") || Char.IsLetter(lastToken.ToCharArray()[0]) ||
-                        int.TryParse(lastToken, out int tempLastToken))
+                        Decimal.TryParse(lastToken, out Decimal tempDouble))
                     {
                         if (!operators.Contains(token))
                         {
@@ -211,7 +271,9 @@ namespace Formulas
                         if (operatorStack.Peek().Equals("*") ||
                             operatorStack.Peek().Equals("/"))
                         {
-                            valueStack.Push(PopOpStackForSolution(valueStack.Pop(), valueStack.Pop()));
+                            double denom = valueStack.Pop();
+                            double numer = valueStack.Pop();
+                            valueStack.Push(PopOpStackForSolution(numer, denom));
                         }
                     }
                 }
@@ -228,8 +290,7 @@ namespace Formulas
                             }
                             catch (UndefinedVariableException e)
                             {
-                                Console.WriteLine(e);
-                                throw;
+                                throw new FormulaEvaluationException("Variable not defined.");
                             }
                         }
                         else
@@ -240,8 +301,7 @@ namespace Formulas
                             }
                             catch (UndefinedVariableException e)
                             {
-                                Console.WriteLine(e);
-                                throw;
+                                throw new FormulaEvaluationException("Variable not defined.");
                             }
                         }
                     }
@@ -253,8 +313,7 @@ namespace Formulas
                         }
                         catch (UndefinedVariableException e)
                         {
-                            Console.WriteLine(e);
-                            throw;
+                            throw new FormulaEvaluationException("Variable not defined.");
                         }
                     }
                 }
