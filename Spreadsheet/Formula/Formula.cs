@@ -169,17 +169,23 @@ namespace Formulas
             string lastToken = "-1";
             if (!StringHasDecimalAndVar(firstChar))
             {
-                if (!firstChar.Equals("("))
+                if (!float.TryParse(firstChar, out float temp))
                 {
-                    return false;
+                    if (!firstChar.Equals("("))
+                    {
+                        return false;
+                    }
                 }
             }
 
             if (!StringHasDecimalAndVar(lastNum))
             {
-                if (!lastNum.Equals(")"))
+                if (!float.TryParse(lastNum, out float temp))
                 {
-                    return false;
+                    if (!lastNum.Equals(")"))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -192,9 +198,12 @@ namespace Formulas
                     {
                         if (!StringHasDecimalAndVar(token))
                         {
-                            if (!token.Equals("("))
+                            if (!float.TryParse(token, out float temp))
                             {
-                                return false;
+                                if (!token.Equals("("))
+                                {
+                                    return false;
+                                }
                             }
                         }
                     }
