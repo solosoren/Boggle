@@ -61,6 +61,12 @@ namespace Dependencies
             nodeList = new Dictionary<string, GraphNode>();
         }
 
+        public DependencyGraph(DependencyGraph dependencyGraph)
+        {
+            nodeList = dependencyGraph.nodeList;
+            NumberOfDependencies = dependencyGraph.NumberOfDependencies;
+        }
+
         /// <summary>
         /// The number of dependencies in the DependencyGraph.
         /// </summary>
@@ -71,9 +77,15 @@ namespace Dependencies
 
         /// <summary>
         /// Reports whether dependents(s) is non-empty.  Requires s != null.
+        /// If s is null, an ArgumentNullException is thrown.
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (s.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 return false;
@@ -85,9 +97,15 @@ namespace Dependencies
 
         /// <summary>
         /// Reports whether dependees(s) is non-empty.  Requires s != null.
+        /// If s is null, an ArgumentNullException is thrown.
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (s.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 return false;
@@ -98,9 +116,15 @@ namespace Dependencies
 
         /// <summary>
         /// Enumerates dependents(s).  Requires s != null.
+        /// If s is null, an ArgumentNullException is thrown.
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
+            if (s.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 yield break;
@@ -114,9 +138,15 @@ namespace Dependencies
 
         /// <summary>
         /// Enumerates dependees(s).  Requires s != null.
+        /// If s is null, an ArgumentNullException is thrown.
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
+            if (s.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 yield break;
@@ -132,9 +162,14 @@ namespace Dependencies
         /// Adds the dependency (s,t) to this DependencyGraph.
         /// This has no effect if (s,t) already belongs to this DependencyGraph.
         /// Requires s != null and t != null.
+        /// If s or t is null, an ArgumentNullException is thrown.
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (s.Equals(null) || t.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
 //            if (s.Equals(t))
 //            {
 //                throw new Exception(s + " can't be a dependent and a dependee of itself.");
@@ -207,9 +242,15 @@ namespace Dependencies
         /// Removes the dependency (s,t) from this DependencyGraph.
         /// Does nothing if (s,t) doesn't belong to this DependencyGraph.
         /// Requires s != null and t != null.
+        /// If s or t is null, an ArgumentNullException is thrown.
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if (s.Equals(null) || t.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 return;
@@ -239,9 +280,16 @@ namespace Dependencies
         /// Removes all existing dependencies of the form (s,r).  Then, for each
         /// t in newDependents, adds the dependency (s,t).
         /// Requires s != null and t != null.
+        /// If s or newDependents is null, an ArgumentNullException is thrown.
+        /// If newDependents contains a null string, an ArgumentNullException is thrown.
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (s.Equals(null) || newDependents.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 return;
@@ -256,6 +304,11 @@ namespace Dependencies
             // Add new Dependents(s)
             foreach (string dependent in newDependents.ToList())
             {
+                if (dependent.Equals(null))
+                {
+                    throw new ArgumentNullException();
+                }
+
                 AddDependency(s, dependent);
             }
         }
@@ -264,9 +317,16 @@ namespace Dependencies
         /// Removes all existing dependencies of the form (r,t).  Then, for each
         /// s in newDependees, adds the dependency (s,t).
         /// Requires s != null and t != null.
+        /// If t or newDependees is null, an ArgumentNullException is thrown.
+        /// If newDependees contains a null string, an ArgumentNullException is thrown.
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            if (t.Equals(null) || newDependees.Equals(null))
+            {
+                throw new ArgumentNullException();
+            }
+
             if (nodeList.Count == 0)
             {
                 return;
@@ -281,6 +341,11 @@ namespace Dependencies
             // Add new Dependees(t)
             foreach (string dependee in newDependees.ToList())
             {
+                if (dependee.Equals(null))
+                {
+                    throw new ArgumentNullException();
+                }
+
                 AddDependency(dependee, t);
             }
         }
