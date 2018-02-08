@@ -28,6 +28,7 @@ namespace Formulas
         // This stack consists of the operators from the formula.
         private Stack<string> operatorStack;
 
+        // List of variables
         private ISet<string> variables;
 
         /// <summary>
@@ -284,6 +285,10 @@ namespace Formulas
                     }
                 }
 
+                if (token.Length == 1 && Char.IsLetter(token.ToCharArray()[0]))
+                {
+                    variables.Add(token);
+                }
 
                 if (close > open)
                 {
