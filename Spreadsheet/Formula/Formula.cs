@@ -110,7 +110,9 @@ namespace Formulas
                             {
                                 throw new FormulaFormatException("Validation failed.");
                             }
+
                             newFormula += normalizer.Invoke(var);
+                            variables.Remove(var);
                             variables.Add(normalizer.Invoke(var));
                         }
                         catch (UndefinedVariableException e)
@@ -124,6 +126,8 @@ namespace Formulas
                     }
                 }
             }
+
+            this.formula = newFormula;
         }
 
         public ISet<string> GetVariables()
