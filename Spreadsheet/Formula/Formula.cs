@@ -106,7 +106,10 @@ namespace Formulas
                     {
                         try
                         {
-                            validator.Invoke(normalizer.Invoke(var));
+                            if (!validator.Invoke(normalizer.Invoke(var)))
+                            {
+                                throw new FormulaFormatException("Validation failed.");
+                            }
                             newFormula += normalizer.Invoke(var);
                             variables.Add(normalizer.Invoke(var));
                         }
