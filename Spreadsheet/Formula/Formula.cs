@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Formulas
@@ -17,7 +18,7 @@ namespace Formulas
     /// the four binary operator symbols +, -, *, and /.  (The unary operators + and -
     /// are not allowed.)
     /// </summary>
-    public class Formula
+    public struct Formula
     {
         private string formula;
 
@@ -26,6 +27,8 @@ namespace Formulas
 
         // This stack consists of the operators from the formula.
         private Stack<string> operatorStack;
+
+        private ISet<string> variables;
 
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
@@ -49,19 +52,79 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
+            if (formula == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             if (formula.Length < 1)
             {
                 throw new FormulaFormatException("Formula is empty.");
             }
+
+            operatorStack = new Stack<string>();
+            valueStack = new Stack<double>();
+            this.formula = formula;
+            variables = null;
+
+            if (!ParenthesisEval(formula))
+            {
+                throw new FormulaFormatException("Formula format is invalid.");
+            }
+        }
+
+        public Formula(string formula, Normalizer normalizer, Validator validator)
+        {
+            if (formula == null || normalizer == null || validator == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (formula.Length < 1)
+            {
+                throw new FormulaFormatException("Formula is empty.");
+            }
+
+            operatorStack = new Stack<string>();
+            valueStack = new Stack<double>();
+            this.formula = formula;
+            variables = null;
 
             if (!ParenthesisEval(formula))
             {
                 throw new FormulaFormatException("Formula format is invalid.");
             }
 
-            operatorStack = new Stack<string>();
-            valueStack = new Stack<double>();
-            this.formula = formula;
+            string newFormula = "";
+            foreach (string var in GetTokens(formula))
+            {
+                if (var.Length == 1)
+                {
+                    char possVar = var.ToCharArray()[0];
+                    if (Char.IsLetter(possVar))
+                    {
+                        try
+                        {
+                            validator.Invoke(normalizer.Invoke(var));
+                            newFormula += normalizer.Invoke(var);
+                            variables.Add(normalizer.Invoke(var));
+                        }
+                        catch (UndefinedVariableException e)
+                        {
+                            throw new FormulaFormatException(e.Message);
+                        }
+                    }
+                    else
+                    {
+                        newFormula += var;
+                    }
+                }
+            }
+        }
+
+        public ISet<string> GetVariables()
+        {
+            return variables;
         }
 
         private string GetFirstChar(string firstToken)
@@ -246,6 +309,11 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            if (lookup == null)
+            {
+                throw new ArgumentNullException();
+            }
+
             double number;
             foreach (string var in GetTokens(formula))
             {
@@ -391,6 +459,11 @@ namespace Formulas
             }
         }
 
+        public override string ToString()
+        {
+            return formula;
+        }
+
         /// <summary>
         /// Given a formula, enumerates the tokens that compose it.  Tokens are left paren,
         /// right paren, one of the four operator symbols, a string consisting of a letter followed by
@@ -443,6 +516,10 @@ namespace Formulas
     /// don't is up to the implementation of the method.
     /// </summary>
     public delegate double Lookup(string var);
+
+    public delegate string Normalizer(string s);
+
+    public delegate bool Validator(string s);
 
     /// <summary>
     /// Used to report that a Lookup delegate is unable to determine the value
