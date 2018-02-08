@@ -66,7 +66,7 @@ namespace Formulas
             operatorStack = new Stack<string>();
             valueStack = new Stack<double>();
             this.formula = formula;
-            variables = null;
+            variables = new HashSet<string>();
 
             if (!ParenthesisEval(formula))
             {
@@ -89,7 +89,7 @@ namespace Formulas
             operatorStack = new Stack<string>();
             valueStack = new Stack<double>();
             this.formula = formula;
-            variables = null;
+            variables = new HashSet<string>();
 
             if (!ParenthesisEval(formula))
             {
