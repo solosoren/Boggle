@@ -139,26 +139,19 @@ namespace DependencyGraphTestCases
         }
 
         /// <summary>
-        /// Test to see if (t, s) is not added while (s, t) exists in the graph
+        /// Test to see if another graph is copied into a new graph.
         /// </summary>
-        /// <returns></returns>
         [TestMethod]
-        public void TestAddOppositeDependency()
+        public void TestCopyGraph()
         {
             graph = new DependencyGraph();
             graph.AddDependency("A", "B");
+            graph.AddDependency("C", "D");
+            graph.AddDependency("B", "B");
 
-            try
-            {
-                graph.AddDependency("B", "A");
-                Assert.Fail();
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(true);
-            }
+            DependencyGraph newGraph = new DependencyGraph(graph);
 
-            Assert.IsTrue(graph.Size == 1);
+            Assert.IsTrue(graph.Size == newGraph.Size);
         }
 
         /// <summary>
@@ -183,26 +176,75 @@ namespace DependencyGraphTestCases
             Assert.IsTrue(graph.Size == 3);
         }
 
-        /// <summary>
-        /// Test to see if adding (s, s) throws an exception
-        /// </summary>
+        // The following are to test ArgumentNullExceptions
+
         [TestMethod]
-        public void TestAddingDependencyWithTheSameName()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull1()
         {
             graph = new DependencyGraph();
-            try
-            {
-                graph.AddDependency("A", "A");
-                Assert.Fail();
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(true);
-            }
-
-            Assert.IsTrue(graph.Size == 0);
+            graph.HasDependents(null);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull2()
+        {
+            graph = new DependencyGraph();
+            graph.HasDependees(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull3()
+        {
+            graph = new DependencyGraph();
+            foreach (var VARIABLE in graph.GetDependees(null))
+            {
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull4()
+        {
+            graph = new DependencyGraph();
+            foreach (var VARIABLE in graph.GetDependents(null))
+            {
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull5()
+        {
+            graph = new DependencyGraph();
+            graph.AddDependency(null, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull6()
+        {
+            graph = new DependencyGraph();
+            graph.RemoveDependency(null, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull7()
+        {
+            graph = new DependencyGraph();
+            graph.ReplaceDependees(null, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNull8()
+        {
+            graph = new DependencyGraph();
+            graph.ReplaceDependents(null, null);
+        }
 
         /// <summary>
         /// Private method to help generate an IEnumerable object.

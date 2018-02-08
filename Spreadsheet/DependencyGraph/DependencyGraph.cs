@@ -81,7 +81,7 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
-            if (s.Equals(null))
+            if (s == null)
             {
                 throw new ArgumentNullException();
             }
@@ -101,7 +101,7 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
-            if (s.Equals(null))
+            if (s == null)
             {
                 throw new ArgumentNullException();
             }
@@ -120,7 +120,7 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            if (s.Equals(null))
+            if (s == null)
             {
                 throw new ArgumentNullException();
             }
@@ -142,7 +142,7 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            if (s.Equals(null))
+            if (s == null)
             {
                 throw new ArgumentNullException();
             }
@@ -166,7 +166,7 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
-            if (s.Equals(null) || t.Equals(null))
+            if (s == null || t == null)
             {
                 throw new ArgumentNullException();
             }
@@ -246,7 +246,7 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
-            if (s.Equals(null) || t.Equals(null))
+            if (s == null || t == null)
             {
                 throw new ArgumentNullException();
             }
@@ -285,7 +285,7 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
-            if (s.Equals(null) || newDependents.Equals(null))
+            if (s == null || newDependents == null)
             {
                 throw new ArgumentNullException();
             }
@@ -304,7 +304,7 @@ namespace Dependencies
             // Add new Dependents(s)
             foreach (string dependent in newDependents.ToList())
             {
-                if (dependent.Equals(null))
+                if (dependent == null)
                 {
                     throw new ArgumentNullException();
                 }
@@ -322,7 +322,7 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
-            if (t.Equals(null) || newDependees.Equals(null))
+            if (t == null || newDependees == null)
             {
                 throw new ArgumentNullException();
             }
@@ -341,7 +341,7 @@ namespace Dependencies
             // Add new Dependees(t)
             foreach (string dependee in newDependees.ToList())
             {
-                if (dependee.Equals(null))
+                if (dependee == null)
                 {
                     throw new ArgumentNullException();
                 }
