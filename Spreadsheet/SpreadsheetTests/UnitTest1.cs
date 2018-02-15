@@ -152,5 +152,15 @@ namespace SpreadsheetTests
             spreadsheet.SetCellContents("B1", formula);
             spreadsheet.SetCellContents("A1", new Formula("B1"));
         }
+
+        [TestMethod]
+        public void TestAddMultipleDependencyFormula()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetCellContents("A1", 1);
+            spreadsheet.SetCellContents("B1", new Formula("A1 + 1"));
+            spreadsheet.SetCellContents("C1", new Formula("A1 + B1"));
+            spreadsheet.SetCellContents("C1", new Formula("A1 + B1 + 2"));
+        }
     }
 }
