@@ -256,9 +256,12 @@ namespace SS
             }
 
             Cells[name].SetContent(formula);
-            foreach (string dependee in Graph.GetDependees(name))
+            if (Graph.HasDependees(name))
             {
-                Graph.RemoveDependency(dependee, name);
+                foreach (string dependee in Graph.GetDependees(name))
+                {
+                    Graph.RemoveDependency(dependee, name);
+                }
             }
 
             foreach (string variable in variables)
