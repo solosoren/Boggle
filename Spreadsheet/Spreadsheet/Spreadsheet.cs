@@ -5,7 +5,7 @@ using Formulas;
 
 namespace SS
 {
-    public struct Cell
+    public class Cell
     {
         public string name;
         private object content;
@@ -13,12 +13,12 @@ namespace SS
         public Cell(string name)
         {
             this.name = name;
-            content = "";
+            this.content = "";
         }
 
-        public void SetContent(object newContent)
+        public void SetContent(object content)
         {
-            content = newContent;
+            this.content = content;
         }
 
         public object GetContent()
@@ -62,7 +62,6 @@ namespace SS
                 {
                     if (Char.IsLetter(name[i]))
                     {
-                        Console.WriteLine(name[i]);
                     }
                     else
                     {
@@ -75,7 +74,6 @@ namespace SS
                     {
                         if (lastCharWasNum == false)
                         {
-                            Console.WriteLine(name[i]);
                         }
                         else
                         {
@@ -90,7 +88,7 @@ namespace SS
                             return false;
                         }
 
-                        Console.WriteLine(name[i]);
+
                         lastCharWasNum = true;
                     }
                     else
@@ -249,11 +247,7 @@ namespace SS
             }
 
             // Set consisting of variables in formula
-            ISet<string> variables = new HashSet<string>();
-            foreach (string variable in formula.GetVariables())
-            {
-                variables.Add(variable);
-            }
+            ISet<string> variables = formula.GetVariables();
 
             Cells[name].SetContent(formula);
             if (Graph.HasDependees(name))
