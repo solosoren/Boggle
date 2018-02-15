@@ -11,10 +11,9 @@ namespace SpreadsheetTests
         public void TestMethod1()
         {
             Spreadsheet spreadsheet = new Spreadsheet();
-
             foreach (var VARIABLE in spreadsheet.GetNamesOfAllNonemptyCells())
             {
-                Console.WriteLine(VARIABLE);
+                Assert.AreEqual("12", "");
             }
         }
     }
