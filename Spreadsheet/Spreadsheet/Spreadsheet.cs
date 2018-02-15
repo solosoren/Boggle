@@ -13,7 +13,7 @@ namespace SS
         public Cell(string name)
         {
             this.name = name;
-            content = "";
+            this.content = "";
         }
 
         public void SetContent(object content)
