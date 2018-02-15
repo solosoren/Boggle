@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dependencies;
 using Formulas;
 
@@ -250,18 +251,25 @@ namespace SS
             ISet<string> variables = formula.GetVariables();
 
             Cells[name].SetContent(formula);
+
+            // Remove dependess that aren't there in the formula
             if (Graph.HasDependees(name))
             {
                 foreach (string dependee in Graph.GetDependees(name))
                 {
-                    Graph.RemoveDependency(dependee, name);
+                    if (!variables.Contains(dependee))
+                    {
+                        Graph.RemoveDependency(dependee, name);
+                    }
                 }
             }
 
+            // Add dependees that don't already exist
             foreach (string variable in variables)
             {
                 Graph.AddDependency(variable, name);
             }
+
 
             ISet<string> changedSet = new HashSet<string>();
             changedSet.Add(name);
@@ -270,11 +278,6 @@ namespace SS
                 foreach (string dependent in Graph.GetDependents(name))
                 {
                     changedSet.Add(dependent);
-                    Graph.RemoveDependency(name, dependent);
-                    foreach (string variable in variables)
-                    {
-                        Graph.AddDependency(variable, dependent);
-                    }
                 }
             }
 

@@ -91,6 +91,11 @@ namespace Dependencies
                 return false;
             }
 
+            if (!nodeList.ContainsKey(s))
+            {
+                return false;
+            }
+
             return nodeList[s].NumberOfDependents() != 0;
         }
 
@@ -107,6 +112,11 @@ namespace Dependencies
             }
 
             if (nodeList.Count == 0)
+            {
+                return false;
+            }
+
+            if (!nodeList.ContainsKey(s))
             {
                 return false;
             }
