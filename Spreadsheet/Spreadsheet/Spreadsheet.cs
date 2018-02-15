@@ -10,10 +10,10 @@ namespace SS
         public string name;
         private object content;
 
-        public Cell(string name, object content)
+        public Cell(string name)
         {
             this.name = name;
-            this.content = content;
+            content = "";
         }
 
         public void SetContent(object newContent)
@@ -42,6 +42,72 @@ namespace SS
             Cells = new Dictionary<string, Cell>();
         }
 
+        /// A string s is a valid cell name if and only if it consists of one or more letters,
+        /// followed by a non-zero digit, followed by zero or more digits.
+        ///
+        /// For example, "A15", "a15", "XY32", and "BC7" are valid cell names.  On the other hand,
+        /// "Z", "X07", and "hello" are not valid cell names.
+        private bool IsValidCellName(string name)
+        {
+            if (name == null)
+            {
+                return false;
+            }
+
+            bool lastCharWasNum = false;
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (i == 0)
+                {
+                    if (Char.IsLetter(name[i]))
+                    {
+                        Console.WriteLine(name[i]);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (Char.IsLetter(name[i]))
+                    {
+                        if (lastCharWasNum == false)
+                        {
+                            Console.WriteLine(name[i]);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+
+                    else if (Char.IsNumber(name[i]))
+                    {
+                        if (name[i].Equals('0'))
+                        {
+                            return false;
+                        }
+
+                        Console.WriteLine(name[i]);
+                        lastCharWasNum = true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (!lastCharWasNum)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Enumerates the names of all the non-empty cells in the spreadsheet.
         /// </summary>
@@ -61,15 +127,14 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {
-            if (!Cells.ContainsKey(name))
+            if (!IsValidCellName(name))
             {
                 throw new InvalidNameException();
             }
 
-            // TODO: Need to see where to check whether or not return value is string, double or a Formula
-            if (Cells[name].GetContent() == null)
+            if (!Cells.ContainsKey(name))
             {
-                return "";
+                Cells.Add(name, new Cell(name));
             }
 
             return Cells[name].GetContent();
@@ -87,9 +152,14 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, double number)
         {
-            if (!Cells.ContainsKey(name))
+            if (!IsValidCellName(name))
             {
                 throw new InvalidNameException();
+            }
+
+            if (!Cells.ContainsKey(name))
+            {
+                Cells.Add(name, new Cell(name));
             }
 
             Cells[name].SetContent(number);
@@ -126,9 +196,14 @@ namespace SS
                 throw new ArgumentNullException();
             }
 
-            if (!Cells.ContainsKey(name))
+            if (!IsValidCellName(name))
             {
                 throw new InvalidNameException();
+            }
+
+            if (!Cells.ContainsKey(name))
+            {
+                Cells.Add(name, new Cell(name));
             }
 
             Cells[name].SetContent(text);
@@ -163,20 +238,20 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
-            if (!Cells.ContainsKey(name))
+            if (!IsValidCellName(name))
             {
                 throw new InvalidNameException();
+            }
+
+            if (!Cells.ContainsKey(name))
+            {
+                Cells.Add(name, new Cell(name));
             }
 
             // Set consisting of variables in formula
             ISet<string> variables = new HashSet<string>();
             foreach (string variable in formula.GetVariables())
             {
-                if (!Cells.ContainsKey(variable))
-                {
-                    throw new InvalidNameException();
-                }
-
                 variables.Add(variable);
             }
 
@@ -236,7 +311,7 @@ namespace SS
                 throw new ArgumentNullException();
             }
 
-            if (!Cells.ContainsKey(name))
+            if (!IsValidCellName(name))
             {
                 throw new InvalidNameException();
             }
