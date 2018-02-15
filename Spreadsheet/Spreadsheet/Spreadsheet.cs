@@ -255,7 +255,7 @@ namespace SS
             // Remove dependess that aren't there in the formula
             if (Graph.HasDependees(name))
             {
-                foreach (string dependee in Graph.GetDependees(name))
+                foreach (string dependee in Graph.GetDependees(name).ToList())
                 {
                     if (!variables.Contains(dependee))
                     {

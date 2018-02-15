@@ -153,6 +153,11 @@ namespace SpreadsheetTests
             spreadsheet.SetCellContents("A1", new Formula("B1"));
         }
 
+
+        /// <summary>
+        /// Testing to see that no exception is thrown for removing variables from
+        /// a formula.
+        /// </summary>
         [TestMethod]
         public void TestAddMultipleDependencyFormula()
         {
@@ -160,7 +165,7 @@ namespace SpreadsheetTests
             spreadsheet.SetCellContents("A1", 1);
             spreadsheet.SetCellContents("B1", new Formula("A1 + 1"));
             spreadsheet.SetCellContents("C1", new Formula("A1 + B1"));
-            spreadsheet.SetCellContents("C1", new Formula("A1 + B1 + 2"));
+            spreadsheet.SetCellContents("C1", new Formula("B1 + 2"));
         }
     }
 }
