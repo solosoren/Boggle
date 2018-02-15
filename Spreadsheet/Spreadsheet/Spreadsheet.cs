@@ -16,20 +16,6 @@ namespace SS
             this.content = content;
         }
 
-        /// <summary>
-        /// Unimplemented for now.
-        /// </summary>
-        /// <returns></returns>
-        public object GetValue()
-        {
-            return new object();
-        }
-
-        public string GetName()
-        {
-            return name;
-        }
-
         public void SetContent(object newContent)
         {
             content = newContent;
@@ -81,7 +67,12 @@ namespace SS
             }
 
             // TODO: Need to see where to check whether or not return value is string, double or a Formula
-            return Cells[name];
+            if (Cells[name].GetContent() == null)
+            {
+                return "";
+            }
+
+            return Cells[name].GetContent();
         }
 
         /// <summary>
@@ -96,7 +87,6 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, double number)
         {
-            //TODO: If name does not exist, add it.
             if (!Cells.ContainsKey(name))
             {
                 throw new InvalidNameException();
@@ -136,7 +126,6 @@ namespace SS
                 throw new ArgumentNullException();
             }
 
-            //TODO: If name does not exist, add it.
             if (!Cells.ContainsKey(name))
             {
                 throw new InvalidNameException();
@@ -174,7 +163,6 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
-            //TODO: If name does not exist, add it.
             if (!Cells.ContainsKey(name))
             {
                 throw new InvalidNameException();
@@ -193,6 +181,34 @@ namespace SS
             }
 
             Cells[name].SetContent(formula);
+            foreach (string dependee in Graph.GetDependees(name))
+            {
+                Graph.RemoveDependency(dependee, name);
+            }
+
+            foreach (string variable in variables)
+            {
+                Graph.AddDependency(variable, name);
+            }
+
+            ISet<string> changedSet = new HashSet<string>();
+            changedSet.Add(name);
+            if (Graph.HasDependents(name))
+            {
+                foreach (string dependent in Graph.GetDependents(name))
+                {
+                    changedSet.Add(dependent);
+                    Graph.RemoveDependency(name, dependent);
+                    foreach (string variable in variables)
+                    {
+                        Graph.AddDependency(variable, dependent);
+                    }
+                }
+            }
+
+            // To check for Circular Dependency
+            GetCellsToRecalculate(changedSet);
+            return changedSet;
         }
 
 
