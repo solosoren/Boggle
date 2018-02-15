@@ -14,7 +14,7 @@ namespace SpreadsheetTests
 
             foreach (var VARIABLE in spreadsheet.GetNamesOfAllNonemptyCells())
             {
-                Console.WriteLine(VARIABLE);
+                Assert.Equals(VARIABLE, "0");
             }
         }
     }

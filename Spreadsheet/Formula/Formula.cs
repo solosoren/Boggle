@@ -1,4 +1,4 @@
-﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
+﻿﻿﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
 // Kunaal Kumar
 // u1063137
 // January 24, 2018.
@@ -292,7 +292,7 @@ namespace Formulas
                     }
                 }
 
-                if (token.Length == 1 && Char.IsLetter(token.ToCharArray()[0]))
+                if ((token.Length == 1 && Char.IsLetter(token.ToCharArray()[0])) || IsValidCellName(token))
                 {
                     variables.Add(token);
                 }
@@ -308,6 +308,70 @@ namespace Formulas
             }
 
             return open == close;
+        }
+
+        /// A string s is a valid cell name if and only if it consists of one or more letters,
+        /// followed by a non-zero digit, followed by zero or more digits.
+        ///
+        /// For example, "A15", "a15", "XY32", and "BC7" are valid cell names.  On the other hand,
+        /// "Z", "X07", and "hello" are not valid cell names.
+        private bool IsValidCellName(string name)
+        {
+            if (name == null)
+            {
+                return false;
+            }
+
+            bool lastCharWasNum = false;
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (i == 0)
+                {
+                    if (Char.IsLetter(name[i]))
+                    {
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (Char.IsLetter(name[i]))
+                    {
+                        if (lastCharWasNum == false)
+                        {
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+
+                    else if (Char.IsNumber(name[i]))
+                    {
+                        if (name[i].Equals('0'))
+                        {
+                            return false;
+                        }
+
+
+                        lastCharWasNum = true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (!lastCharWasNum)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
