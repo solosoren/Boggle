@@ -328,12 +328,59 @@ namespace SpreadsheetTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(IOException))]
+        [ExpectedException(typeof(SpreadsheetReadException))]
         public void TestRegexConstructor3()
         {
-            TextReader source = new StreamReader("Does_not_exist.xml");
+            TextReader source = new StreamReader("Test1.xml");
             AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
             Assert.IsFalse(spreadsheet.Changed);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRegexConstructor4()
+        {
+            TextReader source = new StreamReader("Test2.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetVersionException))]
+        public void TestRegexConstructor5()
+        {
+            TextReader source = new StreamReader("SampleSavedSpreadsheet.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRegexConstructor6()
+        {
+            TextReader source = new StreamReader("Test3.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRegexConstructor7()
+        {
+            TextReader source = new StreamReader("Test4.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadException))]
+        public void TestRegexConstructor8()
+        {
+            TextReader source = new StreamReader("Test5.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
+        }
+
+        // The following tests are to test GetCellValue
     }
 }

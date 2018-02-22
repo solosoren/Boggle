@@ -15,13 +15,11 @@ namespace SS
     {
         private object content;
         public bool hasFormula;
-        public bool hasBeenSet;
 
         public Cell(string name)
         {
             content = "";
             hasFormula = false;
-            hasBeenSet = false;
         }
 
         public void SetContent(object content)
@@ -31,7 +29,6 @@ namespace SS
                 hasFormula = true;
             }
 
-            hasBeenSet = true;
             this.content = content;
         }
 
@@ -157,10 +154,7 @@ namespace SS
                             // This means that this cell has already been assigned
                             if (Cells.ContainsKey(cellName))
                             {
-                                if (!Cells[cellName].hasBeenSet)
-                                {
-                                    throw new SpreadsheetReadException("Duplicate cell name.");
-                                }
+                                throw new SpreadsheetReadException("Duplicate cell name.");
                             }
 
                             cellContent = reader["contents"];
