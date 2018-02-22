@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Schema;
 using Dependencies;
 using Formulas;
 
@@ -13,12 +15,14 @@ namespace SS
         public string name;
         private object content;
         public bool hasFormula;
+        public bool hasBeenSet;
 
         public Cell(string name)
         {
             this.name = name;
             this.content = "";
             hasFormula = false;
+            hasBeenSet = false;
         }
 
         public void SetContent(object content)
@@ -28,6 +32,7 @@ namespace SS
                 hasFormula = true;
             }
 
+            hasBeenSet = true;
             this.content = content;
         }
 
@@ -95,6 +100,92 @@ namespace SS
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
         public Spreadsheet(TextReader source, Regex newIsValid)
         {
+            Graph = new DependencyGraph();
+            Cells = new Dictionary<string, Cell>();
+
+            XmlDocument xmlDocument = new XmlDocument();
+            try
+            {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.Schemas.Add("http://www.w3.org/2001/XMLSchema", "Spreadsheet.xsd");
+                settings.ValidationType = ValidationType.Schema;
+
+                // Validate XML with schema
+                xmlDocument.Load(source);
+                xmlDocument.Validate(ValidationEventHandler);
+
+                string cellName;
+                string cellContent;
+                string sourceRegex = xmlDocument.DocumentElement.Attributes[0].InnerText;
+                try
+                {
+                    new Regex(sourceRegex);
+                }
+                catch
+                {
+                    throw new SpreadsheetReadException("Invalid regex.");
+                }
+
+                Regex oldIsValid = new Regex(sourceRegex);
+                foreach (XmlNode node in xmlDocument.DocumentElement)
+                {
+                    cellName = node.Attributes[0].InnerText;
+                    cellContent = node.Attributes[1].InnerText;
+
+                    // This means that the cell name is invalid
+                    if (!IsValidCellName(cellName, oldIsValid))
+                    {
+                        throw new SpreadsheetReadException("Old regex failed.");
+                    }
+
+                    if (!IsValidCellName(cellName, newIsValid))
+                    {
+                        throw new SpreadsheetVersionException("New regex failed.");
+                    }
+
+                    // This means that this cell has already been assigned
+                    if (!Cells[cellName].hasBeenSet)
+                    {
+                        throw new SpreadsheetReadException("Duplicate cell name.");
+                    }
+
+                    // Means it is a formula
+                    if (cellContent[0].Equals('='))
+                    {
+                        try
+                        {
+                            SetCellContents(cellName, new Formula(cellContent.Substring(1, cellContent.Length - 1)));
+                        }
+                        // Formula format is invalid
+                        catch (FormulaFormatException e)
+                        {
+                            throw new SpreadsheetReadException("Formula format is invalid.");
+                        }
+                        // Formula causes circular dependency
+                        catch (CircularException e)
+                        {
+                            throw new SpreadsheetReadException("Formula causes circular dependency.");
+                        }
+                    }
+
+                    // Else its either a string or double
+                    else
+                    {
+                        SetCellContents(node.Attributes[0].InnerText, cellContent);
+                    }
+                }
+
+                IsValid = newIsValid;
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
+        }
+
+        static void ValidationEventHandler(object sender, ValidationEventArgs e)
+        {
+            throw new SpreadsheetReadException("XML is not consistent with XSD.");
         }
 
         /// A string is a valid cell name if and only if (1) s consists of one or more letters,
@@ -104,7 +195,7 @@ namespace SS
         /// For example, "A15", "a15", "XY32", and "BC7" are valid cell names, so long as they also
         /// are accepted by IsValid.  On the other hand, "Z", "X07", and "hello" are not valid cell
         /// names, regardless of IsValid.
-        private bool IsValidCellName(string name)
+        private bool IsValidCellName(string name, Regex toUseRegex)
         {
             if (name == null)
             {
@@ -160,7 +251,7 @@ namespace SS
                 return false;
             }
 
-            return true;
+            return toUseRegex.IsMatch(name.ToUpper());
         }
 
         public override bool Changed { get; protected set; }
@@ -203,6 +294,7 @@ namespace SS
                                        "\"></cell>");
                     }
                 }
+
                 dest.WriteLine("</spreadsheet>");
                 dest.Flush();
             }
@@ -236,7 +328,7 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {
-            if (!IsValidCellName(name))
+            if (!IsValidCellName(name, IsValid))
             {
                 throw new InvalidNameException();
             }
@@ -266,7 +358,7 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, double number)
         {
-            if (!IsValidCellName(name))
+            if (!IsValidCellName(name, IsValid))
             {
                 throw new InvalidNameException();
             }
@@ -310,7 +402,7 @@ namespace SS
                 throw new ArgumentNullException();
             }
 
-            if (!IsValidCellName(name))
+            if (!IsValidCellName(name, IsValid))
             {
                 throw new InvalidNameException();
             }
@@ -352,7 +444,7 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, Formula formula)
         {
-            if (!IsValidCellName(name))
+            if (!IsValidCellName(name, IsValid))
             {
                 throw new InvalidNameException();
             }
@@ -426,7 +518,7 @@ namespace SS
                 throw new ArgumentNullException();
             }
 
-            if (!IsValidCellName(name))
+            if (!IsValidCellName(name, IsValid))
             {
                 throw new InvalidNameException();
             }
