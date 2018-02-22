@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -365,10 +366,17 @@ namespace SS
         /// </summary>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
-            foreach (var cell in Cells)
+            foreach (KeyValuePair<string, Cell> cell in Cells)
             {
+                if (cell.Value.GetContent().ToString().Equals(""))
+                {
+                    yield break;
+                }
+
                 yield return cell.Key;
             }
+
+            yield break;
         }
 
         /// <summary>
@@ -444,13 +452,17 @@ namespace SS
             }
 
             // Is a Formula
-            if (content[0].Equals('='))
+            if (content.Length > 1)
             {
-                Formula formula = new Formula(content.Substring(1, content.Length - 1), s => s.ToUpper(),
-                    s => IsValidCellName(s, IsValid));
-                Changed = true;
-                return SetCellContents(name, formula);
+                if (content[0].Equals('='))
+                {
+                    Formula formula = new Formula(content.Substring(1, content.Length - 1), s => s.ToUpper(),
+                        s => IsValidCellName(s, IsValid));
+                    Changed = true;
+                    return SetCellContents(name, formula);
+                }
             }
+
 
             // Is a string
             Changed = true;
@@ -482,16 +494,38 @@ namespace SS
             Cells[name].SetContent(number);
 
             ISet<string> changedSet = new HashSet<string>();
-            changedSet.Add(name);
-            if (Graph.HasDependents(name))
-            {
-                foreach (string dependent in Graph.GetDependents(name))
-                {
-                    changedSet.Add(dependent);
-                }
-            }
+            changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
+//            changedSet.Add(name);
+//            if (Graph.HasDependents(name))
+//            {
+//                foreach (string dependent in Graph.GetDependents(name))
+//                {
+//                    changedSet.Add(dependent);
+//                }
+//            }
 
             return changedSet;
+        }
+
+        private ISet<string> GetAllRelatedDependents(ISet<string> currentSet, string name)
+        {
+            if (Graph.GetDependents(name) == null)
+            {
+                return currentSet;
+            }
+
+            currentSet.Add(name);
+            foreach (string dependent in Graph.GetDependents(name))
+            {
+                if (Graph.GetDependents(dependent) != null)
+                {
+                    return GetAllRelatedDependents(currentSet, dependent);
+                }
+
+                currentSet.Add(dependent);
+            }
+
+            return currentSet;
         }
 
         /// <summary>
