@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS3GradingTests", "PS3Gradi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetTests", "SpreadsheetTests\SpreadsheetTests.csproj", "{15A7B22B-A8FD-4BAF-89D3-FADCD2B62A97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{AF4E7BBF-4FEF-4073-9DAD-49DFB27092AB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,10 +31,6 @@ Global
 		{15A7B22B-A8FD-4BAF-89D3-FADCD2B62A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15A7B22B-A8FD-4BAF-89D3-FADCD2B62A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15A7B22B-A8FD-4BAF-89D3-FADCD2B62A97}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF4E7BBF-4FEF-4073-9DAD-49DFB27092AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF4E7BBF-4FEF-4073-9DAD-49DFB27092AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF4E7BBF-4FEF-4073-9DAD-49DFB27092AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF4E7BBF-4FEF-4073-9DAD-49DFB27092AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
