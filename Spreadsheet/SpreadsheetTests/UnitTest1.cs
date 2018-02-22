@@ -326,5 +326,14 @@ namespace SpreadsheetTests
             AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
             Assert.IsFalse(spreadsheet.Changed);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(IOException))]
+        public void TestRegexConstructor3()
+        {
+            TextReader source = new StreamReader("Does_not_exist.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
+        }
     }
 }
