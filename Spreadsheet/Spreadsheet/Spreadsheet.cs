@@ -334,7 +334,7 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
-            if (name == null || !IsValidCellName(name, IsValid))
+            if (name == null || !IsValidCellName(name, IsValid) || !Cells.ContainsKey(name))
             {
                 throw new InvalidNameException();
             }
@@ -345,7 +345,10 @@ namespace SS
             {
                 try
                 {
-                    return new Formula(content.ToString()).Evaluate(s => (double) GetCellValue(s));
+                    return new Formula(content.ToString()).Evaluate(s =>
+                        Cells.ContainsKey(s)
+                            ? (double) GetCellValue(s)
+                            : throw new FormulaEvaluationException("Undefined variable"));
                 }
                 catch (FormulaEvaluationException e)
                 {

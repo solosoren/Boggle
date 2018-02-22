@@ -382,5 +382,52 @@ namespace SpreadsheetTests
         }
 
         // The following tests are to test GetCellValue
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestGetCellValue1()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            spreadsheet.GetCellValue(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestGetCellValue2()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            spreadsheet.GetCellValue("A01");
+        }
+
+        [TestMethod]
+        public void TestGetCellValue3()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            spreadsheet.SetContentsOfCell("B1", "Test");
+            Assert.IsTrue(spreadsheet.GetCellValue("A1").Equals((double) 1));
+            Assert.IsTrue(spreadsheet.GetCellValue("B1").Equals("Test"));
+        }
+
+        [TestMethod]
+        public void TestGetCellValue4()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            spreadsheet.SetContentsOfCell("B1", "=A1 * 2");
+            Assert.IsTrue(spreadsheet.GetCellValue("A1").Equals((double) 1));
+            Assert.IsTrue(spreadsheet.GetCellValue("B1").Equals((double) 2));
+        }
+
+        [TestMethod]
+        public void TestGetCellValue5()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            spreadsheet.SetContentsOfCell("B1", "=A2");
+            Assert.IsTrue(spreadsheet.GetCellValue("A1").Equals((double) 1));
+            Assert.IsTrue(spreadsheet.GetCellValue("B1") is FormulaError);
+        }
     }
 }
