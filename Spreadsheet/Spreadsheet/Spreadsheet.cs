@@ -59,6 +59,7 @@ namespace SS
             Graph = new DependencyGraph();
             Cells = new Dictionary<string, Cell>();
             IsValid = new Regex(@".*");
+            Changed = false;
         }
 
         /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
@@ -67,6 +68,7 @@ namespace SS
             Graph = new DependencyGraph();
             Cells = new Dictionary<string, Cell>();
             IsValid = isValid;
+            Changed = false;
         }
 
         /// Creates a Spreadsheet that is a duplicate of the spreadsheet saved in source.
@@ -181,8 +183,16 @@ namespace SS
             {
                 throw e;
             }
+
+            Changed = false;
         }
 
+        /// <summary>
+        /// Helper method to throw excpetion if validation fails.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="SpreadsheetReadException"></exception>
         static void ValidationEventHandler(object sender, ValidationEventArgs e)
         {
             throw new SpreadsheetReadException("XML is not consistent with XSD.");
@@ -254,6 +264,11 @@ namespace SS
             return toUseRegex.IsMatch(name.ToUpper());
         }
 
+        // ADDED FOR PS6
+        /// <summary>
+        /// True if this spreadsheet has been modified since it was created or saved
+        /// (whichever happened most recently); false otherwise.
+        /// </summary>
         public override bool Changed { get; protected set; }
 
         /// <summary>
@@ -302,6 +317,8 @@ namespace SS
             {
                 throw e;
             }
+
+            Changed = false;
         }
 
         // ADDED FOR PS6
@@ -415,6 +432,7 @@ namespace SS
             // Is a double
             if (double.TryParse(content, out double temp))
             {
+                Changed = true;
                 return SetCellContents(name, temp);
             }
 
@@ -423,10 +441,12 @@ namespace SS
             {
                 Formula formula = new Formula(content.Substring(1, content.Length - 1), s => s.ToUpper(),
                     s => IsValidCellName(s, IsValid));
+                Changed = true;
                 return SetCellContents(name, formula);
             }
 
             // Is a string
+            Changed = true;
             return SetCellContents(name, content);
         }
 
