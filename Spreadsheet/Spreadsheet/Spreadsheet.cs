@@ -30,6 +30,7 @@ namespace SS
                 hasFormula = true;
             }
 
+            hasFormula = false;
             this.content = content;
         }
 
@@ -495,14 +496,6 @@ namespace SS
 
             ISet<string> changedSet = new HashSet<string>();
             changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
-//            changedSet.Add(name);
-//            if (Graph.HasDependents(name))
-//            {
-//                foreach (string dependent in Graph.GetDependents(name))
-//                {
-//                    changedSet.Add(dependent);
-//                }
-//            }
 
             return changedSet;
         }
@@ -519,7 +512,7 @@ namespace SS
             {
                 if (Graph.GetDependents(dependent) != null)
                 {
-                    return GetAllRelatedDependents(currentSet, dependent);
+                    currentSet = GetAllRelatedDependents(currentSet, dependent);
                 }
 
                 currentSet.Add(dependent);
