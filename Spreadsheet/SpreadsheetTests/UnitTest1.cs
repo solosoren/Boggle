@@ -138,79 +138,80 @@ namespace SpreadsheetTests
             spreadsheet.SetContentsOfCell("A1", "=A1 + 2");
         }
 
-//        /// <summary>
-//        /// Testing to see if circular exception is thrown for circular dependency.
-//        /// </summary>
-//        /// <returns></returns>
-//        [TestMethod]
-//        [ExpectedException(typeof(CircularException))]
-//        public void TestCircularDependency()
-//        {
-//            AbstractSpreadsheet spreadsheet = new Spreadsheet();
-//            spreadsheet.SetCellContents("A1", 1.2);
-//            spreadsheet.SetCellContents("A4", new Formula("A1 + 2"));
-//            Formula formula = new Formula("A4");
-//            spreadsheet.SetCellContents("B1", formula);
-//            spreadsheet.SetCellContents("A1", new Formula("B1"));
-//        }
-//
-//
-//        /// <summary>
-//        /// Testing to see that no exception is thrown for removing variables from
-//        /// a formula.
-//        /// </summary>
-//        [TestMethod]
-//        public void TestAddMultipleDependencyFormula()
-//        {
-//            AbstractSpreadsheet spreadsheet = new Spreadsheet();
-//            spreadsheet.SetCellContents("A1", 1.1);
-//            Formula formulaB = new Formula("A1 + 1");
-//            Formula formulaC = new Formula("B1 + 2");
-//            spreadsheet.SetCellContents("B1", formulaB);
-//            spreadsheet.SetCellContents("C1", new Formula("A1 + B1"));
-//            spreadsheet.SetCellContents("C1", formulaC);
-//
-//            Assert.AreEqual(spreadsheet.GetCellContents("A1"), 1.1);
-//            Assert.AreEqual(spreadsheet.GetCellContents("B1"), formulaB);
-//            Assert.AreEqual(spreadsheet.GetCellContents("C1"), formulaC);
-//        }
-//
-//        // The following methods test SetContent for strings
-//        [TestMethod]
-//        [ExpectedException(typeof(InvalidNameException))]
-//        public void TestSetContentString()
-//        {
-//            AbstractSpreadsheet spreadsheet = new Spreadsheet();
-//            spreadsheet.GetCellContents("A0");
-//        }
-//
-//        [TestMethod]
-//        public void TestSetContentString1()
-//        {
-//            AbstractSpreadsheet spreadsheet = new Spreadsheet();
-//            Assert.AreEqual(spreadsheet.GetCellContents("A1"), "");
-//        }
-//
-//        [TestMethod]
-//        [ExpectedException(typeof(ArgumentNullException))]
-//        public void TestSetContentString2()
-//        {
-//            AbstractSpreadsheet spreadsheet = new Spreadsheet();
-//            spreadsheet.SetCellContents("A1", null);
-//        }
-//
-//        [TestMethod]
-//        public void TestSetContentString3()
-//        {
-//            AbstractSpreadsheet spreadsheet = new Spreadsheet();
-//            spreadsheet.SetCellContents("A1", 1.0f);
-//            spreadsheet.SetCellContents("B1", new Formula("A1 + 1"));
-//            spreadsheet.SetCellContents("C1", new Formula("A1"));
-//            spreadsheet.SetCellContents("D1", new Formula("C1"));
-//            foreach (string changed in spreadsheet.SetCellContents("A1", "Test"))
-//            {
-//                Assert.IsTrue(changed.Equals("A1") || changed.Equals("B1") || changed.Equals("C1"));
-//            }
-//        }
+        /// <summary>
+        /// Testing to see if circular exception is thrown for circular dependency.
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        [ExpectedException(typeof(CircularException))]
+        public void TestCircularDependency()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1.2");
+            spreadsheet.SetContentsOfCell("A4", "=A1 + 2");
+            spreadsheet.SetContentsOfCell("B1", "=A4");
+            spreadsheet.SetContentsOfCell("A1", "=B1");
+        }
+
+
+        /// <summary>
+        /// Testing to see that no exception is thrown for removing variables from
+        /// a formula.
+        /// </summary>
+        [TestMethod]
+        public void TestAddMultipleDependencyFormula()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1.1");
+            string formulaB = "=A1+1";
+            Formula expectedFormulaB = new Formula("A1+1");
+            string formulaC = "=B1+2";
+            Formula expectedFormulaC = new Formula("B1+2");
+            spreadsheet.SetContentsOfCell("B1", formulaB);
+            spreadsheet.SetContentsOfCell("C1", "=A1+B1");
+            spreadsheet.SetContentsOfCell("C1", formulaC);
+
+            Assert.AreEqual(spreadsheet.GetCellContents("A1"), 1.1);
+            Assert.AreEqual(spreadsheet.GetCellContents("B1").ToString(), expectedFormulaB.ToString());
+            Assert.AreEqual(spreadsheet.GetCellContents("C1").ToString(), expectedFormulaC.ToString());
+        }
+
+        // The following methods test SetContent for strings
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestSetContentString()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.GetCellContents("A0");
+        }
+
+        [TestMethod]
+        public void TestSetContentString1()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            Assert.AreEqual(spreadsheet.GetCellContents("A1"), "");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestSetContentString2()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", null);
+        }
+
+        [TestMethod]
+        public void TestSetContentString3()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1.0");
+            spreadsheet.SetContentsOfCell("B1", "=A1+1");
+            spreadsheet.SetContentsOfCell("C1", "=A1");
+            spreadsheet.SetContentsOfCell("D1", "=C1");
+            foreach (string changed in spreadsheet.SetContentsOfCell("A1", "Test"))
+            {
+                Assert.IsTrue(changed.Equals("A1") || changed.Equals("B1") || changed.Equals("C1"));
+            }
+        }
     }
 }
