@@ -304,9 +304,36 @@ namespace SS
             }
         }
 
+        // ADDED FOR PS6
+        /// <summary>
+        /// If name is null or invalid, throws an InvalidNameException.
+        ///
+        /// Otherwise, returns the value (as opposed to the contents) of the named cell.  The return
+        /// value should be either a string, a double, or a FormulaError.
+        /// </summary>
         public override object GetCellValue(string name)
         {
-            throw new NotImplementedException();
+            if (name == null || !IsValidCellName(name, IsValid))
+            {
+                throw new InvalidNameException();
+            }
+
+            object content = Cells[name].GetContent();
+            // If it is a formula
+            if (Cells[name].hasFormula)
+            {
+                try
+                {
+                    return new Formula(content.ToString()).Evaluate(s => (double) GetCellValue(s));
+                }
+                catch (FormulaEvaluationException e)
+                {
+                    return new FormulaError("Formula evaluation failed: " + e);
+                }
+            }
+
+            // Has to be either a string or double
+            return content;
         }
 
         /// <summary>
@@ -341,6 +368,38 @@ namespace SS
             return Cells[name].GetContent();
         }
 
+        // ADDED FOR PS6
+        /// <summary>
+        /// If content is null, throws an ArgumentNullException.
+        ///
+        /// Otherwise, if name is null or invalid, throws an InvalidNameException.
+        ///
+        /// Otherwise, if content parses as a double, the contents of the named
+        /// cell becomes that double.
+        ///
+        /// Otherwise, if content begins with the character '=', an attempt is made
+        /// to parse the remainder of content into a Formula f using the Formula
+        /// constructor with s => s.ToUpper() as the normalizer and a validator that
+        /// checks that s is a valid cell name as defined in the AbstractSpreadsheet
+        /// class comment.  There are then three possibilities:
+        ///
+        ///   (1) If the remainder of content cannot be parsed into a Formula, a
+        ///       Formulas.FormulaFormatException is thrown.
+        ///
+        ///   (2) Otherwise, if changing the contents of the named cell to be f
+        ///       would cause a circular dependency, a CircularException is thrown.
+        ///
+        ///   (3) Otherwise, the contents of the named cell becomes f.
+        ///
+        /// Otherwise, the contents of the named cell becomes content.
+        ///
+        /// If an exception is not thrown, the method returns a set consisting of
+        /// name plus the names of all other cells whose value depends, directly
+        /// or indirectly, on the named cell.
+        ///
+        /// For example, if name is A1, B1 contains A1*2, and C1 contains B1+A1, the
+        /// set {A1, B1, C1} is returned.
+        /// </summary>
         public override ISet<string> SetContentsOfCell(string name, string content)
         {
             throw new NotImplementedException();
