@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Dependencies;
 using Formulas;
 
@@ -11,15 +12,22 @@ namespace SS
     {
         public string name;
         private object content;
+        public bool hasFormula;
 
         public Cell(string name)
         {
             this.name = name;
             this.content = "";
+            hasFormula = false;
         }
 
         public void SetContent(object content)
         {
+            if (content is Formula)
+            {
+                hasFormula = true;
+            }
+
             this.content = content;
         }
 
@@ -37,18 +45,65 @@ namespace SS
         // Graph will contain the dependencies of the cells
         private DependencyGraph Graph;
 
+        private Regex IsValid;
+
+
+        /// Creates an empty Spreadsheet whose IsValid regular expression accepts every string.
         public Spreadsheet()
         {
             Graph = new DependencyGraph();
-
             Cells = new Dictionary<string, Cell>();
+            IsValid = new Regex(@".*");
         }
 
-        /// A string s is a valid cell name if and only if it consists of one or more letters,
-        /// followed by a non-zero digit, followed by zero or more digits.
+        /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
+        public Spreadsheet(Regex isValid)
+        {
+            Graph = new DependencyGraph();
+            Cells = new Dictionary<string, Cell>();
+            IsValid = isValid;
+        }
+
+        /// Creates a Spreadsheet that is a duplicate of the spreadsheet saved in source.
         ///
-        /// For example, "A15", "a15", "XY32", and "BC7" are valid cell names.  On the other hand,
-        /// "Z", "X07", and "hello" are not valid cell names.
+        /// See the AbstractSpreadsheet.Save method and Spreadsheet.xsd for the file format
+        /// specification.
+        ///
+        /// If there's a problem reading source, throws an IOException.
+        ///
+        /// Else if the contents of source are not consistent with the schema in Spreadsheet.xsd,
+        /// throws a SpreadsheetReadException.
+        ///
+        /// Else if the IsValid string contained in source is not a valid C# regular expression, throws
+        /// a SpreadsheetReadException.  (If the exception is not thrown, this regex is referred to
+        /// below as oldIsValid.)
+        ///
+        /// Else if there is a duplicate cell name in the source, throws a SpreadsheetReadException.
+        /// (Two cell names are duplicates if they are identical after being converted to upper case.)
+        ///
+        /// Else if there is an invalid cell name or an invalid formula in the source, throws a
+        /// SpreadsheetReadException.  (Use oldIsValid in place of IsValid in the definition of
+        /// cell name validity.)
+        ///
+        /// Else if there is an invalid cell name or an invalid formula in the source, throws a
+        /// SpreadsheetVersionException.  (Use newIsValid in place of IsValid in the definition of
+        /// cell name validity.)
+        ///
+        /// Else if there's a formula that causes a circular dependency, throws a SpreadsheetReadException.
+        ///
+        /// Else, create a Spreadsheet that is a duplicate of the one encoded in source except that
+        /// the new Spreadsheet's IsValid regular expression should be newIsValid.
+        public Spreadsheet(TextReader source, Regex newIsValid)
+        {
+        }
+
+        /// A string is a valid cell name if and only if (1) s consists of one or more letters,
+        /// followed by a non-zero digit, followed by zero or more digits AND (2) the C#
+        /// expression IsValid.IsMatch(s.ToUpper()) is true.
+        ///
+        /// For example, "A15", "a15", "XY32", and "BC7" are valid cell names, so long as they also
+        /// are accepted by IsValid.  On the other hand, "Z", "X07", and "hello" are not valid cell
+        /// names, regardless of IsValid.
         private bool IsValidCellName(string name)
         {
             if (name == null)
@@ -110,9 +165,51 @@ namespace SS
 
         public override bool Changed { get; protected set; }
 
+        /// <summary>
+        /// Writes the contents of this spreadsheet to dest using an XML format.
+        /// The XML elements should be structured as follows:
+        ///
+        /// <spreadsheet IsValid="IsValid regex goes here">
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        /// </spreadsheet>
+        ///
+        /// The value of the IsValid attribute should be IsValid.ToString()
+        ///
+        /// There should be one cell element for each non-empty cell in the spreadsheet.
+        /// If the cell contains a string, the string (without surrounding double quotes) should be written as the contents.
+        /// If the cell contains a double d, d.ToString() should be written as the contents.
+        /// If the cell contains a Formula f, f.ToString() with "=" prepended should be written as the contents.
+        ///
+        /// If there are any problems writing to dest, the method should throw an IOException.
+        /// </summary>
         public override void Save(TextWriter dest)
         {
-            throw new NotImplementedException();
+            try
+            {
+                dest.WriteLine("<spreadsheet IsValid=\"" + IsValid.ToString() + "\">");
+                foreach (KeyValuePair<string, Cell> entry in Cells)
+                {
+                    if (entry.Value.hasFormula)
+                    {
+                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"=" + entry.Value.ToString() +
+                                       "\"></cell>");
+                    }
+
+                    else
+                    {
+                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" + entry.Value.ToString() +
+                                       "\"></cell>");
+                    }
+                }
+                dest.WriteLine("</spreadsheet>");
+                dest.Flush();
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
         }
 
         public override object GetCellValue(string name)
