@@ -154,7 +154,7 @@ namespace SS
                     {
                         try
                         {
-                            SetCellContents(cellName, new Formula(cellContent.Substring(1, cellContent.Length - 1)));
+                            SetContentsOfCell(cellName, cellContent);
                         }
                         // Formula format is invalid
                         catch (FormulaFormatException e)
@@ -171,7 +171,7 @@ namespace SS
                     // Else its either a string or double
                     else
                     {
-                        SetCellContents(node.Attributes[0].InnerText, cellContent);
+                        SetContentsOfCell(node.Attributes[0].InnerText, cellContent);
                     }
                 }
 
@@ -402,7 +402,32 @@ namespace SS
         /// </summary>
         public override ISet<string> SetContentsOfCell(string name, string content)
         {
-            throw new NotImplementedException();
+            if (content == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (name == null || !IsValidCellName(name, IsValid))
+            {
+                throw new InvalidNameException();
+            }
+
+            // Is a double
+            if (double.TryParse(content, out double temp))
+            {
+                return SetCellContents(name, temp);
+            }
+
+            // Is a Formula
+            else if (content[0].Equals('='))
+            {
+                Formula formula = new Formula(content.Substring(1, content.Length - 1), s => s.ToUpper(),
+                    s => IsValidCellName(s, IsValid));
+                return SetCellContents(name, formula);
+            }
+
+            // Is a string
+            return SetCellContents(name, content);
         }
 
         /// <summary>
