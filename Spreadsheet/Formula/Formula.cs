@@ -1,4 +1,4 @@
-﻿﻿﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
+﻿// Skeleton written by Joe Zachary for CS 3500, January 2017
 // Kunaal Kumar
 // u1063137
 // January 24, 2018.
@@ -99,9 +99,11 @@ namespace Formulas
             string newFormula = "";
             foreach (string var in GetTokens(formula))
             {
+                // variable
                 if (var.Length == 1)
                 {
                     char possVar = var.ToCharArray()[0];
+                    // variable
                     if (Char.IsLetter(possVar))
                     {
                         try
@@ -124,6 +126,30 @@ namespace Formulas
                     {
                         newFormula += var;
                     }
+                }
+                // cell name
+                else if (IsValidCellName(var))
+                {
+                    try
+                    {
+                        if (!validator.Invoke(normalizer.Invoke(var)))
+                        {
+                            throw new FormulaFormatException("Validation failed.");
+                        }
+
+                        newFormula += normalizer.Invoke(var);
+                        variables.Remove(var);
+                        variables.Add(normalizer.Invoke(var));
+                    }
+                    catch (UndefinedVariableException e)
+                    {
+                        throw new FormulaFormatException(e.Message);
+                    }
+                }
+                // value
+                else
+                {
+                    newFormula += var;
                 }
             }
 

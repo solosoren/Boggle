@@ -38,6 +38,11 @@ namespace SS
 
         public object GetContent()
         {
+            if (hasFormula)
+            {
+                return new Formula(content.ToString());
+            }
+
             return content;
         }
     }
@@ -437,7 +442,7 @@ namespace SS
             }
 
             // Is a Formula
-            else if (content[0].Equals('='))
+            if (content[0].Equals('='))
             {
                 Formula formula = new Formula(content.Substring(1, content.Length - 1), s => s.ToUpper(),
                     s => IsValidCellName(s, IsValid));
