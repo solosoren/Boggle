@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 using Dependencies;
 using Formulas;
@@ -12,15 +13,13 @@ namespace SS
 {
     public class Cell
     {
-        public string name;
         private object content;
         public bool hasFormula;
         public bool hasBeenSet;
 
         public Cell(string name)
         {
-            this.name = name;
-            this.content = "";
+            content = "";
             hasFormula = false;
             hasBeenSet = false;
         }
@@ -105,103 +104,118 @@ namespace SS
         ///
         /// Else, create a Spreadsheet that is a duplicate of the one encoded in source except that
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
-        public Spreadsheet(TextReader source, Regex newIsValid)
-        {
-            Graph = new DependencyGraph();
-            Cells = new Dictionary<string, Cell>();
-
-            XmlDocument xmlDocument = new XmlDocument();
-            try
-            {
-                XmlReaderSettings settings = new XmlReaderSettings();
-                settings.Schemas.Add("http://www.w3.org/2001/XMLSchema", "Spreadsheet.xsd");
-                settings.ValidationType = ValidationType.Schema;
-
-                // Validate XML with schema
-                xmlDocument.Load(source);
-                xmlDocument.Validate(ValidationEventHandler);
-
-                string cellName;
-                string cellContent;
-                string sourceRegex = xmlDocument.DocumentElement.Attributes[0].InnerText;
-                try
-                {
-                    new Regex(sourceRegex);
-                }
-                catch
-                {
-                    throw new SpreadsheetReadException("Invalid regex.");
-                }
-
-                Regex oldIsValid = new Regex(sourceRegex);
-                foreach (XmlNode node in xmlDocument.DocumentElement)
-                {
-                    cellName = node.Attributes[0].InnerText;
-                    cellContent = node.Attributes[1].InnerText;
-
-                    // This means that the cell name is invalid
-                    if (!IsValidCellName(cellName, oldIsValid))
-                    {
-                        throw new SpreadsheetReadException("Old regex failed.");
-                    }
-
-                    if (!IsValidCellName(cellName, newIsValid))
-                    {
-                        throw new SpreadsheetVersionException("New regex failed.");
-                    }
-
-                    // This means that this cell has already been assigned
-                    if (!Cells[cellName].hasBeenSet)
-                    {
-                        throw new SpreadsheetReadException("Duplicate cell name.");
-                    }
-
-                    // Means it is a formula
-                    if (cellContent[0].Equals('='))
-                    {
-                        try
-                        {
-                            SetContentsOfCell(cellName, cellContent);
-                        }
-                        // Formula format is invalid
-                        catch (FormulaFormatException e)
-                        {
-                            throw new SpreadsheetReadException("Formula format is invalid.");
-                        }
-                        // Formula causes circular dependency
-                        catch (CircularException e)
-                        {
-                            throw new SpreadsheetReadException("Formula causes circular dependency.");
-                        }
-                    }
-
-                    // Else its either a string or double
-                    else
-                    {
-                        SetContentsOfCell(node.Attributes[0].InnerText, cellContent);
-                    }
-                }
-
-                IsValid = newIsValid;
-            }
-            catch (IOException e)
-            {
-                throw e;
-            }
-
-            Changed = false;
-        }
-
+        ///
         /// <summary>
         /// Helper method to throw excpetion if validation fails.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <exception cref="SpreadsheetReadException"></exception>
-        static void ValidationEventHandler(object sender, ValidationEventArgs e)
+        private void ValidationEventHandler(object sender, ValidationEventArgs e)
         {
             throw new SpreadsheetReadException("XML is not consistent with XSD.");
         }
+
+        public Spreadsheet(TextReader source, Regex newIsValid)
+        {
+            Graph = new DependencyGraph();
+            Cells = new Dictionary<string, Cell>();
+            IsValid = new Regex(@".*");
+
+            try
+            {
+                // Validate xml with xsd
+                XmlSchemaSet schema = new XmlSchemaSet();
+                schema.Add(null, "Spreadsheet.xsd");
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.ValidationType = ValidationType.Schema;
+                settings.Schemas = schema;
+                settings.ValidationEventHandler += ValidationEventHandler;
+                XmlReader reader = XmlReader.Create(source, settings);
+                string cellName;
+                string cellContent;
+                string sourceRegex;
+                Regex oldIsValid = null;
+                while (reader.Read())
+                {
+                    if (reader.IsStartElement())
+                    {
+                        switch (reader.Name)
+                        {
+                            case "spreadsheet":
+                                sourceRegex = reader["IsValid"];
+                                try
+                                {
+                                    oldIsValid = new Regex(sourceRegex);
+                                }
+                                catch
+                                {
+                                    throw new SpreadsheetReadException("Invalid regex.");
+                                }
+
+
+                                break;
+
+                            case "cell":
+                                cellName = reader["name"];
+                                if (!IsValidCellName(cellName, oldIsValid))
+                                {
+                                    throw new SpreadsheetReadException("Old regex failed.");
+                                }
+
+                                if (!IsValidCellName(cellName, newIsValid))
+                                {
+                                    throw new SpreadsheetVersionException("New regex failed.");
+                                }
+
+                                // This means that this cell has already been assigned
+                                if (Cells.ContainsKey(cellName))
+                                {
+                                    if (!Cells[cellName].hasBeenSet)
+                                    {
+                                        throw new SpreadsheetReadException("Duplicate cell name.");
+                                    }
+                                }
+
+                                cellContent = reader["contents"];
+                                // Means it is a formula
+                                if (cellContent[0].Equals('='))
+                                {
+                                    try
+                                    {
+                                        SetContentsOfCell(cellName, cellContent);
+                                    }
+                                    // Formula format is invalid
+                                    catch (FormulaFormatException e)
+                                    {
+                                        throw new SpreadsheetReadException("Formula format is invalid.");
+                                    }
+                                    // Formula causes circular dependency
+                                    catch (CircularException e)
+                                    {
+                                        throw new SpreadsheetReadException("Formula causes circular dependency.");
+                                    }
+                                }
+                                // Else its either a string or double
+                                else
+                                {
+                                    SetContentsOfCell(cellName, cellContent);
+                                }
+
+                                break;
+                        }
+                    }
+                }
+
+                IsValid = newIsValid;
+                Changed = false;
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
+        }
+
 
         /// A string is a valid cell name if and only if (1) s consists of one or more letters,
         /// followed by a non-zero digit, followed by zero or more digits AND (2) the C#

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 using Formulas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SS;
@@ -212,6 +214,117 @@ namespace SpreadsheetTests
             {
                 Assert.IsTrue(changed.Equals("A1") || changed.Equals("B1") || changed.Equals("C1"));
             }
+        }
+
+        // The following tests are to test the method SetContentsOfCell
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestSetContentsOfCell1()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestSetContentsOfCell2()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell(null, "1");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestSetContentsOfCell3()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("B03", "1");
+        }
+
+        [TestMethod]
+        public void TestSetContentsOfCell4()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            Assert.AreEqual((double) 1, spreadsheet.GetCellContents("A1"));
+            Assert.IsTrue(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        public void TestSetContentsOfCell4a()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "1");
+            foreach (string changed in spreadsheet.SetContentsOfCell("A1", "1"))
+            {
+                Assert.IsTrue(changed.Equals("A1"));
+            }
+
+            Assert.AreEqual((double) 1, spreadsheet.GetCellContents("A1"));
+            Assert.IsTrue(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void TestSetContentsOfCell5()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            spreadsheet.SetContentsOfCell("A1", "=X");
+        }
+
+        [TestMethod]
+        public void TestSetContentsOfCell6()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            foreach (string changed in spreadsheet.SetContentsOfCell("A1", "=B1"))
+            {
+                Assert.IsTrue(changed.Equals("A1"));
+            }
+
+            Formula formula = new Formula("B1");
+            Assert.AreEqual(formula.ToString(), spreadsheet.GetCellContents("A1").ToString());
+            Assert.IsTrue(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        public void TestSetContentsOfCell7()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet();
+            foreach (string changed in spreadsheet.SetContentsOfCell("A1", "Test"))
+            {
+                Assert.IsTrue(changed.Equals("A1"));
+            }
+
+            Assert.IsTrue("Test".Equals(spreadsheet.GetCellContents("A1")));
+            Assert.IsTrue(spreadsheet.Changed);
+        }
+
+        // The following tests are to test the spreadsheet constructors
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void TestRegexConstructor()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(new Regex("[A-C][1-2]"));
+            spreadsheet.SetContentsOfCell("B4", "1.0");
+        }
+
+        [TestMethod]
+        public void TestRegexConstructor1()
+        {
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(new Regex("[A-C][1-2]"));
+            Assert.IsFalse(spreadsheet.Changed);
+            spreadsheet.SetContentsOfCell("A2", "1");
+            spreadsheet.SetContentsOfCell("A1", "=A2");
+            spreadsheet.SetContentsOfCell("C2", "2");
+            Assert.IsTrue(spreadsheet.Changed);
+        }
+
+        [TestMethod]
+        public void TestRegexConstructor2()
+        {
+            TextReader source = new StreamReader("SampleSavedSpreadsheet.xml");
+            AbstractSpreadsheet spreadsheet = new Spreadsheet(source, new Regex("[A-B][1-3]"));
+            Assert.IsFalse(spreadsheet.Changed);
         }
     }
 }
