@@ -840,5 +840,16 @@ namespace SpreadsheetTests
 
             return f;
         }
+
+        // The following tests are to test the Save method.
+        [TestMethod]
+        public void TestSave1()
+        {
+            TextWriter textWriter = new StreamWriter("TestSave1.txt");
+            AbstractSpreadsheet s = new Spreadsheet();
+            s.SetContentsOfCell("A1", "Hello");
+            s.SetContentsOfCell("B1", "Bye");
+            s.Save(textWriter);
+        }
     }
 }

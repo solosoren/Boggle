@@ -303,7 +303,7 @@ namespace SS
         {
             try
             {
-                dest.WriteLine("<spreadsheet IsValid=\"" + IsValid.ToString() + "\">");
+                dest.WriteLine("<spreadsheet IsValid=\"" + IsValid + "\">");
                 foreach (KeyValuePair<string, Cell> entry in Cells)
                 {
                     if (entry.Value.hasFormula)
