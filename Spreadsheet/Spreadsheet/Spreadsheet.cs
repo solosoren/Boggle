@@ -314,7 +314,8 @@ namespace SS
 
                     else
                     {
-                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" + entry.Value.GetContent().ToString() +
+                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" +
+                                       entry.Value.GetContent().ToString() +
                                        "\"></cell>");
                     }
                 }
@@ -500,36 +501,78 @@ namespace SS
             ISet<string> changedSet = new HashSet<string>();
             if (Graph.HasDependents(name))
             {
-                changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
+                changedSet = GetAllRelatedDependents(name);
                 return changedSet;
-
             }
 
             changedSet.Add(name);
             return changedSet;
-
         }
 
-        private ISet<string> GetAllRelatedDependents(ISet<string> currentSet, string name)
+        private ISet<string> GetAllRelatedDependents(string name)
         {
-            if (!Graph.HasDependents(name))
+            ISet<string> set = new HashSet<string>();
+            Queue<string> queue = new Queue<string>();
+            if (Graph.HasDependents(name))
             {
-                return currentSet;
-            }
-
-            currentSet.Add(name);
-            foreach (string dependent in Graph.GetDependents(name))
-            {
-                if (Graph.GetDependents(dependent) != null)
+                string currentCell = name;
+                set.Add(currentCell);
+                while (currentCell != null)
                 {
-                    currentSet = GetAllRelatedDependents(currentSet, dependent);
-                }
+                    foreach (string dependent in Graph.GetDependents(currentCell))
+                    {
+                        if (!set.Contains(dependent))
+                        {
+                            if (Graph.HasDependents(dependent))
+                            {
+                                queue.Enqueue(dependent);
+                            }
+                            else
+                            {
+                                set.Add(dependent);
+                            }
+                        }
+                    }
 
-                currentSet.Add(dependent);
+                    if (queue.Count == 0)
+                    {
+                        currentCell = null;
+                    }
+                    else
+                    {
+                        currentCell = queue.Dequeue();
+                        set.Add(currentCell);
+                    }
+                }
+            }
+            else
+            {
+                set.Add(name);
             }
 
-            return currentSet;
+            return set;
         }
+
+//        private ISet<string> GetAllRelatedDependents(ISet<string> currentSet, string name)
+//        {
+//            if (!Graph.HasDependents(name))
+//            {
+//                return currentSet;
+//            }
+//
+//            currentSet.Add(name);
+//            foreach (string dependent in Graph.GetDependents(name))
+//            {
+//                if (Graph.HasDependents(dependent))
+//                {
+//                    currentSet = GetAllRelatedDependents(currentSet, dependent);
+//                }
+//
+//                currentSet.Add(dependent);
+//            }
+//
+//            return currentSet;
+//        }
 
         /// <summary>
         /// If text is null, throws an ArgumentNullException.
@@ -563,7 +606,7 @@ namespace SS
             Cells[name].SetContent(text);
 
             ISet<string> changedSet = new HashSet<string>();
-            changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
+            changedSet = GetAllRelatedDependents(name);
 
             return changedSet;
         }
@@ -620,14 +663,15 @@ namespace SS
 
 
             ISet<string> changedSet = new HashSet<string>();
-            changedSet.Add(name);
-            if (Graph.HasDependents(name))
-            {
-                foreach (string dependent in Graph.GetDependents(name))
-                {
-                    changedSet.Add(dependent);
-                }
-            }
+            changedSet = GetAllRelatedDependents(name);
+//            changedSet.Add(name);
+//            if (Graph.HasDependents(name))
+//            {
+//                foreach (string dependent in Graph.GetDependents(name))
+//                {
+//                    changedSet.Add(dependent);
+//                }
+//            }
 
             // To check for Circular Dependency
             GetCellsToRecalculate(changedSet);

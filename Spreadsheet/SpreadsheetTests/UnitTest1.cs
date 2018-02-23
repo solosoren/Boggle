@@ -859,5 +859,18 @@ namespace SpreadsheetTests
                 Assert.AreEqual(n.GetCellContents(VARIABLE), s.GetCellContents(VARIABLE));
             }
         }
+
+        [TestMethod]
+        public void methTest()
+        {
+            AbstractSpreadsheet s = new Spreadsheet();
+            s.SetContentsOfCell("A1", "=B1+B2");
+            s.SetContentsOfCell("B1", "=C1");
+            s.SetContentsOfCell("B2", "=C1");
+            foreach (string changed in s.SetContentsOfCell("C1", "3"))
+            {
+                Assert.IsTrue(changed.Equals("A1") || changed.Equals("B1") || changed.Equals("B2") || changed.Equals("C1"));
+            }
+        }
     }
 }
