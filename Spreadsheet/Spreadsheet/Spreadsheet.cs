@@ -17,7 +17,7 @@ namespace SS
         private object content;
         public bool hasFormula;
 
-        public Cell(string name)
+        public Cell()
         {
             content = "";
             hasFormula = false;
@@ -29,8 +29,11 @@ namespace SS
             {
                 hasFormula = true;
             }
+            else
+            {
+                hasFormula = false;
+            }
 
-            hasFormula = false;
             this.content = content;
         }
 
@@ -247,7 +250,7 @@ namespace SS
 
                     else if (Char.IsNumber(name[i]))
                     {
-                        if (name[i].Equals('0'))
+                        if (!lastCharWasNum && name[i].Equals('0'))
                         {
                             return false;
                         }
@@ -395,7 +398,7 @@ namespace SS
 
             if (!Cells.ContainsKey(name))
             {
-                Cells.Add(name, new Cell(name));
+                Cells.Add(name, new Cell());
             }
 
             return Cells[name].GetContent();
@@ -489,20 +492,27 @@ namespace SS
 
             if (!Cells.ContainsKey(name))
             {
-                Cells.Add(name, new Cell(name));
+                Cells.Add(name, new Cell());
             }
 
             Cells[name].SetContent(number);
 
             ISet<string> changedSet = new HashSet<string>();
-            changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
+            if (Graph.HasDependents(name))
+            {
+                changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
+                return changedSet;
 
+            }
+
+            changedSet.Add(name);
             return changedSet;
+
         }
 
         private ISet<string> GetAllRelatedDependents(ISet<string> currentSet, string name)
         {
-            if (Graph.GetDependents(name) == null)
+            if (!Graph.HasDependents(name))
             {
                 return currentSet;
             }
@@ -547,20 +557,13 @@ namespace SS
 
             if (!Cells.ContainsKey(name))
             {
-                Cells.Add(name, new Cell(name));
+                Cells.Add(name, new Cell());
             }
 
             Cells[name].SetContent(text);
 
             ISet<string> changedSet = new HashSet<string>();
-            changedSet.Add(name);
-            if (Graph.HasDependents(name))
-            {
-                foreach (string dependent in Graph.GetDependents(name))
-                {
-                    changedSet.Add(dependent);
-                }
-            }
+            changedSet = GetAllRelatedDependents(new HashSet<string>(), name);
 
             return changedSet;
         }
@@ -589,7 +592,7 @@ namespace SS
 
             if (!Cells.ContainsKey(name))
             {
-                Cells.Add(name, new Cell(name));
+                Cells.Add(name, new Cell());
             }
 
             // Set consisting of variables in formula
