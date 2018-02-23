@@ -212,7 +212,8 @@ namespace SpreadsheetTests
             spreadsheet.SetContentsOfCell("D1", "=C1");
             foreach (string changed in spreadsheet.SetContentsOfCell("A1", "Test"))
             {
-                Assert.IsTrue(changed.Equals("A1") || changed.Equals("B1") || changed.Equals("C1") || changed.Equals("D1"));
+                Assert.IsTrue(changed.Equals("A1") || changed.Equals("B1") || changed.Equals("C1") ||
+                              changed.Equals("D1"));
             }
         }
 
@@ -850,6 +851,13 @@ namespace SpreadsheetTests
             s.SetContentsOfCell("A1", "Hello");
             s.SetContentsOfCell("B1", "Bye");
             s.Save(textWriter);
+
+            TextReader textReader = new StreamReader("TestSave1.txt");
+            AbstractSpreadsheet n = new Spreadsheet(textReader, new Regex("[A-B][1-3]"));
+            foreach (var VARIABLE in s.GetNamesOfAllNonemptyCells())
+            {
+                Assert.AreEqual(n.GetCellContents(VARIABLE), s.GetCellContents(VARIABLE));
+            }
         }
     }
 }

@@ -314,7 +314,7 @@ namespace SS
 
                     else
                     {
-                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" + entry.Value.ToString() +
+                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" + entry.Value.GetContent().ToString() +
                                        "\"></cell>");
                     }
                 }
