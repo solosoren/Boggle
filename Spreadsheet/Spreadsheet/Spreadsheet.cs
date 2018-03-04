@@ -356,9 +356,9 @@ namespace SS
                 Cells.Add(name, new Cell());
             }
 
-            object content = Cells[name].GetContent();
+            object content = Cells[name.ToUpper()].GetContent();
             // If it is a formula
-            if (Cells[name].hasFormula)
+            if (Cells[name.ToUpper()].hasFormula)
             {
                 try
                 {
@@ -398,8 +398,6 @@ namespace SS
 
                 yield return cell.Key;
             }
-
-            yield break;
         }
 
         /// <summary>
@@ -420,7 +418,7 @@ namespace SS
                 Cells.Add(name, new Cell());
             }
 
-            return Cells[name].GetContent();
+            return Cells[name.ToUpper()].GetContent();
         }
 
         // ADDED FOR PS6
@@ -471,7 +469,7 @@ namespace SS
             if (double.TryParse(content, out double temp))
             {
                 Changed = true;
-                return SetCellContents(name, temp);
+                return SetCellContents(name.ToUpper(), temp);
             }
 
             // Is a Formula
@@ -482,14 +480,14 @@ namespace SS
                     Formula formula = new Formula(content.Substring(1, content.Length - 1), s => s.ToUpper(),
                         s => IsValidCellName(s, IsValid));
                     Changed = true;
-                    return SetCellContents(name, formula);
+                    return SetCellContents(name.ToUpper(), formula);
                 }
             }
 
 
             // Is a string
             Changed = true;
-            return SetCellContents(name, content);
+            return SetCellContents(name.ToUpper(), content);
         }
 
         /// <summary>
@@ -514,7 +512,7 @@ namespace SS
                 Cells.Add(name, new Cell());
             }
 
-            Cells[name].SetContent(number);
+            Cells[name.ToUpper()].SetContent(number);
 
             ISet<string> changedSet = new HashSet<string>();
             if (Graph.HasDependents(name))
@@ -621,11 +619,13 @@ namespace SS
                 Cells.Add(name, new Cell());
             }
 
-            Cells[name].SetContent(text);
-
+            Cells[name.ToUpper()].SetContent(text);
             ISet<string> changedSet = new HashSet<string>();
             changedSet = GetAllRelatedDependents(name);
-
+            if (text.Equals(""))
+            {
+                Cells.Remove(name.ToUpper());
+            }
             return changedSet;
         }
 
@@ -660,10 +660,10 @@ namespace SS
             ISet<string> variables = formula.GetVariables();
 
 
-            object oldVal = Cells[name].GetContent();
-            bool hadFormula = Cells[name].hasFormula;
+            object oldVal = Cells[name.ToUpper()].GetContent();
+            bool hadFormula = Cells[name.ToUpper()].hasFormula;
 
-            Cells[name].SetContent(formula);
+            Cells[name.ToUpper()].SetContent(formula);
 
             // Remove dependess that aren't there in the formula
             if (Graph.HasDependees(name))
@@ -702,8 +702,8 @@ namespace SS
             }
             catch (CircularException e)
             {
-                Cells[name].SetContent(oldVal);
-                Cells[name].hasFormula = hadFormula;
+                Cells[name.ToUpper()].SetContent(oldVal);
+                Cells[name.ToUpper()].hasFormula = hadFormula;
                 throw e;
             }
 
