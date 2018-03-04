@@ -247,17 +247,29 @@ namespace Formulas
 
         private bool ParenthesisEval(string formula)
         {
-            string[] fomrulaArray = formula.Split(' ');
+            string[] formulaArray = formula.Split(' ');
             int open = 0;
             int close = 0;
-            string firstChar = GetFirstChar(fomrulaArray[0]);
+            string firstChar = GetFirstChar(formulaArray[0]);
             if (firstChar.Equals(""))
             {
-                return false;
+                int index = 1;
+                while (firstChar == "")
+                {
+                    if (index == formulaArray.Length)
+                    {
+                        break;
+                    }
+
+                    firstChar = GetFirstChar(formulaArray[index]);
+                    index++;
+                }
+                if(firstChar.Equals(""))
+                    return false;
             }
 
             List<string> operators = new List<string> {"+", "-", "*", "/"};
-            string lastNum = GetLastChar(formula.Split(' ')[fomrulaArray.Length - 1]);
+            string lastNum = GetLastChar(formula.Split(' ')[formulaArray.Length - 1]);
             if (lastNum.Equals(""))
             {
                 return false;
@@ -377,7 +389,7 @@ namespace Formulas
 
                     else if (Char.IsNumber(name[i]))
                     {
-                        if (name[i].Equals('0'))
+                        if (!lastCharWasNum && name[i].Equals('0'))
                         {
                             return false;
                         }

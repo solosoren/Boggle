@@ -211,35 +211,14 @@ namespace Dependencies
             if (!nodeList[s].HasDependent(t))
             {
                 // Add t to s.Dependents
-                // t does not exist in list
-                if (!nodeList.ContainsKey(t))
-                {
-                    // add t to list
-                    nodeList.Add(t, dependentToAdd);
-                    nodeList[s].Dependents.Add(dependentToAdd);
-                }
-
-                else
-                {
-                    nodeList[s].Dependents.Add(nodeList[t]);
-                }
+                nodeList[s].Dependents.Add(nodeList[t]);
             }
 
             // t.Dependee does not contain s
             if (!nodeList[t].HasDependee(s))
             {
                 // Add s to t.Dependees
-                // s does not exist in list
-                if (!nodeList.ContainsKey(s))
-                {
-                    // add s to list
-                    nodeList.Add(s, dependeeToAdd);
-                    nodeList[t].Dependees.Add(dependeeToAdd);
-                }
-                else
-                {
-                    nodeList[t].Dependees.Add(nodeList[s]);
-                }
+                nodeList[t].Dependees.Add(nodeList[s]);
             }
 
             NumberOfDependencies++;

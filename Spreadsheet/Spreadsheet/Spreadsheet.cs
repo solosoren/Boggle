@@ -12,7 +12,7 @@ using Formulas;
 
 namespace SS
 {
-    public class Cell
+    class Cell
     {
         private object content;
         public bool hasFormula;
@@ -21,6 +21,12 @@ namespace SS
         {
             content = "";
             hasFormula = false;
+        }
+
+        public void copyCell(Cell sourcCell)
+        {
+            content = sourcCell.GetContent();
+            hasFormula = sourcCell.hasFormula;
         }
 
         public void SetContent(object content)
@@ -340,9 +346,14 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
-            if (name == null || !IsValidCellName(name, IsValid) || !Cells.ContainsKey(name))
+            if (name == null || !IsValidCellName(name, IsValid))
             {
                 throw new InvalidNameException();
+            }
+
+            if (!Cells.ContainsKey(name))
+            {
+                Cells.Add(name, new Cell());
             }
 
             object content = Cells[name].GetContent();
@@ -351,10 +362,7 @@ namespace SS
             {
                 try
                 {
-                    return new Formula(content.ToString()).Evaluate(s =>
-                        Cells.ContainsKey(s)
-                            ? (double) GetCellValue(s)
-                            : throw new FormulaEvaluationException("Undefined variable"));
+                    return new Formula(content.ToString()).Evaluate(GetCellValueForFormula);
                 }
                 catch (FormulaEvaluationException e)
                 {
@@ -364,6 +372,16 @@ namespace SS
 
             // Has to be either a string or double
             return content;
+        }
+
+        private double GetCellValueForFormula(string name)
+        {
+            if (!Cells.ContainsKey(name) || GetCellValue(name) is FormulaError || GetCellValue(name) is string)
+            {
+                throw new FormulaEvaluationException("FormulaError");
+            }
+
+            return (double) GetCellValue(name);
         }
 
         /// <summary>
@@ -641,6 +659,10 @@ namespace SS
             // Set consisting of variables in formula
             ISet<string> variables = formula.GetVariables();
 
+
+            object oldVal = Cells[name].GetContent();
+            bool hadFormula = Cells[name].hasFormula;
+
             Cells[name].SetContent(formula);
 
             // Remove dependess that aren't there in the formula
@@ -674,7 +696,17 @@ namespace SS
 //            }
 
             // To check for Circular Dependency
-            GetCellsToRecalculate(changedSet);
+            try
+            {
+                GetCellsToRecalculate(changedSet);
+            }
+            catch (CircularException e)
+            {
+                Cells[name].SetContent(oldVal);
+                Cells[name].hasFormula = hadFormula;
+                throw e;
+            }
+
             return changedSet;
         }
 
