@@ -314,7 +314,7 @@ namespace SS
                 {
                     if (entry.Value.hasFormula)
                     {
-                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"=" + entry.Value.ToString() +
+                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"=" + entry.Value.GetContent().ToString() +
                                        "\"></cell>");
                     }
 
