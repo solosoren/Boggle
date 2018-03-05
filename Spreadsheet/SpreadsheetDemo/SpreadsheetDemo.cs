@@ -25,7 +25,6 @@ namespace SSGui
             // This could also be done graphically in the designer, as has been
             // demonstrated in class.
             spreadsheetPanel1.SelectionChanged += displaySelection;
-            spreadsheetPanel1.SetSelection(2, 3);
         }
         /// <summary>
         /// Every time the selection changes, this method is called with the
