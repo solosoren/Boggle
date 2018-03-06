@@ -44,6 +44,9 @@ namespace SpreadsheetGUI
 
             // Displays cell name and value in value textbox
             cellValueTextBox.Text = getCellName(column, row) + " : " + value;
+
+            // Displays cell value based on selection in content textbox
+            cellContentTextBox.Text = value;
         }
 
         /// <summary>
@@ -121,9 +124,22 @@ namespace SpreadsheetGUI
             }
         }
 
-        private void label1_Click(object sender, EventArgs e)
+       
+        /// <summary>
+        /// Once enter is pressed while content text box is in focus,
+        /// sets content value for selected cell to the text that is
+        /// in the text box.
+        /// </summary>
+        private void cellContentTextBox_KeyDown(object sender, KeyEventArgs e)
         {
+            if(e.KeyCode.Equals(Keys.Enter))
+            {
+                int column, row;
+                spreadsheetPanel1.GetSelection(out column, out row);
 
+                // Will need to add controller command here
+                spreadsheetPanel1.SetValue(column, row, cellContentTextBox.Text);
+            }
         }
 
 
