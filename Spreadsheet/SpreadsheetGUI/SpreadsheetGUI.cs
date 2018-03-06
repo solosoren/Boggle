@@ -29,7 +29,7 @@ namespace SpreadsheetGUI
         {
             InitializeComponent();
             panelWidthOffset = this.Width - spreadsheetPanel1.Width;
-            panelHeightOffset = this.Height - spreadsheetPanel1.Height;   
+            panelHeightOffset = this.Height - spreadsheetPanel1.Height;
             KeyPreview = true;
             spreadsheetPanel1.SelectionChanged += displaySelection;
         }
@@ -124,7 +124,7 @@ namespace SpreadsheetGUI
             }
         }
 
-       
+
         /// <summary>
         /// Once enter is pressed while content text box is in focus,
         /// sets content value for selected cell to the text that is
@@ -132,7 +132,7 @@ namespace SpreadsheetGUI
         /// </summary>
         private void cellContentTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode.Equals(Keys.Enter))
+            if (e.KeyCode.Equals(Keys.Enter))
             {
                 int column, row;
                 spreadsheetPanel1.GetSelection(out column, out row);
@@ -150,7 +150,7 @@ namespace SpreadsheetGUI
         {
             spreadsheetPanel1.Width = this.Width - panelWidthOffset;
             spreadsheetPanel1.Height = this.Height - panelHeightOffset;
-   
+
         }
 
 
