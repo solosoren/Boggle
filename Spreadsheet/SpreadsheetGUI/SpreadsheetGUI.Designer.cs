@@ -66,6 +66,7 @@
             this.spreadsheetPanel1.Name = "spreadsheetPanel1";
             this.spreadsheetPanel1.Size = new System.Drawing.Size(499, 314);
             this.spreadsheetPanel1.TabIndex = 0;
+            this.spreadsheetPanel1.TabStop = false;
             // 
             // SpreadsheetGUI
             // 
@@ -77,6 +78,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "SpreadsheetGUI";
             this.Text = "Form1";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SpreadsheetGUI_KeyDown);
             this.Resize += new System.EventHandler(this.SpreadsheetGUI_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

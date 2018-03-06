@@ -66,21 +66,9 @@ namespace SpreadsheetGUI
 
 
         /// <summary>
-        /// Ignore this for now, I'm still working on it
+        /// Allows to naviagte cells using arrow keys.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void SpreadsheetGUI_KeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// Ignore this for now, I'm still working on it
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void spreadsheetPanel1_KeyDown(object sender, KeyEventArgs e)
         {
             int column, row;
             spreadsheetPanel1.GetSelection(out column, out row);
@@ -94,6 +82,7 @@ namespace SpreadsheetGUI
                     spreadsheetPanel1.SetSelection(column, row + 1);
                     // displaySelection here may not be necessary
                     displaySelection(spreadsheetPanel1);
+                    e.Handled = true;
                     break;
                 case Keys.Up:
                     if (row == 0)
@@ -103,6 +92,7 @@ namespace SpreadsheetGUI
                     spreadsheetPanel1.SetSelection(column, row - 1);
                     // displaySelection here may not be necessary
                     displaySelection(spreadsheetPanel1);
+                    e.Handled = true;
                     break;
                 case Keys.Left:
                     if (column == 0)
@@ -112,6 +102,7 @@ namespace SpreadsheetGUI
                     spreadsheetPanel1.SetSelection(column - 1, row);
                     // displaySelection here may not be necessary
                     displaySelection(spreadsheetPanel1);
+                    e.Handled = true;
                     break;
                 case Keys.Right:
                     if (column == 26)
@@ -121,9 +112,9 @@ namespace SpreadsheetGUI
                     spreadsheetPanel1.SetSelection(column + 1, row);
                     // displaySelection here may not be necessary
                     displaySelection(spreadsheetPanel1);
+                    e.Handled = true;
                     break;
             }
-
         }
 
 
