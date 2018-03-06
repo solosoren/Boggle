@@ -29,7 +29,7 @@ namespace SpreadsheetGUI
         {
             InitializeComponent();
             panelWidthOffset = this.Width - spreadsheetPanel1.Width;
-            panelHeightOffset = this.Height - spreadsheetPanel1.Height;
+            panelHeightOffset = this.Height - spreadsheetPanel1.Height;   
             KeyPreview = true;
             spreadsheetPanel1.SelectionChanged += displaySelection;
         }
@@ -37,9 +37,13 @@ namespace SpreadsheetGUI
         private void displaySelection(SpreadsheetPanel ss)
         {
             int column, row;
+            string value;
             ss.GetSelection(out column, out row);
             ss.SetSelection(column, row);
-            ss.SetValue(column, row, getCellName(column, row));
+            ss.GetValue(column, row, out value);
+
+            // Displays cell name and value in value textbox
+            cellValueTextBox.Text = getCellName(column, row) + " : " + value;
         }
 
         /// <summary>
@@ -117,6 +121,11 @@ namespace SpreadsheetGUI
             }
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
 
         /// <summary>
         /// Resizes SpreadsheetPanel based on SpreadsheetGUI.
@@ -125,6 +134,7 @@ namespace SpreadsheetGUI
         {
             spreadsheetPanel1.Width = this.Width - panelWidthOffset;
             spreadsheetPanel1.Height = this.Height - panelHeightOffset;
+   
         }
 
 
