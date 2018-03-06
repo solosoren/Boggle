@@ -73,7 +73,7 @@
             // cellValueTextBox
             // 
             this.cellValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cellValueTextBox.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.cellValueTextBox.BackColor = System.Drawing.SystemColors.ControlLight;
             this.cellValueTextBox.Enabled = false;
             this.cellValueTextBox.ForeColor = System.Drawing.SystemColors.InfoText;
             this.cellValueTextBox.Location = new System.Drawing.Point(80, 317);
@@ -82,6 +82,7 @@
             this.cellValueTextBox.Size = new System.Drawing.Size(100, 20);
             this.cellValueTextBox.TabIndex = 2;
             this.cellValueTextBox.Text = "Cell Name: Value";
+            this.cellValueTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // cellContentTextBox
             // 
