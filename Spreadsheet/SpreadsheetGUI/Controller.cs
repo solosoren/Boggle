@@ -34,23 +34,14 @@ namespace SpreadsheetGUI
         {
             foreach (string name in spreadsheet.SetContentsOfCell(getCellName(column, row), content))
             {
-                int col = -65, ro = -49;
-                foreach (char character in name.ToCharArray())
-                {
-                    if (Regex.IsMatch(character.ToString(), @"[a-zA-Z]"))
-                    {
-                        col += character;
-                    }
-                    else
-                    {
-                        ro += character;
-                    }
-                }
-                spreadsheetView.SetCellValue(col, ro, spreadsheet.GetCellValue(name).ToString());
+                int col = name.ToCharArray()[0] - 65;
+                int ro = int.Parse(name.Substring(1));
+                spreadsheetView.SetCellValue(col, ro - 1, spreadsheet.GetCellValue(name).ToString());
             }
         }
 
- 
+
+
         /// <summary>
         /// Converts given column and row integers to a string that matches the spreadsheet and returns it.
         /// </summary>
