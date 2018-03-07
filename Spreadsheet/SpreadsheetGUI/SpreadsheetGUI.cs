@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,9 +31,12 @@ namespace SpreadsheetGUI
         /// Fired when request is made to close window
         /// </summary>
         public event Action CloseEvent;
-
+        public event Action<FileStream> SaveEvent;
         public event Action NewEvent;
         public event Action HelpEvent;
+
+        // fired when checking whether a save is necessary
+        public event Action DidChangeEvent;
 
         public SpreadsheetGUI()
         {
@@ -162,10 +166,7 @@ namespace SpreadsheetGUI
 
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (HelpEvent != null)
-            {
-                HelpEvent();
-            }
+            HelpEvent?.Invoke();
         }
 
         /// <summary>
@@ -178,16 +179,35 @@ namespace SpreadsheetGUI
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(NewEvent != null)
-            {
-                NewEvent();
-            }
+            NewEvent?.Invoke();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DidChangeEvent?.Invoke();
         }
 
         public void SetCellValue(int column, int row, string content)
         {
             displaySelection(spreadsheetPanel1);
             spreadsheetPanel1.SetValue(column, row, content);
+        }
+
+        public void Save()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save Spreadsheet";
+            saveFileDialog.ShowDialog();
+
+            if (saveFileDialog.FileName != "")
+            {
+                // TODO: Check is filepath is valid and if it is going to overwrite 
+
+                System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
+                SaveEvent?.Invoke(fs);
+
+            }
+
         }
     }
 }
