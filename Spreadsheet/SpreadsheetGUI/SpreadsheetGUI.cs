@@ -71,7 +71,6 @@ namespace SpreadsheetGUI
             }
         }
 
-
         /// <summary>
         /// Allows to naviagte cells using arrow keys.
         /// </summary>
@@ -175,6 +174,14 @@ namespace SpreadsheetGUI
         public void CloseWindow()
         {
             Close();
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(NewEvent != null)
+            {
+                NewEvent();
+            }
         }
 
         public void SetCellValue(int column, int row, string content)

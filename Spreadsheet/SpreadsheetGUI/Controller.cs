@@ -8,6 +8,7 @@ using Formulas;
 using System.Windows.Forms;
 using SSGui;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace SpreadsheetGUI
 {
@@ -24,6 +25,7 @@ namespace SpreadsheetGUI
             spreadsheetView.CloseEvent += HandleClose;
             spreadsheetView.HelpEvent += HandleHelp;
             spreadsheetView.SelectionChangeEvent += HandleSelectionChange;
+            spreadsheetView.NewEvent += HandleNew;
         }
 
         /// <summary>
@@ -81,6 +83,24 @@ namespace SpreadsheetGUI
 
         }
 
+
+        /// <summary>
+        /// Handles a request to open a new spreadsheet
+        /// </summary>
+        private void HandleNew()
+        {
+           
+            Thread thread = new Thread(() =>
+            {
+                var context = SpreadsheetGUIContext.GetContext();
+                SpreadsheetGUIContext.GetContext().RunNew();
+                Application.Run(context);
+            });
+
+            thread.Start();
+
+        }
+
         /// <summary>
         /// Changes the information in value and content textboxes
         /// </summary>
@@ -93,7 +113,15 @@ namespace SpreadsheetGUI
             // Displays cell name and value in value textbox
             valueTextBox.Text = String.Format("{0} : {1}", getCellName(column, row), spreadsheet.GetCellValue(getCellName(column, row)));
             // Displays cell value based on selection in content textbox
-            contentTextBox.Text = spreadsheet.GetCellContents(getCellName(column, row)).ToString();
+            object content = spreadsheet.GetCellContents(getCellName(column, row));
+            if (content is Formula)
+            {
+                contentTextBox.Text = "=" + spreadsheet.GetCellContents(getCellName(column, row)).ToString();
+            }
+            else
+            {
+                contentTextBox.Text = spreadsheet.GetCellContents(getCellName(column, row)).ToString();
+            }
         }
 
     }
