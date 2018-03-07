@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Formula", "Formula\Formula.csproj", "{D43D998C-9797-4CF4-9BB0-6DE22753849A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaSimpleTest", "FormulaSimpleTest\FormulaSimpleTest.csproj", "{D2B178C1-979A-4C6F-B411-486D1D8C37D6}"
@@ -25,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetPanel", "Spreads
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetGUI", "SpreadsheetGUI\SpreadsheetGUI.csproj", "{F9EA1EAB-5795-46C7-9E75-AD5EA7BD6173}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spreadsheet", "Spreadsheet\Spreadsheet.csproj", "{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,12 +33,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|x86.Build.0 = Debug|Any CPU
-		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|x86.ActiveCfg = Release|Any CPU
-		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|x86.Build.0 = Release|Any CPU
 		{D43D998C-9797-4CF4-9BB0-6DE22753849A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D43D998C-9797-4CF4-9BB0-6DE22753849A}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{D43D998C-9797-4CF4-9BB0-6DE22753849A}.Debug|x86.Build.0 = Debug|Any CPU
@@ -105,6 +99,14 @@ Global
 		{F9EA1EAB-5795-46C7-9E75-AD5EA7BD6173}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F9EA1EAB-5795-46C7-9E75-AD5EA7BD6173}.Release|x86.ActiveCfg = Release|Any CPU
 		{F9EA1EAB-5795-46C7-9E75-AD5EA7BD6173}.Release|x86.Build.0 = Release|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Debug|x86.Build.0 = Debug|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|x86.ActiveCfg = Release|Any CPU
+		{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,7 +17,9 @@ namespace SpreadsheetGUI
         {
             this.spreadsheetView = spreadsheetView;
             spreadsheet = new Spreadsheet();
-            spreadsheetView.SetConentEvent += HandleSetContent;
+            spreadsheetView.SetContentEvent += HandleSetContent;
+            spreadsheetView.CloseEvent += HandleClose;
+
         }
 
         /// <summary>
@@ -26,8 +28,28 @@ namespace SpreadsheetGUI
         /// <param name="content"></param>
         private void HandleSetContent(string content)
         {
-            spreadsheet.SetContentsOfCell(spreadsheetView.GetCellName(), content);
+            foreach (string name in spreadsheet.SetContentsOfCell(spreadsheetView.GetCellName(), content))
+            {   
+                spreadsheetView.SetCellContent(name, spreadsheet.GetCellValue(name).ToString());
+            }
 
+        }
+
+        /// <summary>
+        /// Handles a request to close the window
+        /// </summary>
+        private void HandleClose()
+        {
+            if (spreadsheet.Changed)
+            {
+                // TODO: Display save? dialogue box
+
+            }
+            else
+            {
+                spreadsheetView.CloseWindow();
+            }
+            
         }
 
 

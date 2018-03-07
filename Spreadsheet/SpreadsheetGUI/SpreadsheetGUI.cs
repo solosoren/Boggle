@@ -24,7 +24,13 @@ namespace SpreadsheetGUI
         /// Fired when request is made to set content.
         /// The parameter is the content to be set.
         /// </summary>
-        public event Action<string> SetConentEvent;
+        public event Action<string> SetContentEvent;
+        /// <summary>
+        /// Fired when request is made to close window
+        /// </summary>
+        public event Action CloseEvent;
+
+        public event Action NewEvent;
 
         public SpreadsheetGUI()
         {
@@ -69,7 +75,10 @@ namespace SpreadsheetGUI
         /// </summary>
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Close();
+            if (CloseEvent != null)
+            {
+                CloseEvent();
+            }
         }
 
 
@@ -135,15 +144,9 @@ namespace SpreadsheetGUI
         {
             if (e.KeyCode.Equals(Keys.Enter))
             {
-                int column, row;
-                spreadsheetPanel1.GetSelection(out column, out row);
-                SetConentEvent?.Invoke(cellContentTextBox.Text);
-                spreadsheetPanel1.SetValue(column, row, cellContentTextBox.Text);
-                // Displays cell name and value in value textbox
-                cellValueTextBox.Text = getCellName(row, column) + " : " + cellContentTextBox.Text;
+                SetContentEvent?.Invoke(cellContentTextBox.Text);  
             }
         }
-
 
         /// <summary>
         /// Resizes SpreadsheetPanel based on SpreadsheetGUI.
@@ -171,6 +174,32 @@ namespace SpreadsheetGUI
             return c + (row + 1).ToString();
         }
 
+        /// <summary>
+        /// sets the cells content
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        public void SetCellContent(string name, string content)
+        {
+            int column, row;
+            spreadsheetPanel1.GetSelection(out column, out row);
+            spreadsheetPanel1.SetValue(column, row, content);
+            // Displays cell name and value in value textbox
+            cellValueTextBox.Text = getCellName(row, column) + " : " + content;
+        }
 
+        public void OpenNew()
+        {
+            // TODO:
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Closes the window
+        /// </summary>
+        public void CloseWindow()
+        {
+            Close();
+        }
     }
 }
