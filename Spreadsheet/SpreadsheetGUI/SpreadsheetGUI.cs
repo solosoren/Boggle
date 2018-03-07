@@ -24,13 +24,15 @@ namespace SpreadsheetGUI
         /// Fired when request is made to set content.
         /// The parameter is the content to be set.
         /// </summary>
-        public event Action<string> SetContentEvent;
+        public event Action<int, int, string> SetContentEvent;
+        public event Action<int, int, TextBox, TextBox> SelectionChangeEvent;
         /// <summary>
         /// Fired when request is made to close window
         /// </summary>
         public event Action CloseEvent;
 
         public event Action NewEvent;
+        public event Action HelpEvent;
 
         public SpreadsheetGUI()
         {
@@ -41,32 +43,20 @@ namespace SpreadsheetGUI
             spreadsheetPanel1.SelectionChanged += displaySelection;
         }
 
-        private void displaySelection(SpreadsheetPanel ss)
-        {
-            int column, row;
-            string value;
-            ss.GetSelection(out column, out row);
-            ss.SetSelection(column, row);
-            ss.GetValue(column, row, out value);
-
-            // Displays cell name and value in value textbox
-            cellValueTextBox.Text = getCellName(row, column) + " : " + value;
-
-            // Displays cell value based on selection in content textbox
-            cellContentTextBox.Text = value;
-        }
 
         /// <summary>
-        /// Converts given column and row integers to a string that matches the spreadsheet and returns it.
+        /// Updates value and content text boxes to show correct information.
         /// </summary>
-        /// <param name="column"></param>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        private string getCellName(int column, int row)
+        /// <param name="ss"></param>
+        private void displaySelection(SpreadsheetPanel ss)
         {
-            Char c = (Char)(65 + column);
-            string rowS = row.ToString();
-            return c + (row + 1).ToString();
+            if (SelectionChangeEvent != null)
+            {
+                int column, row;
+                ss.GetSelection(out column, out row);
+                ss.SetSelection(column, row);
+                SelectionChangeEvent(column, row, cellValueTextBox, cellContentTextBox);
+            }
         }
 
 
@@ -144,7 +134,13 @@ namespace SpreadsheetGUI
         {
             if (e.KeyCode.Equals(Keys.Enter))
             {
-                SetContentEvent?.Invoke(cellContentTextBox.Text);  
+                int column, row;
+                spreadsheetPanel1.GetSelection(out column, out row);
+                if (SetContentEvent != null)
+                {
+                    SetContentEvent(column, row, cellContentTextBox.Text);
+                }
+                e.SuppressKeyPress = true;
             }
         }
 
@@ -158,38 +154,19 @@ namespace SpreadsheetGUI
 
         }
 
-        /// <summary>
-        /// Converts given column and row integers to a string that matches the spreadsheet
-        /// and returns it.
-        /// </summary>
-        /// <param name="column"></param>
-        /// <param name="row"></param>
-        /// <returns></returns>
-        string ISpreadsheetView.GetCellName()
-        {
-            int column, row;
-            spreadsheetPanel1.GetSelection(out column, out row);
-            Char c = (Char)(65 + column);
-            string rowS = row.ToString();
-            return c + (row + 1).ToString();
-        }
-
-        /// <summary>
-        /// sets the cells content
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="content"></param>
-        public void SetCellContent(int column, int row, string name, string content)
-        {
-            spreadsheetPanel1.SetValue(column, row, content);
-            // Displays cell name and value in value textbox
-            cellValueTextBox.Text = getCellName(row, column) + " : " + content;
-        }
 
         public void OpenNew()
         {
             // TODO:
             throw new NotImplementedException();
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (HelpEvent != null)
+            {
+                HelpEvent();
+            }
         }
 
         /// <summary>
@@ -198,6 +175,12 @@ namespace SpreadsheetGUI
         public void CloseWindow()
         {
             Close();
+        }
+
+        public void SetCellValue(int column, int row, string content)
+        {
+            displaySelection(spreadsheetPanel1);
+            spreadsheetPanel1.SetValue(column, row, content);
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using SSGui;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SpreadsheetGUI
 {
@@ -12,23 +14,19 @@ namespace SpreadsheetGUI
     interface ISpreadsheetView
     {
 
-        event Action<string> SetContentEvent;
+        event Action<int, int, string> SetContentEvent;
         event Action CloseEvent;
         event Action NewEvent;
+        event Action HelpEvent;
+        event Action<int, int, TextBox, TextBox> SelectionChangeEvent;
 
         /// <summary>
-        /// Gets the cell name
+        /// Sets spreadsheetPanel to given content at given location
         /// </summary>
-        /// <returns></returns>
-        string GetCellName();
-
-        /// <summary>
-        /// Sets the cell's content after a formula has been computed
-        /// </summary>
-        /// <param name="name"></param>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
         /// <param name="content"></param>
-        void SetCellContent(int column, int row, string name, string content);
-
+        void SetCellValue(int column, int row, string content);
         /// <summary>
         /// Opens a new Window
         /// </summary>
