@@ -27,7 +27,7 @@ namespace SpreadsheetGUI
         /// </summary>
         /// <param name="name"></param>
         /// <param name="content"></param>
-        void SetCellContent(string name, string content);
+        void SetCellContent(int column, int row, string name, string content);
 
         /// <summary>
         /// Opens a new Window

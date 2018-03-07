@@ -179,10 +179,8 @@ namespace SpreadsheetGUI
         /// </summary>
         /// <param name="name"></param>
         /// <param name="content"></param>
-        public void SetCellContent(string name, string content)
+        public void SetCellContent(int column, int row, string name, string content)
         {
-            int column, row;
-            spreadsheetPanel1.GetSelection(out column, out row);
             spreadsheetPanel1.SetValue(column, row, content);
             // Displays cell name and value in value textbox
             cellValueTextBox.Text = getCellName(row, column) + " : " + content;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Formulas;
+using System.Text.RegularExpressions;
 
 namespace SpreadsheetGUI
 {
@@ -29,8 +30,20 @@ namespace SpreadsheetGUI
         private void HandleSetContent(string content)
         {
             foreach (string name in spreadsheet.SetContentsOfCell(spreadsheetView.GetCellName(), content))
-            {   
-                spreadsheetView.SetCellContent(name, spreadsheet.GetCellValue(name).ToString());
+            {
+                int col = -65, row = -49;
+                foreach (char character in name.ToCharArray())
+                {
+                    if (Regex.IsMatch(character.ToString(), @"[a-zA-Z]"))
+                    {
+                        col += character;
+                    }
+                    else
+                    {
+                        row += character;
+                    }
+                }
+                spreadsheetView.SetCellContent(col, row, name, spreadsheet.GetCellValue(name).ToString());
             }
 
         }
