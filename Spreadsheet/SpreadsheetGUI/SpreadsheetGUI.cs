@@ -12,18 +12,19 @@ using System.Windows.Forms;
 
 namespace SpreadsheetGUI
 {
-    public partial class SpreadsheetGUI : Form
+    public partial class SpreadsheetGUI : Form, ISpreadsheetView
     {
-
-        /// <summary>
-        /// Underlying spreadsheet which will contain all information.
-        /// </summary>
-        private Spreadsheet spreadsheet;
 
         /// <summary>
         /// Offsets for resizing so the SpreadsheetPanel does not get hidden under the GUI.
         /// </summary>
         private int panelWidthOffset, panelHeightOffset;
+
+        /// <summary>
+        /// Fired when request is made to set content.
+        /// The parameter is the content to be set.
+        /// </summary>
+        public event Action<string> SetConentEvent;
 
         public SpreadsheetGUI()
         {
@@ -43,7 +44,7 @@ namespace SpreadsheetGUI
             ss.GetValue(column, row, out value);
 
             // Displays cell name and value in value textbox
-            cellValueTextBox.Text = getCellName(column, row) + " : " + value;
+            cellValueTextBox.Text = getCellName(row, column) + " : " + value;
 
             // Displays cell value based on selection in content textbox
             cellContentTextBox.Text = value;
@@ -136,9 +137,10 @@ namespace SpreadsheetGUI
             {
                 int column, row;
                 spreadsheetPanel1.GetSelection(out column, out row);
-
-                // Will need to add controller command here
+                SetConentEvent?.Invoke(cellContentTextBox.Text);
                 spreadsheetPanel1.SetValue(column, row, cellContentTextBox.Text);
+                // Displays cell name and value in value textbox
+                cellValueTextBox.Text = getCellName(row, column) + " : " + cellContentTextBox.Text;
             }
         }
 
@@ -151,6 +153,22 @@ namespace SpreadsheetGUI
             spreadsheetPanel1.Width = this.Width - panelWidthOffset;
             spreadsheetPanel1.Height = this.Height - panelHeightOffset;
 
+        }
+
+        /// <summary>
+        /// Converts given column and row integers to a string that matches the spreadsheet
+        /// and returns it.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        string ISpreadsheetView.GetCellName()
+        {
+            int column, row;
+            spreadsheetPanel1.GetSelection(out column, out row);
+            Char c = (Char)(65 + column);
+            string rowS = row.ToString();
+            return c + (row + 1).ToString();
         }
 
 
