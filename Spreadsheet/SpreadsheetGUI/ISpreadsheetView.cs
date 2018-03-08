@@ -1,7 +1,6 @@
 ﻿using SSGui;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,8 +18,6 @@ namespace SpreadsheetGUI
         event Action CloseEvent;
         event Action NewEvent;
         event Action HelpEvent;
-        event Action<FileStream> SaveEvent;
-        event Action DidChangeEvent;
         event Action<int, int, TextBox, TextBox> SelectionChangeEvent;
 
         /// <summary>
@@ -30,7 +27,6 @@ namespace SpreadsheetGUI
         /// <param name="row"></param>
         /// <param name="content"></param>
         void SetCellValue(int column, int row, string content);
-
         /// <summary>
         /// Opens a new Window
         /// </summary>
@@ -40,11 +36,6 @@ namespace SpreadsheetGUI
         /// Closes the window
         /// </summary>
         void CloseWindow();
-
-        /// <summary>
-        /// Find the file to save
-        /// </summary>
-        void Save();
 
 
     }

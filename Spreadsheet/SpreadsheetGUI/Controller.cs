@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using SSGui;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.IO;
 
 namespace SpreadsheetGUI
 {
@@ -27,8 +26,6 @@ namespace SpreadsheetGUI
             spreadsheetView.HelpEvent += HandleHelp;
             spreadsheetView.SelectionChangeEvent += HandleSelectionChange;
             spreadsheetView.NewEvent += HandleNew;
-            spreadsheetView.DidChangeEvent += HandleDidChange;
-            spreadsheetView.SaveEvent += HandleSave;
         }
 
         /// <summary>
@@ -37,12 +34,40 @@ namespace SpreadsheetGUI
         /// <param name="content"></param>
         private void HandleSetContent(int column, int row, string content)
         {
-            foreach (string name in spreadsheet.SetContentsOfCell(getCellName(column, row), content))
+
+            // Made this to restore to old values if there is an error with the Formula
+            // Im sure there is a lot better way to do this but i've put this here for
+            // the moment. Feel free to change it.
+            Spreadsheet oldSpreadsheet = new Spreadsheet();
+            foreach(string name in spreadsheet.GetNamesOfAllNonemptyCells())
             {
-                int col = name.ToCharArray()[0] - 65;
-                int ro = int.Parse(name.Substring(1));
-                spreadsheetView.SetCellValue(col, ro - 1, spreadsheet.GetCellValue(name).ToString());
+                oldSpreadsheet.SetContentsOfCell(name, spreadsheet.GetCellContents(name).ToString());
             }
+            try
+            {
+                foreach (string name in spreadsheet.SetContentsOfCell(getCellName(column, row), content))
+                {
+                    int col = name.ToCharArray()[0] - 65;
+                    int ro = int.Parse(name.Substring(1));
+                    object contentToCheck = spreadsheet.GetCellValue(name);
+                    if(contentToCheck is FormulaError)
+                    {
+                        MessageBox.Show(String.Format("Formula error {0}", contentToCheck.ToString()));
+                        spreadsheet = oldSpreadsheet;
+                        break;
+                    }
+                    spreadsheetView.SetCellValue(col, ro - 1, spreadsheet.GetCellValue(name).ToString());
+                }
+            }
+            catch(FormulaFormatException e)
+            {
+                MessageBox.Show("Formula format invalid");
+                
+            }catch(CircularException e)
+            {
+                MessageBox.Show("Circular exception");
+            }
+            
         }
 
 
@@ -59,30 +84,6 @@ namespace SpreadsheetGUI
             string rowS = row.ToString();
             return c + (row + 1).ToString();
         }
-        
-        /// <summary>
-        /// checks whether the spreadsheet was changed and calls save() accordingly
-        /// </summary>
-        private void HandleDidChange()
-        {
-            if (spreadsheet.Changed)
-            {
-                spreadsheetView.Save();
-            }
-        }
-
-
-        private void HandleSave(FileStream fs)
-        {
-            using (StreamWriter s = new StreamWriter(fs))
-            {
-                spreadsheet.Save(s);
-            }
-                
-
-            
-        }
-
 
 
         /// <summary>
