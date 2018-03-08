@@ -30,6 +30,7 @@ namespace SpreadsheetGUI
             spreadsheetView.NewEvent += HandleNew;
             spreadsheetView.DidChangeEvent += HandleDidChange;
             spreadsheetView.SaveEvent += HandleSave;
+            spreadsheetView.OpenEvent += HandleOpen;
         }
 
         /// <summary>
@@ -49,19 +50,23 @@ namespace SpreadsheetGUI
             }
             try
             {
-                foreach (string name in spreadsheet.SetContentsOfCell(getCellName(column, row), content))
+                if (content != "")
                 {
-                    int col = name.ToCharArray()[0] - 65;
-                    int ro = int.Parse(name.Substring(1));
-                    object contentToCheck = spreadsheet.GetCellValue(name);
-                    if (contentToCheck is FormulaError)
+                    foreach (string name in spreadsheet.SetContentsOfCell(getCellName(column, row), content))
                     {
-                        MessageBox.Show(String.Format("Formula error {0}", contentToCheck.ToString()));
-                        spreadsheet = oldSpreadsheet;
-                        break;
+                        int col = name.ToCharArray()[0] - 65;
+                        int ro = int.Parse(name.Substring(1));
+                        object contentToCheck = spreadsheet.GetCellValue(name);
+                        if (contentToCheck is FormulaError)
+                        {
+                            MessageBox.Show(String.Format("Formula error {0}", contentToCheck.ToString()));
+                            spreadsheet = oldSpreadsheet;
+                            break;
+                        }
+                        spreadsheetView.SetCellValue(col, ro - 1, spreadsheet.GetCellValue(name).ToString());
                     }
-                    spreadsheetView.SetCellValue(col, ro - 1, spreadsheet.GetCellValue(name).ToString());
                 }
+
             }
             catch (FormulaFormatException e)
             {
@@ -173,6 +178,39 @@ namespace SpreadsheetGUI
             using (StreamWriter s = new StreamWriter(fs))
             {
                 spreadsheet.Save(s);
+            }
+        }
+
+        private void HandleOpen(TextBox valueTextBox, TextBox contentTextBox)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileStream fs = (FileStream)openFileDialog.OpenFile();
+                using (StreamReader s = new StreamReader(fs))
+                    spreadsheet = new Spreadsheet(s, new Regex(""));
+
+                resetView();
+                foreach (string name in spreadsheet.GetNamesOfAllNonemptyCells().ToList())
+                {
+                    int col = name.ToCharArray()[0] - 65;
+                    int row = int.Parse(name.Substring(1));
+                    spreadsheetView.SetCellValue(col, row - 1, spreadsheet.GetCellValue(name).ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resets all cell values to null in SpreadsheetPanel
+        /// </summary>
+        private void resetView()
+        {
+            for (int col = 0; col < 27; col++)
+            {
+                for (int row = 0; row < 99; row++)
+                {
+                    spreadsheetView.SetCellValue(col, row, "");
+                }
             }
         }
 

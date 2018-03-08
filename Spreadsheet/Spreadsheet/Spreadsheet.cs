@@ -569,26 +569,26 @@ namespace SS
             return set;
         }
 
-//        private ISet<string> GetAllRelatedDependents(ISet<string> currentSet, string name)
-//        {
-//            if (!Graph.HasDependents(name))
-//            {
-//                return currentSet;
-//            }
-//
-//            currentSet.Add(name);
-//            foreach (string dependent in Graph.GetDependents(name))
-//            {
-//                if (Graph.HasDependents(dependent))
-//                {
-//                    currentSet = GetAllRelatedDependents(currentSet, dependent);
-//                }
-//
-//                currentSet.Add(dependent);
-//            }
-//
-//            return currentSet;
-//        }
+        //        private ISet<string> GetAllRelatedDependents(ISet<string> currentSet, string name)
+        //        {
+        //            if (!Graph.HasDependents(name))
+        //            {
+        //                return currentSet;
+        //            }
+        //
+        //            currentSet.Add(name);
+        //            foreach (string dependent in Graph.GetDependents(name))
+        //            {
+        //                if (Graph.HasDependents(dependent))
+        //                {
+        //                    currentSet = GetAllRelatedDependents(currentSet, dependent);
+        //                }
+        //
+        //                currentSet.Add(dependent);
+        //            }
+        //
+        //            return currentSet;
+        //        }
 
         /// <summary>
         /// If text is null, throws an ArgumentNullException.
@@ -686,14 +686,14 @@ namespace SS
 
             ISet<string> changedSet = new HashSet<string>();
             changedSet = GetAllRelatedDependents(name);
-//            changedSet.Add(name);
-//            if (Graph.HasDependents(name))
-//            {
-//                foreach (string dependent in Graph.GetDependents(name))
-//                {
-//                    changedSet.Add(dependent);
-//                }
-//            }
+            //            changedSet.Add(name);
+            //            if (Graph.HasDependents(name))
+            //            {
+            //                foreach (string dependent in Graph.GetDependents(name))
+            //                {
+            //                    changedSet.Add(dependent);
+            //                }
+            //            }
 
             // To check for Circular Dependency
             try

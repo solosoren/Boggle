@@ -38,6 +38,7 @@ namespace SpreadsheetGUI
         // fired when checking whether a save is necessary
         public event Action DidChangeEvent;
         public event Action HelpFileEvent;
+        public event Action<TextBox, TextBox> OpenEvent;
 
         public SpreadsheetGUI()
         {
@@ -175,7 +176,7 @@ namespace SpreadsheetGUI
         {
             displaySelection(spreadsheetPanel1);
             spreadsheetPanel1.SetValue(column, row, content);
-        } 
+        }
 
         private void saveToolStripMenuItem_Click_1(object sender, EventArgs e) => DidChangeEvent?.Invoke();
 
@@ -189,19 +190,23 @@ namespace SpreadsheetGUI
             HelpFileEvent?.Invoke();
         }
 
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenEvent?.Invoke(cellValueTextBox, cellContentTextBox);
+        }
+
         public void Save()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Spreadsheet (*.ss)|*.ss|All files (*.*)|*.*";
             saveFileDialog.Title = "Save Spreadsheet";
             saveFileDialog.ShowDialog();
-
             if (saveFileDialog.FileName != "")
             {
-                System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
+                FileStream fs = (FileStream)saveFileDialog.OpenFile();
                 SaveEvent?.Invoke(fs);
             }
-
         }
+
     }
 }
