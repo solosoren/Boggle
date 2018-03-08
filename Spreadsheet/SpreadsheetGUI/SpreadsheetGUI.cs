@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,9 +31,12 @@ namespace SpreadsheetGUI
         /// Fired when request is made to close window
         /// </summary>
         public event Action CloseEvent;
-
+        public event Action<FileStream> SaveEvent;
         public event Action NewEvent;
         public event Action HelpEvent;
+
+        // fired when checking whether a save is necessary
+        public event Action DidChangeEvent;
 
         public SpreadsheetGUI()
         {
@@ -42,7 +46,6 @@ namespace SpreadsheetGUI
             KeyPreview = true;
             spreadsheetPanel1.SelectionChanged += displaySelection;
         }
-
 
         /// <summary>
         /// Updates value and content text boxes to show correct information.
@@ -65,10 +68,7 @@ namespace SpreadsheetGUI
         /// </summary>
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CloseEvent != null)
-            {
-                CloseEvent();
-            }
+            CloseEvent?.Invoke();
         }
 
         /// <summary>
@@ -153,19 +153,16 @@ namespace SpreadsheetGUI
 
         }
 
-
         public void OpenNew()
         {
             // TODO:
             throw new NotImplementedException();
         }
 
+
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (HelpEvent != null)
-            {
-                HelpEvent();
-            }
+            HelpEvent?.Invoke();
         }
 
         /// <summary>
@@ -176,18 +173,29 @@ namespace SpreadsheetGUI
             Close();
         }
 
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (NewEvent != null)
-            {
-                NewEvent();
-            }
-        }
+        private void newToolStripMenuItem_Click(object sender, EventArgs e) => NewEvent?.Invoke();
 
         public void SetCellValue(int column, int row, string content)
         {
             displaySelection(spreadsheetPanel1);
             spreadsheetPanel1.SetValue(column, row, content);
+        } 
+
+        private void saveToolStripMenuItem_Click_1(object sender, EventArgs e) => DidChangeEvent?.Invoke();
+
+
+        public void Save()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save Spreadsheet";
+            saveFileDialog.ShowDialog();
+
+            if (saveFileDialog.FileName != "")
+            {
+                System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog.OpenFile();
+                SaveEvent?.Invoke(fs);
+            }
+
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using SSGui;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.IO;
 
 namespace SpreadsheetGUI
 {
@@ -26,6 +27,8 @@ namespace SpreadsheetGUI
             spreadsheetView.HelpEvent += HandleHelp;
             spreadsheetView.SelectionChangeEvent += HandleSelectionChange;
             spreadsheetView.NewEvent += HandleNew;
+            spreadsheetView.DidChangeEvent += HandleDidChange;
+            spreadsheetView.SaveEvent += HandleSave;
         }
 
         /// <summary>
@@ -135,6 +138,26 @@ namespace SpreadsheetGUI
 
             thread.Start();
 
+        }
+
+        /// <summary>
+        /// checks whether the spreadsheet was changed and calls save() accordingly
+        /// </summary>
+        private void HandleDidChange()
+        {
+            if (spreadsheet.Changed)
+            {
+                spreadsheetView.Save();
+            }
+        }
+
+
+        private void HandleSave(FileStream fs)
+        {
+            using (StreamWriter s = new StreamWriter(fs))
+            {
+                spreadsheet.Save(s);
+            }
         }
 
         /// <summary>
