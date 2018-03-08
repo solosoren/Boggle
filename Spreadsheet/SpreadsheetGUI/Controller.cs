@@ -1,12 +1,8 @@
 ﻿using SS;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Formulas;
 using System.Windows.Forms;
-using SSGui;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO;
@@ -124,7 +120,7 @@ namespace SpreadsheetGUI
                 SpreadsheetGUIContext.GetContext().RunSpreadsheetHelp();
                 Application.Run(context);
             });
-
+            thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
         }
 
@@ -139,7 +135,7 @@ namespace SpreadsheetGUI
                 SpreadsheetGUIContext.GetContext().RunFileHelp();
                 Application.Run(context);
             });
-
+            thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
         }
 
@@ -156,7 +152,7 @@ namespace SpreadsheetGUI
                 SpreadsheetGUIContext.GetContext().RunNew();
                 Application.Run(context);
             });
-
+            thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
 
         }
