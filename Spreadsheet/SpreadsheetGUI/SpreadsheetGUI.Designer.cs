@@ -38,6 +38,8 @@
             this.spreadsheetPanel1 = new SSGui.SpreadsheetPanel();
             this.cellValueTextBox = new System.Windows.Forms.TextBox();
             this.cellContentTextBox = new System.Windows.Forms.TextBox();
+            this.fileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.spreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -92,10 +94,12 @@
             // 
             // helpToolStripMenuItem
             // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem1,
+            this.spreadsheetToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
-            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // spreadsheetPanel1
             // 
@@ -127,6 +131,20 @@
             this.cellContentTextBox.Size = new System.Drawing.Size(100, 20);
             this.cellContentTextBox.TabIndex = 3;
             this.cellContentTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cellContentTextBox_KeyDown);
+            // 
+            // fileToolStripMenuItem1
+            // 
+            this.fileToolStripMenuItem1.Name = "fileToolStripMenuItem1";
+            this.fileToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.fileToolStripMenuItem1.Text = "File";
+            this.fileToolStripMenuItem1.Click += new System.EventHandler(this.fileToolStripMenuItem1_Click);
+            // 
+            // spreadsheetToolStripMenuItem
+            // 
+            this.spreadsheetToolStripMenuItem.Name = "spreadsheetToolStripMenuItem";
+            this.spreadsheetToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.spreadsheetToolStripMenuItem.Text = "Spreadsheet";
+            this.spreadsheetToolStripMenuItem.Click += new System.EventHandler(this.spreadsheetToolStripMenuItem_Click);
             // 
             // SpreadsheetGUI
             // 
@@ -161,6 +179,8 @@
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem spreadsheetToolStripMenuItem;
     }
 }
 

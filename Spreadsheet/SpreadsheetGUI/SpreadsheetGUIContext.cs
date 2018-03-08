@@ -45,11 +45,25 @@ namespace SpreadsheetGUI
         }
 
         /// <summary>
-        /// Runs the and opens the Help window
+        /// Runs and opens the help spreadsheet dialog
         /// </summary>
-        public void RunHelp()
+        public void RunSpreadsheetHelp()
         {
-            HelpDialog helpDialog = new HelpDialog();
+            HelpSpreadsheetDialog helpDialog = new HelpSpreadsheetDialog();
+
+            windowCount++;
+
+            helpDialog.FormClosed += (o, e) => { if (--windowCount <= 0) ExitThread(); };
+
+            helpDialog.Show();
+        }
+
+        /// <summary>
+        /// Runs and opens the help file dialog
+        /// </summary>
+        public void RunFileHelp()
+        {
+            HelpFileDialog helpDialog = new HelpFileDialog();
 
             windowCount++;
 

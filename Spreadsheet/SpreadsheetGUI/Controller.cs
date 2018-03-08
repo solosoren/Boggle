@@ -24,7 +24,8 @@ namespace SpreadsheetGUI
             spreadsheet = new Spreadsheet();
             spreadsheetView.SetContentEvent += HandleSetContent;
             spreadsheetView.CloseEvent += HandleClose;
-            spreadsheetView.HelpEvent += HandleHelp;
+            spreadsheetView.HelpSpreadsheetEvent += HandleSpreadsheetHelp;
+            spreadsheetView.HelpFileEvent += HandleFileHelp;
             spreadsheetView.SelectionChangeEvent += HandleSelectionChange;
             spreadsheetView.NewEvent += HandleNew;
             spreadsheetView.DidChangeEvent += HandleDidChange;
@@ -108,14 +109,29 @@ namespace SpreadsheetGUI
         }
 
         /// <summary>
-        /// Handles a request to open a help dialog
+        /// Handles a request to open a help dialog for spreadsheet
         /// </summary>
-        private void HandleHelp()
+        private void HandleSpreadsheetHelp()
         {
             Thread thread = new Thread(() =>
             {
                 var context = SpreadsheetGUIContext.GetContext();
-                SpreadsheetGUIContext.GetContext().RunHelp();
+                SpreadsheetGUIContext.GetContext().RunSpreadsheetHelp();
+                Application.Run(context);
+            });
+
+            thread.Start();
+        }
+
+        /// <summary>
+        /// Handles a request to open a help dialog for file
+        /// </summary>
+        private void HandleFileHelp()
+        {
+            Thread thread = new Thread(() =>
+            {
+                var context = SpreadsheetGUIContext.GetContext();
+                SpreadsheetGUIContext.GetContext().RunFileHelp();
                 Application.Run(context);
             });
 

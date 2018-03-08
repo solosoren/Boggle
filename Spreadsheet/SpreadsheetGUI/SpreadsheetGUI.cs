@@ -33,10 +33,11 @@ namespace SpreadsheetGUI
         public event Action CloseEvent;
         public event Action<FileStream> SaveEvent;
         public event Action NewEvent;
-        public event Action HelpEvent;
+        public event Action HelpSpreadsheetEvent;
 
         // fired when checking whether a save is necessary
         public event Action DidChangeEvent;
+        public event Action HelpFileEvent;
 
         public SpreadsheetGUI()
         {
@@ -160,11 +161,6 @@ namespace SpreadsheetGUI
         }
 
 
-        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            HelpEvent?.Invoke();
-        }
-
         /// <summary>
         /// Closes the window
         /// </summary>
@@ -183,10 +179,20 @@ namespace SpreadsheetGUI
 
         private void saveToolStripMenuItem_Click_1(object sender, EventArgs e) => DidChangeEvent?.Invoke();
 
+        private void spreadsheetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpSpreadsheetEvent?.Invoke();
+        }
+
+        private void fileToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            HelpFileEvent?.Invoke();
+        }
 
         public void Save()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Spreadsheet|*.ss";
             saveFileDialog.Title = "Save Spreadsheet";
             saveFileDialog.ShowDialog();
 

@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace SpreadsheetGUI
 {
-    public partial class HelpDialog : Form
+    public partial class HelpFileDialog : Form
     {
-        public HelpDialog()
+        public HelpFileDialog()
         {
             InitializeComponent();
         }

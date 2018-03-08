@@ -18,7 +18,8 @@ namespace SpreadsheetGUI
         event Action<int, int, string> SetContentEvent;
         event Action CloseEvent;
         event Action NewEvent;
-        event Action HelpEvent;
+        event Action HelpSpreadsheetEvent;
+        event Action HelpFileEvent;
         event Action<FileStream> SaveEvent;
         event Action DidChangeEvent;
         event Action<int, int, TextBox, TextBox> SelectionChangeEvent;

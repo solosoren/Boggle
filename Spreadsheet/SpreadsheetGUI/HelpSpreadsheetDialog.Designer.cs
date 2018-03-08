@@ -1,6 +1,6 @@
 ﻿namespace SpreadsheetGUI
 {
-    partial class HelpDialog
+    partial class HelpSpreadsheetDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -191,7 +191,7 @@
             this.MaximumSize = new System.Drawing.Size(500, 400);
             this.MinimumSize = new System.Drawing.Size(500, 400);
             this.Name = "HelpDialog";
-            this.Text = "HelpDialog";
+            this.Text = "Spreadsheet Help";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
