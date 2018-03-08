@@ -192,7 +192,7 @@ namespace SpreadsheetGUI
         public void Save()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Spreadsheet|*.ss";
+            saveFileDialog.Filter = "Spreadsheet (*.ss)|*.ss|All files (*.*)|*.*";
             saveFileDialog.Title = "Save Spreadsheet";
             saveFileDialog.ShowDialog();
 

@@ -181,7 +181,7 @@
             this.MaximumSize = new System.Drawing.Size(500, 400);
             this.MinimumSize = new System.Drawing.Size(500, 400);
             this.Name = "HelpFileDialog";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "File Help";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);

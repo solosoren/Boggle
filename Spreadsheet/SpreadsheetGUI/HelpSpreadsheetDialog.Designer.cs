@@ -170,7 +170,7 @@
             this.label8.Text = "In order for the entered content to register, you must press enter";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // HelpDialog
+            // HelpSpreadsheetDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -190,7 +190,8 @@
             this.Controls.Add(this.label1);
             this.MaximumSize = new System.Drawing.Size(500, 400);
             this.MinimumSize = new System.Drawing.Size(500, 400);
-            this.Name = "HelpDialog";
+            this.Name = "HelpSpreadsheetDialog";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Spreadsheet Help";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
