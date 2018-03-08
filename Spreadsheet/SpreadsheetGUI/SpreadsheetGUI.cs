@@ -178,7 +178,7 @@ namespace SpreadsheetGUI
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(NewEvent != null)
+            if (NewEvent != null)
             {
                 NewEvent();
             }

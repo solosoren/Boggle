@@ -76,6 +76,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="SpreadsheetGUI.resx">
       <DependentUpon>SpreadsheetGUI.cs</DependentUpon>
@@ -106,6 +107,18 @@
       <Project>{9025a594-df2a-4e6a-b8c2-f087ecc3e203}</Project>
       <Name>Spreadsheet</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ValueContentTextBox.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StringExample.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ValueExample.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FormulaExample.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

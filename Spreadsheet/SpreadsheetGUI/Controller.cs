@@ -39,7 +39,7 @@ namespace SpreadsheetGUI
             // Im sure there is a lot better way to do this but i've put this here for
             // the moment. Feel free to change it.
             Spreadsheet oldSpreadsheet = new Spreadsheet();
-            foreach(string name in spreadsheet.GetNamesOfAllNonemptyCells())
+            foreach (string name in spreadsheet.GetNamesOfAllNonemptyCells())
             {
                 oldSpreadsheet.SetContentsOfCell(name, spreadsheet.GetCellContents(name).ToString());
             }
@@ -50,7 +50,7 @@ namespace SpreadsheetGUI
                     int col = name.ToCharArray()[0] - 65;
                     int ro = int.Parse(name.Substring(1));
                     object contentToCheck = spreadsheet.GetCellValue(name);
-                    if(contentToCheck is FormulaError)
+                    if (contentToCheck is FormulaError)
                     {
                         MessageBox.Show(String.Format("Formula error {0}", contentToCheck.ToString()));
                         spreadsheet = oldSpreadsheet;
@@ -59,15 +59,16 @@ namespace SpreadsheetGUI
                     spreadsheetView.SetCellValue(col, ro - 1, spreadsheet.GetCellValue(name).ToString());
                 }
             }
-            catch(FormulaFormatException e)
+            catch (FormulaFormatException e)
             {
                 MessageBox.Show("Formula format invalid");
-                
-            }catch(CircularException e)
+
+            }
+            catch (CircularException e)
             {
                 MessageBox.Show("Circular exception");
             }
-            
+
         }
 
 
@@ -108,7 +109,14 @@ namespace SpreadsheetGUI
         /// </summary>
         private void HandleHelp()
         {
+            Thread thread = new Thread(() =>
+            {
+                var context = SpreadsheetGUIContext.GetContext();
+                SpreadsheetGUIContext.GetContext().RunHelp();
+                Application.Run(context);
+            });
 
+            thread.Start();
         }
 
 
@@ -117,7 +125,7 @@ namespace SpreadsheetGUI
         /// </summary>
         private void HandleNew()
         {
-           
+
             Thread thread = new Thread(() =>
             {
                 var context = SpreadsheetGUIContext.GetContext();
