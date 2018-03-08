@@ -173,27 +173,43 @@ namespace SpreadsheetGUI
         {
             using (StreamWriter s = new StreamWriter(fs))
             {
-                spreadsheet.Save(s);
+                try
+                {
+                    spreadsheet.Save(s);
+
+                }
+                catch (IOException e)
+                {
+                    MessageBox.Show("Unkown error encountered while attempting to save file.");
+                }
             }
         }
 
         private void HandleOpen(TextBox valueTextBox, TextBox contentTextBox)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            try
             {
-                FileStream fs = (FileStream)openFileDialog.OpenFile();
-                using (StreamReader s = new StreamReader(fs))
-                    spreadsheet = new Spreadsheet(s, new Regex(""));
-
-                resetView();
-                foreach (string name in spreadsheet.GetNamesOfAllNonemptyCells().ToList())
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    int col = name.ToCharArray()[0] - 65;
-                    int row = int.Parse(name.Substring(1));
-                    spreadsheetView.SetCellValue(col, row - 1, spreadsheet.GetCellValue(name).ToString());
+                    FileStream fs = (FileStream)openFileDialog.OpenFile();
+                    using (StreamReader s = new StreamReader(fs))
+                        spreadsheet = new Spreadsheet(s, new Regex(""));
+
+                    resetView();
+                    foreach (string name in spreadsheet.GetNamesOfAllNonemptyCells().ToList())
+                    {
+                        int col = name.ToCharArray()[0] - 65;
+                        int row = int.Parse(name.Substring(1));
+                        spreadsheetView.SetCellValue(col, row - 1, spreadsheet.GetCellValue(name).ToString());
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error reading file : " + e.Message);
+            }
+
         }
 
         /// <summary>
