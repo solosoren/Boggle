@@ -57,6 +57,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Formula\Formula.csproj">
+      <Project>{D43D998C-9797-4CF4-9BB0-6DE22753849A}</Project>
+      <Name>Formula</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SpreadsheetGUI\SpreadsheetGUI.csproj">
       <Project>{f9ea1eab-5795-46c7-9e75-ad5ea7bd6173}</Project>
       <Name>SpreadsheetGUI</Name>

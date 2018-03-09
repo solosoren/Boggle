@@ -1,4 +1,5 @@
 ﻿using System;
+using Formulas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SpreadsheetGUI;
 
@@ -18,6 +19,18 @@ namespace PS7Tester
             Controller controller = new Controller(stub);
             stub.CloseWindow();
             Assert.IsTrue(stub.CalledCloseWindow);
+        }
+
+        /// <summary>
+        /// Tests SetVellValue
+        /// </summary>
+        [ExpectedException(typeof(FormulaFormatException))]
+        [TestMethod]
+        public void TestSetContent()
+        {
+            SpreadsheetViewStub stub = new SpreadsheetViewStub();
+            Controller controller = new Controller(stub);
+            stub.TestSetContentEvent(1, 1, "=a1");
         }
     }
 }

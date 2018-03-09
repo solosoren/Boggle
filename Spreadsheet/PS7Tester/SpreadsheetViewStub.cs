@@ -40,7 +40,12 @@ namespace PS7Tester
 
         public void SetCellValue(int column, int row, string content)
         {
-            throw new NotImplementedException();
+            
+        }
+
+        public void TestSetContentEvent(int column, int row, string content)
+        {
+            SetContentEvent(column, row, content);
         }
 
     }
