@@ -20,9 +20,12 @@ namespace PS7Tester
         public event Action DidChangeEvent;
         public event Action<int, int, System.Windows.Forms.TextBox, System.Windows.Forms.TextBox> SelectionChangeEvent;
 
+
+        public Boolean CalledCloseWindow = false;
+
         public void CloseWindow()
         {
-            throw new NotImplementedException();
+            CalledCloseWindow = true;
         }
 
         public void OpenNew()
@@ -39,5 +42,6 @@ namespace PS7Tester
         {
             throw new NotImplementedException();
         }
+
     }
 }

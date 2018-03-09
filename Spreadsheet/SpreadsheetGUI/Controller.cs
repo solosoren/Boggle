@@ -99,8 +99,13 @@ namespace SpreadsheetGUI
         {
             if (spreadsheet.Changed)
             {
-                // TODO: Display save? dialogue box
-
+               if( MessageBox.Show("File isn't saved. Would you like to save the file before closing? ", "Save file", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                    spreadsheetView.Save();
+                }
+               else
+                {
+                    spreadsheetView.CloseWindow();
+                }
             }
             else
             {

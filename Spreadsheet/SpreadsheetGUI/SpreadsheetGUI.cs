@@ -181,6 +181,7 @@ namespace SpreadsheetGUI
             OpenEvent?.Invoke(cellValueTextBox, cellContentTextBox);
         }
 
+
         public void Save()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
