@@ -18,7 +18,7 @@ namespace SpreadsheetGUI
         event Action<int, int, string> SetContentEvent;
         event Action CloseEvent;
         event Action NewEvent;
-        event Action <TextBox, TextBox>OpenEvent;
+        event Action OpenEvent;
         event Action HelpSpreadsheetEvent;
         event Action HelpFileEvent;
         event Action<FileStream> SaveEvent;
@@ -42,6 +42,8 @@ namespace SpreadsheetGUI
         /// Find the file to save
         /// </summary>
         void Save();
+
+        void DisplayMessage(string message);
 
 
     }

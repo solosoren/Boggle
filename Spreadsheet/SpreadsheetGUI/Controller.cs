@@ -35,10 +35,6 @@ namespace SpreadsheetGUI
         /// <param name="content"></param>
         private void HandleSetContent(int column, int row, string content)
         {
-
-            // Made this to restore to old values if there is an error with the Formula
-            // Im sure there is a lot better way to do this but i've put this here for
-            // the moment. Feel free to change it.
             Spreadsheet oldSpreadsheet = new Spreadsheet();
             foreach (string name in spreadsheet.GetNamesOfAllNonemptyCells())
             {
@@ -55,7 +51,7 @@ namespace SpreadsheetGUI
                         object contentToCheck = spreadsheet.GetCellValue(name);
                         if (contentToCheck is FormulaError)
                         {
-                            MessageBox.Show(String.Format("Formula error {0}", contentToCheck.ToString()));
+                            spreadsheetView.DisplayMessage(String.Format("Formula error {0}", contentToCheck.ToString()));
                             spreadsheet = oldSpreadsheet;
                             break;
                         }
@@ -66,12 +62,12 @@ namespace SpreadsheetGUI
             }
             catch (FormulaFormatException e)
             {
-                MessageBox.Show("Formula format invalid");
+               spreadsheetView.DisplayMessage("Formula format invalid");
 
             }
             catch (CircularException e)
             {
-                MessageBox.Show("Circular exception");
+                spreadsheetView.DisplayMessage("Circular exception");
             }
 
         }
@@ -102,6 +98,7 @@ namespace SpreadsheetGUI
                 if (MessageBox.Show("File isn't saved. Would you like to save the file before closing? ", "Save file", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     spreadsheetView.Save();
+                    spreadsheetView.CloseWindow();
                 }
                 else
                 {
@@ -186,12 +183,12 @@ namespace SpreadsheetGUI
                 }
                 catch (IOException e)
                 {
-                    MessageBox.Show("Unkown error encountered while attempting to save file.");
+                    spreadsheetView.DisplayMessage("Unkown error encountered while attempting to save file.");
                 }
             }
         }
 
-        private void HandleOpen(TextBox valueTextBox, TextBox contentTextBox)
+        private void HandleOpen()
         {
             try
             {

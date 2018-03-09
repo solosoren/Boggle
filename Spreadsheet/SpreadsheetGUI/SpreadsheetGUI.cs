@@ -30,7 +30,7 @@ namespace SpreadsheetGUI
         // fired when checking whether a save is necessary
         public event Action DidChangeEvent;
         public event Action HelpFileEvent;
-        public event Action<TextBox, TextBox> OpenEvent;
+        public event Action OpenEvent;
 
         // variable to check if crossed or not.
         private Boolean crossed = true;
@@ -177,7 +177,7 @@ namespace SpreadsheetGUI
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenEvent?.Invoke(cellValueTextBox, cellContentTextBox);
+            OpenEvent?.Invoke();
         }
 
         private void SpreadsheetGUI_FormClosing(object sender, FormClosingEventArgs e)
@@ -201,6 +201,11 @@ namespace SpreadsheetGUI
                 FileStream fs = (FileStream)saveFileDialog.OpenFile();
                 SaveEvent?.Invoke(fs);
             }
+        }
+
+        public void DisplayMessage(string message)
+        {
+            MessageBox.Show(message);
         }
 
     }
