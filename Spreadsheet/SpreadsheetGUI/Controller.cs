@@ -9,7 +9,7 @@ using System.IO;
 
 namespace SpreadsheetGUI
 {
-    class Controller
+    public class Controller
     {
         private ISpreadsheetView spreadsheetView;
         private Spreadsheet spreadsheet;

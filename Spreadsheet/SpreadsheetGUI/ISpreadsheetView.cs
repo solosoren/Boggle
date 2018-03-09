@@ -12,7 +12,7 @@ namespace SpreadsheetGUI
     /// <summary>
     /// Controllable interface for SpreadsheetGUI
     /// </summary>
-    interface ISpreadsheetView
+    public interface ISpreadsheetView
     {
 
         event Action<int, int, string> SetContentEvent;

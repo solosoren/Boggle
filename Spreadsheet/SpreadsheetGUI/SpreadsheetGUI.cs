@@ -81,7 +81,7 @@ namespace SpreadsheetGUI
                     }
                     spreadsheetPanel1.SetSelection(column, row + 1);
                     // displaySelection here may not be necessary
-                 //   displaySelection(spreadsheetPanel1);
+                    //   displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
                 case Keys.Up:
@@ -91,7 +91,7 @@ namespace SpreadsheetGUI
                     }
                     spreadsheetPanel1.SetSelection(column, row - 1);
                     // displaySelection here may not be necessary
-                  //  displaySelection(spreadsheetPanel1);
+                    //  displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
                 case Keys.Left:
@@ -101,7 +101,7 @@ namespace SpreadsheetGUI
                     }
                     spreadsheetPanel1.SetSelection(column - 1, row);
                     // displaySelection here may not be necessary
-               //     displaySelection(spreadsheetPanel1);
+                    //     displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
                 case Keys.Right:
@@ -111,7 +111,7 @@ namespace SpreadsheetGUI
                     }
                     spreadsheetPanel1.SetSelection(column + 1, row);
                     // displaySelection here may not be necessary
-               //     displaySelection(spreadsheetPanel1);
+                    //     displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
             }
@@ -145,12 +145,6 @@ namespace SpreadsheetGUI
             spreadsheetPanel1.Width = this.Width - panelWidthOffset;
             spreadsheetPanel1.Height = this.Height - panelHeightOffset;
 
-        }
-
-        public void OpenNew()
-        {
-            // TODO:
-            throw new NotImplementedException();
         }
 
 
