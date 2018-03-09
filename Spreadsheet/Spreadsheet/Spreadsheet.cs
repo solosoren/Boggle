@@ -312,18 +312,22 @@ namespace SS
                 dest.WriteLine("<spreadsheet IsValid=\"" + IsValid + "\">");
                 foreach (KeyValuePair<string, Cell> entry in Cells)
                 {
-                    if (entry.Value.hasFormula)
+                    if (!entry.Value.GetContent().Equals(""))
                     {
-                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"=" + entry.Value.GetContent().ToString() +
-                                       "\"></cell>");
+                        if (entry.Value.hasFormula)
+                        {
+                            dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"=" + entry.Value.GetContent().ToString() +
+                                           "\"></cell>");
+                        }
+
+                        else
+                        {
+                            dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" +
+                                           entry.Value.GetContent().ToString() +
+                                           "\"></cell>");
+                        }
                     }
 
-                    else
-                    {
-                        dest.WriteLine("\t<cell name=\"" + entry.Key + "\" contents=\"" +
-                                       entry.Value.GetContent().ToString() +
-                                       "\"></cell>");
-                    }
                 }
 
                 dest.WriteLine("</spreadsheet>");
@@ -381,7 +385,7 @@ namespace SS
                 throw new FormulaEvaluationException("FormulaError");
             }
 
-            return (double) GetCellValue(name);
+            return (double)GetCellValue(name);
         }
 
         /// <summary>

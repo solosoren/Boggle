@@ -160,6 +160,7 @@
             this.MinimumSize = new System.Drawing.Size(525, 388);
             this.Name = "SpreadsheetGUI";
             this.Text = "Spreadsheet";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SpreadsheetGUI_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SpreadsheetGUI_KeyDown);
             this.Resize += new System.EventHandler(this.SpreadsheetGUI_Resize);
             this.menuStrip1.ResumeLayout(false);

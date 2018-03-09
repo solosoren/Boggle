@@ -32,6 +32,9 @@ namespace SpreadsheetGUI
         public event Action HelpFileEvent;
         public event Action<TextBox, TextBox> OpenEvent;
 
+        // variable to check if crossed or not.
+        private Boolean crossed = true;
+
         public SpreadsheetGUI()
         {
             InitializeComponent();
@@ -56,12 +59,12 @@ namespace SpreadsheetGUI
             }
         }
 
-
         /// <summary>
         /// Closes SpreadsheetGUI
         /// </summary>
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            crossed = false;
             CloseEvent?.Invoke();
         }
 
@@ -80,8 +83,7 @@ namespace SpreadsheetGUI
                         break;
                     }
                     spreadsheetPanel1.SetSelection(column, row + 1);
-                    // displaySelection here may not be necessary
-                    //   displaySelection(spreadsheetPanel1);
+                    displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
                 case Keys.Up:
@@ -90,8 +92,7 @@ namespace SpreadsheetGUI
                         break;
                     }
                     spreadsheetPanel1.SetSelection(column, row - 1);
-                    // displaySelection here may not be necessary
-                    //  displaySelection(spreadsheetPanel1);
+                    displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
                 case Keys.Left:
@@ -100,8 +101,7 @@ namespace SpreadsheetGUI
                         break;
                     }
                     spreadsheetPanel1.SetSelection(column - 1, row);
-                    // displaySelection here may not be necessary
-                    //     displaySelection(spreadsheetPanel1);
+                    displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
                 case Keys.Right:
@@ -110,8 +110,7 @@ namespace SpreadsheetGUI
                         break;
                     }
                     spreadsheetPanel1.SetSelection(column + 1, row);
-                    // displaySelection here may not be necessary
-                    //     displaySelection(spreadsheetPanel1);
+                    displaySelection(spreadsheetPanel1);
                     e.Handled = true;
                     break;
             }
@@ -181,6 +180,15 @@ namespace SpreadsheetGUI
             OpenEvent?.Invoke(cellValueTextBox, cellContentTextBox);
         }
 
+        private void SpreadsheetGUI_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (crossed == true)
+            {
+                crossed = false;
+                CloseEvent?.Invoke();
+            }
+
+        }
 
         public void Save()
         {

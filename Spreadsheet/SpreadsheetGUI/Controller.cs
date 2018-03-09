@@ -99,10 +99,11 @@ namespace SpreadsheetGUI
         {
             if (spreadsheet.Changed)
             {
-               if( MessageBox.Show("File isn't saved. Would you like to save the file before closing? ", "Save file", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                if (MessageBox.Show("File isn't saved. Would you like to save the file before closing? ", "Save file", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
                     spreadsheetView.Save();
                 }
-               else
+                else
                 {
                     spreadsheetView.CloseWindow();
                 }
@@ -242,6 +243,7 @@ namespace SpreadsheetGUI
         {
             // Displays cell name and value in value textbox
             valueTextBox.Text = String.Format("{0} : {1}", getCellName(column, row), spreadsheet.GetCellValue(getCellName(column, row)));
+
             // Displays cell value based on selection in content textbox
             object content = spreadsheet.GetCellContents(getCellName(column, row));
             if (content is Formula)
@@ -253,6 +255,6 @@ namespace SpreadsheetGUI
                 contentTextBox.Text = spreadsheet.GetCellContents(getCellName(column, row)).ToString();
             }
         }
-
     }
 }
+
