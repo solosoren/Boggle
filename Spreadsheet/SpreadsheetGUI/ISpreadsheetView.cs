@@ -39,11 +39,6 @@ namespace SpreadsheetGUI
         void CloseWindow();
 
         /// <summary>
-        /// Opens a new Window
-        /// </summary>
-        void OpenNew();
-
-        /// <summary>
         /// Find the file to save
         /// </summary>
         void Save();
