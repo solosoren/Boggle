@@ -51,11 +51,15 @@ namespace PS8
 
         private void HandleCancel()
         {
+            Console.WriteLine("Cancelled");
             tokenSource.Cancel();
+            view.SetControlState(true);
 
             // Just for debugging. Delete later.
             MessageBox.Show("Cancelled");
         }
+
+        //
 
         private async void HandleRegister(string domainName, string playerName)
         {
@@ -63,7 +67,7 @@ namespace PS8
 
             try
             {
-                view.EnableControls(false);
+                view.SetControlState(false);
                 using (HttpClient client = CreateClient())
                 {
                     dynamic user = new ExpandoObject();
@@ -71,12 +75,14 @@ namespace PS8
 
                     tokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+
                     HttpResponseMessage response = await client.PostAsync("users", content, tokenSource.Token);
+
 
                     if (response.IsSuccessStatusCode)
                     {
                         String result = await response.Content.ReadAsStringAsync();
-                        userToken = JsonConvert.DeserializeObject(result).ToString();
+                        userToken = JsonConvert.DeserializeObject<dynamic>(result).UserToken;
                         view.IsUserRegistered = true;
                     }
                     else
@@ -91,7 +97,7 @@ namespace PS8
             }
             finally
             {
-                view.EnableControls(true);
+                view.SetControlState(true);
             }
 
         }
@@ -100,10 +106,17 @@ namespace PS8
         /// Creates an HttpClient for communicating with the server
         /// </summary>
         /// <returns></returns>
-        private static HttpClient CreateClient()
+        private HttpClient CreateClient()
         {
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://ice.eng.utah.edu/BoggleService.svc/");
+            // Added for debugging purposes
+            if (domainAddress.Equals(""))
+            {
+                domainAddress = "http://ice.eng.utah.edu";
+            }
+
+            //TODO(Kunaal) : Make domain address reselient to prefix and suffix.
+            client.BaseAddress = new Uri(domainAddress + "/BoggleService.svc/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             return client;

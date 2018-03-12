@@ -27,11 +27,12 @@ namespace PS8
         /// If state == false, disables all controls and changes register to Cancel
         /// </summary>
         /// <param name="state"></param>
-        public void EnableControls(bool state)
+        public void SetControlState(bool state)
         {
             domainNameTextBox.Enabled = state;
             playerNameTextBox.Enabled = state;
             registerButton.Text = state == true ? "Register" : "Cancel";
+            registerButton.Update();
         }
 
         private void registerButton_Click(object sender, EventArgs e)

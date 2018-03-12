@@ -15,6 +15,6 @@ namespace PS8
         event Action CancelPressed;
 
         bool IsUserRegistered { get; set; }
-        void EnableControls(bool state);
+        void SetControlState(bool state);
     }
 }
