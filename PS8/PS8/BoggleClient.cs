@@ -29,10 +29,31 @@ namespace PS8
         /// <param name="state"></param>
         public void SetControlState(bool state)
         {
-            domainNameTextBox.Enabled = state;
-            playerNameTextBox.Enabled = state;
-            registerButton.Text = state == true ? "Register" : "Cancel";
-            registerButton.Update();
+            if (IsUserRegistered)
+            {
+                domainNameLabel.Enabled = false;
+                domainNameTextBox.Enabled = false;
+                playerNameLabel.Enabled = false;
+                playerNameTextBox.Enabled = false;
+                registerButton.AutoSize = true;
+                registerButton.Text = "Registered";
+                registerButton.Update();
+                registerButton.Enabled = false;
+                gameDurationLabel.Enabled = true;
+                gameDurationTextBox.Enabled = true;
+                joinGameButton.Enabled = true;
+            }
+            else
+            {
+                domainNameTextBox.Enabled = state;
+                playerNameTextBox.Enabled = state;
+                gameDurationLabel.Enabled = false;
+                gameDurationTextBox.Enabled = false;
+                joinGameButton.Enabled = false;
+                registerButton.Text = state == true ? "Register" : "Cancel";
+                registerButton.Update();
+            }
+
         }
 
         private void registerButton_Click(object sender, EventArgs e)
