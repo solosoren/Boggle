@@ -81,7 +81,7 @@ namespace PS8
                 using (HttpClient client = CreateClient())
                 {
                     dynamic user = new ExpandoObject();
-                    user.Nickname = playerName;
+                    user.Nickname = playerName.Trim();
 
                     tokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
@@ -120,7 +120,7 @@ namespace PS8
         {
             HttpClient client = new HttpClient();
             // Added for debugging purposes
-            if (domainAddress.Equals(""))
+            if (domainAddress.Trim().Equals(""))
             {
                 domainAddress = "http://ice.eng.utah.edu";
             }

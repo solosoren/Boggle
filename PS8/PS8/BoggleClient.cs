@@ -62,6 +62,18 @@ namespace PS8
         {
             if (registerButton.Text.Equals("Register"))
             {
+                if (playerNameTextBox.Text.Equals(null) || playerNameTextBox.Text.Trim().Equals(""))
+                {
+                    MessageBox.Show("Player name can't be empty.");
+                    return;
+                }
+
+                if (playerNameTextBox.Text.Trim().Length > 50)
+                {
+                    MessageBox.Show("Player name must be less than 50 characters.");
+                    return;
+                }
+
                 RegisterPressed?.Invoke(domainNameTextBox.Text, playerNameTextBox.Text);
             }
             else
@@ -72,8 +84,8 @@ namespace PS8
 
         private void joinGameButton_Click(object sender, EventArgs e)
         {
-             if (int.TryParse(gameDurationTextBox.Text, out int duration))
-             {
+            if (int.TryParse(gameDurationTextBox.Text, out int duration))
+            {
                 if (duration < 5)
                 {
                     MessageBox.Show("Your game duration must be greater than 5 seconds.");
@@ -86,7 +98,7 @@ namespace PS8
                 }
 
                 JoinGamePressed.Invoke(duration);
-             }
+            }
         }
     }
 }
