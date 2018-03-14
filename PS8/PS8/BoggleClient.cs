@@ -21,8 +21,9 @@ namespace PS8
         public bool IsUserRegistered { get; set; }
 
         public event Action<string, string> RegisterPressed;
-        public event Action CancelPressed;
+        public event Action RegisterCancelPressed;
         public event Action<int> JoinGamePressed;
+        public event Action JoinGameCancelPressed;
 
         /// <summary>
         /// If state == true, enables all controls
@@ -55,8 +56,9 @@ namespace PS8
                 registerButton.Text = state == true ? "Register" : "Cancel";
                 registerButton.Update();
             }
-
         }
+
+
 
         private void registerButton_Click(object sender, EventArgs e)
         {
@@ -78,27 +80,44 @@ namespace PS8
             }
             else
             {
-                CancelPressed?.Invoke();
+                RegisterCancelPressed?.Invoke();
             }
         }
 
         private void joinGameButton_Click(object sender, EventArgs e)
         {
-            if (int.TryParse(gameDurationTextBox.Text, out int duration))
+            if (joinGameButton.Text.Equals("Join Game"))
             {
-                if (duration < 5)
+                if (int.TryParse(gameDurationTextBox.Text, out int duration))
                 {
-                    MessageBox.Show("Your game duration must be greater than 5 seconds.");
-                    return;
-                }
-                else if (duration > 120)
-                {
-                    MessageBox.Show("Your game duration must be less than than 120 seconds.");
-                    return;
-                }
+                    if (duration < 5)
+                    {
+                        MessageBox.Show("Your game duration must be greater than 5 seconds.");
+                        return;
+                    }
+                    else if (duration > 120)
+                    {
+                        MessageBox.Show("Your game duration must be less than than 120 seconds.");
+                        return;
+                    }
 
-                JoinGamePressed.Invoke(duration);
+                    JoinGamePressed.Invoke(duration);
+                }
             }
+            else
+            {
+                JoinGameCancelPressed?.Invoke();
+            }
+
+        }
+
+        public void SetJoinGameControlState(bool state)
+        {
+            gameDurationLabel.Enabled = state;
+            gameDurationTextBox.Enabled = state;
+            joinGameButton.AutoSize = true;
+            joinGameButton.Text = state == true ? "Join Game" : "Cancel game request";
+            joinGameButton.Update();
         }
     }
 }

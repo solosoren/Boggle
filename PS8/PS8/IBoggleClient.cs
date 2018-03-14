@@ -12,10 +12,12 @@ namespace PS8
     interface IBoggleClient
     {
         event Action<string, string> RegisterPressed;
-        event Action CancelPressed;
+        event Action RegisterCancelPressed;
+        event Action JoinGameCancelPressed;
         event Action<int> JoinGamePressed;
 
         bool IsUserRegistered { get; set; }
         void SetControlState(bool state);
+        void SetJoinGameControlState(bool state);
     }
 }

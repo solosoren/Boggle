@@ -55,20 +55,28 @@ namespace PS8
             pregameTimer.Elapsed += new ElapsedEventHandler(PregameTimerElapsed);
 
             view.RegisterPressed += HandleRegister;
-            view.CancelPressed += HandleCancel;
+            view.RegisterCancelPressed += HandleRegisterCancel;
+            view.JoinGameCancelPressed += HandleJoinGameCancel;
             view.JoinGamePressed += HandleJoinGame;
         }
 
-        private void HandleCancel()
+        private void HandleRegisterCancel()
         {
-            Console.WriteLine("Cancelled");
             tokenSource.Cancel();
             view.SetControlState(true);
 
             // Just for debugging. Delete later.
-            MessageBox.Show("Cancelled");
+            MessageBox.Show("Cancelled registration");
         }
 
+        private void HandleJoinGameCancel()
+        {
+            tokenSource.Cancel();
+            view.SetJoinGameControlState(true);
+
+            // Just for debugging. Delete later.
+            MessageBox.Show("Cancelled game request");
+        }
         //
 
         private async void HandleRegister(string domainName, string playerName)
@@ -140,6 +148,7 @@ namespace PS8
         {
             try
             {
+                view.SetJoinGameControlState(false);
                 using (HttpClient client = CreateClient())
                 {
                     dynamic dynamic = new ExpandoObject();
@@ -160,6 +169,7 @@ namespace PS8
                     }
                     else
                     {
+                        view.SetJoinGameControlState(true);
                         MessageBox.Show("Error Joining Game: " + response.StatusCode + "\n" + response.ReasonPhrase);
                     }
                 }
@@ -306,7 +316,7 @@ namespace PS8
 
 
         }
-        
+
 
     }
 }
