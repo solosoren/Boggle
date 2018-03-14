@@ -104,6 +104,10 @@ namespace PS8
 
                     JoinGamePressed.Invoke(duration);
                 }
+                else
+                {
+                    MessageBox.Show("Enter an integer ranging from 5 - 120.");
+                }
             }
             else
             {

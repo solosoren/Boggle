@@ -147,7 +147,6 @@ namespace PS8
                 domainAddress = "http://ice.eng.utah.edu";
             }
 
-            //TODO(Kunaal) : Make domain address reselient to prefix and suffix.
             client.BaseAddress = new Uri(domainAddress + "/BoggleService.svc/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -194,8 +193,12 @@ namespace PS8
             }
         }
 
+        /// <summary>
+        /// Game will start here along with the gui
+        /// </summary>
         private void StartGame()
         {
+            // Just a place holder
             MessageBox.Show(view.IsInActiveGame.ToString());
         }
 
