@@ -166,10 +166,15 @@ namespace PS8
             }
             finally
             {
-
+                // game was joined
             }
         }
 
+        /// <summary>
+        /// fired every second from the pregame timer when waiting for a new game
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         private void PregameTimerElapsed(object source, ElapsedEventArgs e)
         {
             CheckIfStarted();
@@ -211,8 +216,10 @@ namespace PS8
             }
         }
 
-
-        class Game : Object
+        /// <summary>
+        /// Store everything that is apart of the game. Contains internal Player Struct.
+        /// </summary>
+        class Game
         {
             public string GameID { get; private set; }
             public string GameState { get; private set; }
@@ -222,16 +229,28 @@ namespace PS8
 
             public Player Player2 { get; private set; }
 
+            /// <summary>
+            /// Creates a new game with the GameID
+            /// </summary>
+            /// <param name="gameID"></param>
             public Game(string gameID)
             {
                 GameID = gameID;
             }
 
+            /// <summary>
+            /// Set the game state
+            /// </summary>
+            /// <param name="gameState"></param>
             public void SetState(string gameState)
             {
                 GameState = gameState;
             }
 
+            /// <summary>
+            /// Start a game by storing all the game properties
+            /// </summary>
+            /// <param name="d"> an object from the client containing the game properties</param>
             public void StartGame(dynamic d)
             {
                 GameState = d.GameState;
@@ -245,24 +264,40 @@ namespace PS8
                 Player2 = new Player((string)player2.Nickname, (int)player2.Score);
             }
 
+            /// <summary>
+            /// Update both scores
+            /// </summary>
+            /// <param name="player1Score"></param>
+            /// <param name="player2Score"></param>
             public void UpdateScore(int player1Score, int player2Score)
             {
                 Player1.SetScore(player1Score);
                 Player2.SetScore(player2Score);
             }
 
-
+            /// <summary>
+            /// Used to separate players and scores cleanly
+            /// </summary>
             public struct Player
             {
                 public string NickName { get; private set; }
                 public int Score { get; private set; }
 
+                /// <summary>
+                /// Creates a new player
+                /// </summary>
+                /// <param name="nickName"></param>
+                /// <param name="score"></param>
                 public Player(string nickName, int score)
                 {
                     NickName = nickName;
                     Score = score;
                 }
 
+                /// <summary>
+                /// Sets the players score
+                /// </summary>
+                /// <param name="score"></param>
                 public void SetScore(int score)
                 {
                     Score = score;
