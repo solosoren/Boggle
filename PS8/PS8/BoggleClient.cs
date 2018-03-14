@@ -19,6 +19,7 @@ namespace PS8
         }
 
         public bool IsUserRegistered { get; set; }
+        public bool IsInActiveGame { get; set; }
 
         public event Action<string, string> RegisterPressed;
         public event Action RegisterCancelPressed;
@@ -113,6 +114,15 @@ namespace PS8
 
         public void SetJoinGameControlState(bool state)
         {
+            if (IsInActiveGame)
+            {
+                gameDurationLabel.Enabled = false;
+                gameDurationTextBox.Enabled = false;
+                joinGameButton.AutoSize = true;
+                joinGameButton.Text = "Joined Game";
+                joinGameButton.Update();
+
+            }
             gameDurationLabel.Enabled = state;
             gameDurationTextBox.Enabled = state;
             joinGameButton.AutoSize = true;

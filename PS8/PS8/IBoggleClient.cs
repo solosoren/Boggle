@@ -15,6 +15,7 @@ namespace PS8
         event Action RegisterCancelPressed;
         event Action JoinGameCancelPressed;
         event Action<int> JoinGamePressed;
+        bool IsInActiveGame { get; set; }
 
         bool IsUserRegistered { get; set; }
         void SetControlState(bool state);

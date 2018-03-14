@@ -42,7 +42,7 @@ namespace PS8
         /// <summary>
         /// For cancelling the current operation
         /// </summary>
-        private CancellationTokenSource tokenSource;
+        private CancellationToken cancelToken;
 
         public Controller(IBoggleClient view)
         {
@@ -50,6 +50,7 @@ namespace PS8
             domainAddress = "";
             playerName = "";
             userToken = "";
+            cancelToken = new CancellationToken();
 
             pregameTimer = new System.Timers.Timer(1000);
             pregameTimer.Elapsed += new ElapsedEventHandler(PregameTimerElapsed);
@@ -62,22 +63,36 @@ namespace PS8
 
         private void HandleRegisterCancel()
         {
-            tokenSource.Cancel();
+            cancelToken.ThrowIfCancellationRequested();
             view.SetControlState(true);
 
             // Just for debugging. Delete later.
             MessageBox.Show("Cancelled registration");
         }
 
-        private void HandleJoinGameCancel()
+        private async void HandleJoinGameCancel()
         {
-            tokenSource.Cancel();
-            view.SetJoinGameControlState(true);
+            try
+            {
+                using (HttpClient client = CreateClient())
+                {
+                    dynamic user = new ExpandoObject();
+                    user.UserToken = userToken;
 
-            // Just for debugging. Delete later.
-            MessageBox.Show("Cancelled game request");
+                    cancelToken = new CancellationToken();
+                    StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PutAsync("games", content, cancelToken);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Cancelled game request");
+                        view.SetJoinGameControlState(true);
+                    }
+                }
+            }
+            catch { }
         }
-        //
 
         private async void HandleRegister(string domainName, string playerName)
         {
@@ -91,11 +106,10 @@ namespace PS8
                     dynamic user = new ExpandoObject();
                     user.Nickname = playerName.Trim();
 
-                    tokenSource = new CancellationTokenSource();
+                    cancelToken = new CancellationToken();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await client.PostAsync("users", content, tokenSource.Token);
-
+                    HttpResponseMessage response = await client.PostAsync("users", content, cancelToken);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -155,10 +169,10 @@ namespace PS8
                     dynamic.TimeLimit = length;
                     dynamic.UserToken = userToken;
 
-                    tokenSource = new CancellationTokenSource();
+                    cancelToken = new CancellationToken();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(dynamic), Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await client.PostAsync("games", content, tokenSource.Token);
+                    HttpResponseMessage response = await client.PostAsync("games", content, cancelToken);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -174,10 +188,15 @@ namespace PS8
                     }
                 }
             }
-            finally
+            catch
             {
-                // game was joined
+
             }
+        }
+
+        private void StartGame()
+        {
+            MessageBox.Show(view.IsInActiveGame.ToString());
         }
 
         /// <summary>
@@ -200,10 +219,10 @@ namespace PS8
             using (HttpClient client = CreateClient())
             {
                 // Compose and send the request
-                tokenSource = new CancellationTokenSource();
+                cancelToken = new CancellationToken();
                 String url = String.Format("games/{0}?Brief=no", game.GameID);
 
-                HttpResponseMessage response = await client.GetAsync(url, tokenSource.Token);
+                HttpResponseMessage response = await client.GetAsync(url, cancelToken);
 
                 // Deal with the response
                 if (response.IsSuccessStatusCode)
@@ -216,7 +235,9 @@ namespace PS8
                     {
                         game.StartGame(dynamic);
                         pregameTimer.Stop();
+                        view.IsInActiveGame = true;
                         MessageBox.Show("You have joined a game");
+                        StartGame();
                     }
                 }
                 else
