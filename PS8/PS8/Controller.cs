@@ -200,6 +200,7 @@ namespace PS8
         {
             // Just a place holder
             MessageBox.Show(view.IsInActiveGame.ToString());
+            Application.Run(new BoggleGame());
         }
 
         /// <summary>

@@ -33,22 +33,24 @@
             this.player1Score = new System.Windows.Forms.Label();
             this.player2Score = new System.Windows.Forms.Label();
             this.wordTextBox = new System.Windows.Forms.TextBox();
-            this.col1row1 = new System.Windows.Forms.Label();
-            this.col2row1 = new System.Windows.Forms.Label();
-            this.col3row1 = new System.Windows.Forms.Label();
-            this.col4row1 = new System.Windows.Forms.Label();
-            this.col1row2 = new System.Windows.Forms.Label();
-            this.col2row2 = new System.Windows.Forms.Label();
-            this.col3row2 = new System.Windows.Forms.Label();
-            this.col4row2 = new System.Windows.Forms.Label();
-            this.col1row3 = new System.Windows.Forms.Label();
-            this.col2row3 = new System.Windows.Forms.Label();
-            this.col3row3 = new System.Windows.Forms.Label();
-            this.col4row3 = new System.Windows.Forms.Label();
-            this.col1row4 = new System.Windows.Forms.Label();
-            this.col2row4 = new System.Windows.Forms.Label();
-            this.col3row4 = new System.Windows.Forms.Label();
-            this.col4row4 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // player1Name
@@ -94,187 +96,190 @@
             this.wordTextBox.Size = new System.Drawing.Size(108, 20);
             this.wordTextBox.TabIndex = 4;
             // 
-            // col1row1
+            // tableLayoutPanel1
             // 
-            this.col1row1.AutoSize = true;
-            this.col1row1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col1row1.Location = new System.Drawing.Point(134, 94);
-            this.col1row1.Name = "col1row1";
-            this.col1row1.Size = new System.Drawing.Size(47, 46);
-            this.col1row1.TabIndex = 16;
-            this.col1row1.Text = "A";
+            this.tableLayoutPanel1.ColumnCount = 4;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.Controls.Add(this.label16, 3, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label15, 2, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label14, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label13, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label11, 2, 2);
+            this.tableLayoutPanel1.Controls.Add(this.label10, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.label9, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.label8, 3, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label7, 2, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label6, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label5, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label4, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label3, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label12, 3, 2);
+            this.tableLayoutPanel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(160, 112);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(155, 145);
+            this.tableLayoutPanel1.TabIndex = 32;
             // 
-            // col2row1
+            // label1
             // 
-            this.col2row1.AutoSize = true;
-            this.col2row1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col2row1.Location = new System.Drawing.Point(187, 94);
-            this.col2row1.Name = "col2row1";
-            this.col2row1.Size = new System.Drawing.Size(47, 46);
-            this.col2row1.TabIndex = 17;
-            this.col2row1.Text = "B";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 36);
+            this.label1.TabIndex = 33;
+            this.label1.Text = "label1";
             // 
-            // col3row1
+            // label2
             // 
-            this.col3row1.AutoSize = true;
-            this.col3row1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col3row1.Location = new System.Drawing.Point(236, 94);
-            this.col3row1.Name = "col3row1";
-            this.col3row1.Size = new System.Drawing.Size(49, 46);
-            this.col3row1.TabIndex = 18;
-            this.col3row1.Text = "C";
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(41, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(29, 36);
+            this.label2.TabIndex = 34;
+            this.label2.Text = "label2";
             // 
-            // col4row1
+            // label3
             // 
-            this.col4row1.AutoSize = true;
-            this.col4row1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col4row1.Location = new System.Drawing.Point(291, 94);
-            this.col4row1.Name = "col4row1";
-            this.col4row1.Size = new System.Drawing.Size(49, 46);
-            this.col4row1.TabIndex = 19;
-            this.col4row1.Text = "D";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(79, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(29, 36);
+            this.label3.TabIndex = 35;
+            this.label3.Text = "label3";
             // 
-            // col1row2
+            // label4
             // 
-            this.col1row2.AutoSize = true;
-            this.col1row2.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col1row2.Location = new System.Drawing.Point(134, 144);
-            this.col1row2.Name = "col1row2";
-            this.col1row2.Size = new System.Drawing.Size(47, 46);
-            this.col1row2.TabIndex = 20;
-            this.col1row2.Text = "E";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(117, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(29, 36);
+            this.label4.TabIndex = 36;
+            this.label4.Text = "label4";
             // 
-            // col2row2
+            // label5
             // 
-            this.col2row2.AutoSize = true;
-            this.col2row2.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col2row2.Location = new System.Drawing.Point(187, 144);
-            this.col2row2.Name = "col2row2";
-            this.col2row2.Size = new System.Drawing.Size(44, 46);
-            this.col2row2.TabIndex = 21;
-            this.col2row2.Text = "F";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(3, 36);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(29, 36);
+            this.label5.TabIndex = 37;
+            this.label5.Text = "label5";
             // 
-            // col3row2
+            // label6
             // 
-            this.col3row2.AutoSize = true;
-            this.col3row2.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col3row2.Location = new System.Drawing.Point(236, 144);
-            this.col3row2.Name = "col3row2";
-            this.col3row2.Size = new System.Drawing.Size(51, 46);
-            this.col3row2.TabIndex = 22;
-            this.col3row2.Text = "G";
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(41, 36);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(29, 36);
+            this.label6.TabIndex = 38;
+            this.label6.Text = "label6";
             // 
-            // col4row2
+            // label7
             // 
-            this.col4row2.AutoSize = true;
-            this.col4row2.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col4row2.Location = new System.Drawing.Point(291, 144);
-            this.col4row2.Name = "col4row2";
-            this.col4row2.Size = new System.Drawing.Size(49, 46);
-            this.col4row2.TabIndex = 23;
-            this.col4row2.Text = "H";
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(79, 36);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(29, 36);
+            this.label7.TabIndex = 39;
+            this.label7.Text = "label7";
             // 
-            // col1row3
+            // label8
             // 
-            this.col1row3.AutoSize = true;
-            this.col1row3.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col1row3.Location = new System.Drawing.Point(134, 190);
-            this.col1row3.Name = "col1row3";
-            this.col1row3.Size = new System.Drawing.Size(30, 46);
-            this.col1row3.TabIndex = 24;
-            this.col1row3.Text = "I";
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(117, 36);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(29, 36);
+            this.label8.TabIndex = 40;
+            this.label8.Text = "label8";
             // 
-            // col2row3
+            // label9
             // 
-            this.col2row3.AutoSize = true;
-            this.col2row3.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col2row3.Location = new System.Drawing.Point(187, 190);
-            this.col2row3.Name = "col2row3";
-            this.col2row3.Size = new System.Drawing.Size(40, 46);
-            this.col2row3.TabIndex = 25;
-            this.col2row3.Text = "J";
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(3, 72);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(29, 36);
+            this.label9.TabIndex = 41;
+            this.label9.Text = "label9";
             // 
-            // col3row3
+            // label10
             // 
-            this.col3row3.AutoSize = true;
-            this.col3row3.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col3row3.Location = new System.Drawing.Point(236, 190);
-            this.col3row3.Name = "col3row3";
-            this.col3row3.Size = new System.Drawing.Size(46, 46);
-            this.col3row3.TabIndex = 26;
-            this.col3row3.Text = "K";
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(41, 72);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(29, 36);
+            this.label10.TabIndex = 42;
+            this.label10.Text = "label10";
             // 
-            // col4row3
+            // label11
             // 
-            this.col4row3.AutoSize = true;
-            this.col4row3.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col4row3.Location = new System.Drawing.Point(291, 190);
-            this.col4row3.Name = "col4row3";
-            this.col4row3.Size = new System.Drawing.Size(42, 46);
-            this.col4row3.TabIndex = 27;
-            this.col4row3.Text = "L";
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(79, 72);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(29, 36);
+            this.label11.TabIndex = 43;
+            this.label11.Text = "label11";
             // 
-            // col1row4
+            // label12
             // 
-            this.col1row4.AutoSize = true;
-            this.col1row4.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col1row4.Location = new System.Drawing.Point(134, 236);
-            this.col1row4.Name = "col1row4";
-            this.col1row4.Size = new System.Drawing.Size(53, 46);
-            this.col1row4.TabIndex = 28;
-            this.col1row4.Text = "M";
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(117, 72);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(29, 36);
+            this.label12.TabIndex = 44;
+            this.label12.Text = "label12";
             // 
-            // col2row4
+            // label13
             // 
-            this.col2row4.AutoSize = true;
-            this.col2row4.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col2row4.Location = new System.Drawing.Point(187, 236);
-            this.col2row4.Name = "col2row4";
-            this.col2row4.Size = new System.Drawing.Size(49, 46);
-            this.col2row4.TabIndex = 29;
-            this.col2row4.Text = "N";
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(3, 108);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(29, 37);
+            this.label13.TabIndex = 45;
+            this.label13.Text = "label13";
             // 
-            // col3row4
+            // label14
             // 
-            this.col3row4.AutoSize = true;
-            this.col3row4.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col3row4.Location = new System.Drawing.Point(236, 236);
-            this.col3row4.Name = "col3row4";
-            this.col3row4.Size = new System.Drawing.Size(51, 46);
-            this.col3row4.TabIndex = 30;
-            this.col3row4.Text = "O";
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(41, 108);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(29, 37);
+            this.label14.TabIndex = 46;
+            this.label14.Text = "label14";
             // 
-            // col4row4
+            // label15
             // 
-            this.col4row4.AutoSize = true;
-            this.col4row4.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.col4row4.Location = new System.Drawing.Point(291, 236);
-            this.col4row4.Name = "col4row4";
-            this.col4row4.Size = new System.Drawing.Size(47, 46);
-            this.col4row4.TabIndex = 31;
-            this.col4row4.Text = "P";
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(79, 108);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(29, 37);
+            this.label15.TabIndex = 47;
+            this.label15.Text = "label15";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(117, 108);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(29, 37);
+            this.label16.TabIndex = 48;
+            this.label16.Text = "label16";
             // 
             // BoggleGame
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 361);
-            this.Controls.Add(this.col1row1);
-            this.Controls.Add(this.col2row1);
-            this.Controls.Add(this.col3row1);
-            this.Controls.Add(this.col4row1);
-            this.Controls.Add(this.col1row2);
-            this.Controls.Add(this.col2row2);
-            this.Controls.Add(this.col3row2);
-            this.Controls.Add(this.col4row2);
-            this.Controls.Add(this.col1row3);
-            this.Controls.Add(this.col2row3);
-            this.Controls.Add(this.col3row3);
-            this.Controls.Add(this.col4row3);
-            this.Controls.Add(this.col1row4);
-            this.Controls.Add(this.col2row4);
-            this.Controls.Add(this.col3row4);
-            this.Controls.Add(this.col4row4);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.wordTextBox);
             this.Controls.Add(this.player2Score);
             this.Controls.Add(this.player1Score);
@@ -284,6 +289,8 @@
             this.MinimumSize = new System.Drawing.Size(500, 400);
             this.Name = "BoggleGame";
             this.Text = "Boggle Game";
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -296,21 +303,22 @@
         private System.Windows.Forms.Label player1Score;
         private System.Windows.Forms.Label player2Score;
         private System.Windows.Forms.TextBox wordTextBox;
-        private System.Windows.Forms.Label col1row1;
-        private System.Windows.Forms.Label col2row1;
-        private System.Windows.Forms.Label col3row1;
-        private System.Windows.Forms.Label col4row1;
-        private System.Windows.Forms.Label col1row2;
-        private System.Windows.Forms.Label col2row2;
-        private System.Windows.Forms.Label col3row2;
-        private System.Windows.Forms.Label col4row2;
-        private System.Windows.Forms.Label col1row3;
-        private System.Windows.Forms.Label col2row3;
-        private System.Windows.Forms.Label col3row3;
-        private System.Windows.Forms.Label col4row3;
-        private System.Windows.Forms.Label col1row4;
-        private System.Windows.Forms.Label col2row4;
-        private System.Windows.Forms.Label col3row4;
-        private System.Windows.Forms.Label col4row4;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label12;
     }
 }

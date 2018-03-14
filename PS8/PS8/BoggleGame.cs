@@ -15,6 +15,7 @@ namespace PS8
         public BoggleGame()
         {
             InitializeComponent();
+            Control c = tableLayoutPanel1.GetControlFromPosition(1, 1);
         }
     }
 }
