@@ -199,8 +199,7 @@ namespace PS8
         private void StartGame()
         {
             // Just a place holder
-            MessageBox.Show(view.IsInActiveGame.ToString());
-            Application.Run(new BoggleGame());
+            Application.Run(new BoggleGame(game));
         }
 
         /// <summary>
@@ -224,7 +223,7 @@ namespace PS8
             {
                 // Compose and send the request
                 cancelToken = new CancellationToken();
-                String url = String.Format("games/{0}?Brief=no", game.GameID);
+                String url = String.Format("games/{0}", game.GameID);
 
                 HttpResponseMessage response = await client.GetAsync(url, cancelToken);
 
@@ -234,15 +233,16 @@ namespace PS8
                     String result = response.Content.ReadAsStringAsync().Result;
                     dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
                     game.SetState((string)dynamic.GameState);
-
+                    game.Board = (string)dynamic.Board;
                     if (game.GameState == "active")
                     {
                         game.StartGame(dynamic);
                         pregameTimer.Stop();
                         view.IsInActiveGame = true;
-                        MessageBox.Show("You have joined a game");
                         StartGame();
                     }
+
+                    // Add functionality for game.GameStatus == "completed"
                 }
                 else
                 {
@@ -250,98 +250,5 @@ namespace PS8
                 }
             }
         }
-
-        /// <summary>
-        /// Store everything that is apart of the game. Contains internal Player Struct.
-        /// </summary>
-        class Game
-        {
-            public string GameID { get; private set; }
-            public string GameState { get; private set; }
-            public int TimeLeft { get; private set; }
-            public int TimeLimit { get; private set; }
-            public Player Player1 { get; private set; }
-
-            public Player Player2 { get; private set; }
-
-            /// <summary>
-            /// Creates a new game with the GameID
-            /// </summary>
-            /// <param name="gameID"></param>
-            public Game(string gameID)
-            {
-                GameID = gameID;
-            }
-
-            /// <summary>
-            /// Set the game state
-            /// </summary>
-            /// <param name="gameState"></param>
-            public void SetState(string gameState)
-            {
-                GameState = gameState;
-            }
-
-            /// <summary>
-            /// Start a game by storing all the game properties
-            /// </summary>
-            /// <param name="d"> an object from the client containing the game properties</param>
-            public void StartGame(dynamic d)
-            {
-                GameState = d.GameState;
-                TimeLeft = d.TimeLeft;
-                TimeLimit = d.TimeLimit;
-
-                dynamic player1 = d.Player1;
-                Player1 = new Player((string)player1.Nickname, (int)player1.Score);
-
-                dynamic player2 = d.Player2;
-                Player2 = new Player((string)player2.Nickname, (int)player2.Score);
-            }
-
-            /// <summary>
-            /// Update both scores
-            /// </summary>
-            /// <param name="player1Score"></param>
-            /// <param name="player2Score"></param>
-            public void UpdateScore(int player1Score, int player2Score)
-            {
-                Player1.SetScore(player1Score);
-                Player2.SetScore(player2Score);
-            }
-
-            /// <summary>
-            /// Used to separate players and scores cleanly
-            /// </summary>
-            public struct Player
-            {
-                public string NickName { get; private set; }
-                public int Score { get; private set; }
-
-                /// <summary>
-                /// Creates a new player
-                /// </summary>
-                /// <param name="nickName"></param>
-                /// <param name="score"></param>
-                public Player(string nickName, int score)
-                {
-                    NickName = nickName;
-                    Score = score;
-                }
-
-                /// <summary>
-                /// Sets the players score
-                /// </summary>
-                /// <param name="score"></param>
-                public void SetScore(int score)
-                {
-                    Score = score;
-                }
-            }
-
-
-        }
-
-
     }
 }

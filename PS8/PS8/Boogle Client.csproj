@@ -64,7 +64,9 @@
       <DependentUpon>BoggleGame.cs</DependentUpon>
     </Compile>
     <Compile Include="Controller.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="IBoggleClient.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BoggleClient.resx">

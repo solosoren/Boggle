@@ -12,10 +12,27 @@ namespace PS8
 {
     public partial class BoggleGame : Form
     {
-        public BoggleGame()
+        public BoggleGame(Game game)
         {
             InitializeComponent();
-            Control c = tableLayoutPanel1.GetControlFromPosition(1, 1);
+            Control control = new Control();
+            char[] board = game.Board.ToCharArray();
+            int currentCharacter = 0;
+            for (int col = 0; col < 4; col++)
+            {
+                for (int row = 0; row < 4; row++)
+                {
+                    control = tableLayoutPanel1.GetControlFromPosition(col, row);
+                    control.Text = board[currentCharacter].ToString();
+                    currentCharacter++;
+                }
+            }
+
+            player1Name.Text = game.Player1.NickName;
+            player1Score.Text = game.Player1.Score.ToString();
+
+            player2Name.Text = game.Player2.NickName;
+            player2Score.Text = game.Player2.Score.ToString();
         }
     }
 }
