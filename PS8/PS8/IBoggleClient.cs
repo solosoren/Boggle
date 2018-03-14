@@ -13,6 +13,7 @@ namespace PS8
     {
         event Action<string, string> RegisterPressed;
         event Action CancelPressed;
+        event Action<int> JoinGamePressed;
 
         bool IsUserRegistered { get; set; }
         void SetControlState(bool state);

@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,6 +22,7 @@ namespace PS8
 
         public event Action<string, string> RegisterPressed;
         public event Action CancelPressed;
+        public event Action<int> JoinGamePressed;
 
         /// <summary>
         /// If state == true, enables all controls
@@ -66,6 +68,25 @@ namespace PS8
             {
                 CancelPressed?.Invoke();
             }
+        }
+
+        private void joinGameButton_Click(object sender, EventArgs e)
+        {
+             if (int.TryParse(gameDurationTextBox.Text, out int duration))
+             {
+                if (duration < 5)
+                {
+                    MessageBox.Show("Your game duration must be greater than 5 seconds.");
+                    return;
+                }
+                else if (duration > 120)
+                {
+                    MessageBox.Show("Your game duration must be less than than 120 seconds.");
+                    return;
+                }
+
+                JoinGamePressed.Invoke(duration);
+             }
         }
     }
 }
