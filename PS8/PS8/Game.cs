@@ -14,8 +14,8 @@ namespace PS8
         public string GameID { get; private set; }
         public string GameState { get; private set; }
         public string Board { get; set; }
-        public int TimeLeft { get; private set; }
-        public int TimeLimit { get; private set; }
+        public int? TimeLeft { get; private set; }
+        public int? TimeLimit { get; private set; }
         public Player Player1 { get; private set; }
         public Player Player2 { get; private set; }
 
@@ -46,14 +46,22 @@ namespace PS8
             // handle null
       
             GameState = d.GameState;
-            TimeLeft = d.TimeLeft;
-            TimeLimit = d.TimeLimit;
+            TimeLeft = d.TimeLeft ?? 0;
+            TimeLimit = d.TimeLimit ?? 0;
 
 
             dynamic player1 = d.Player1;
+            if(player1 == null)
+            {
+                player1.Score = 0;
+            }
             Player1 = new Player(Convert.ToString(player1.Nickname), (int)player1.Score);
 
             dynamic player2 = d.Player2;
+            if(player2 == null)
+            {
+                player2.Score = 0;
+            }
             Player2 = new Player(Convert.ToString(player2.Nickname), (int)player2.Score);
         }
 

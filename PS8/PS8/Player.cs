@@ -12,7 +12,7 @@ namespace PS8
     public struct Player
     {
         public string NickName { get; private set; }
-        public int Score { get; private set; }
+        public int? Score { get; private set; }
 
         /// <summary>
         /// Creates a new player

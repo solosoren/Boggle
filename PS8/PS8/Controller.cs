@@ -44,7 +44,7 @@ namespace PS8
         /// <summary>
         /// For cancelling the current operation
         /// </summary>
-        private CancellationToken cancelToken;
+        private CancellationTokenSource cancelTokenSource;
 
         public Controller(IBoggleClient view)
         {
@@ -52,7 +52,7 @@ namespace PS8
             domainAddress = "";
             playerName = "";
             userToken = "";
-            cancelToken = new CancellationToken();
+            cancelTokenSource = new CancellationTokenSource();
 
             pregameTimer = new System.Timers.Timer(1000);
             pregameTimer.Elapsed += new ElapsedEventHandler(PregameTimerElapsed);
@@ -65,7 +65,7 @@ namespace PS8
 
         private void HandleRegisterCancel()
         {
-            cancelToken.ThrowIfCancellationRequested();
+            cancelTokenSource.Cancel();
             view.SetControlState(true);
 
             // Just for debugging. Delete later.
@@ -74,7 +74,7 @@ namespace PS8
 
         private void HandleJoinGameCancel()
         {
-            cancelToken.ThrowIfCancellationRequested();
+            cancelTokenSource.Cancel();
             view.SetJoinGameControlState(false);
 
             //try
@@ -111,10 +111,10 @@ namespace PS8
                     dynamic user = new ExpandoObject();
                     user.Nickname = playerName.Trim();
 
-                    cancelToken = new CancellationToken();
+                    cancelTokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await client.PostAsync("users", content, cancelToken);
+                    HttpResponseMessage response = await client.PostAsync("users", content, cancelTokenSource.Token);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -173,10 +173,10 @@ namespace PS8
                     dynamic.TimeLimit = length;
                     dynamic.UserToken = userToken;
 
-                    cancelToken = new CancellationToken();
+                    cancelTokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(dynamic), Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await client.PostAsync("games", content, cancelToken);
+                    HttpResponseMessage response = await client.PostAsync("games", content, cancelTokenSource.Token);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -216,10 +216,10 @@ namespace PS8
             using (HttpClient client = CreateClient())
             {
                 // Compose and send the request
-                cancelToken = new CancellationToken();
+                cancelTokenSource = new CancellationTokenSource();
                 String url = String.Format("games/{0}", game.GameID);
 
-                HttpResponseMessage response = await client.GetAsync(url, cancelToken);
+                HttpResponseMessage response = await client.GetAsync(url, cancelTokenSource.Token);
 
                 // Deal with the response
                 if (response.IsSuccessStatusCode)
