@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace PS8
 {
-    public partial class BoggleGame : Form
+    public partial class BoggleGame : Form, IBoggleGame
     {
         public BoggleGame(Game game)
         {
@@ -33,6 +33,19 @@ namespace PS8
 
             player2Name.Text = game.Player2.NickName;
             player2Score.Text = game.Player2.Score.ToString();
+            timeLeft.Text = game.TimeLeft.ToString();
+        }
+
+        public void UpdateBoard(Game game)
+        {
+            timeLeft.Text = game.TimeLeft.ToString();
+            player1Score.Text = game.Player1.Score.ToString();
+            player2Score.Text = game.Player2.Score.ToString();
+        }
+
+        private void Enter_Click(object sender, EventArgs e)
+        {
+            // check word
         }
     }
 }

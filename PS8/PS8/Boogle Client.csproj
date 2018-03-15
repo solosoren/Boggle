@@ -65,7 +65,9 @@
     </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GameController.cs" />
     <Compile Include="IBoggleClient.cs" />
+    <Compile Include="IBoggleGame.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

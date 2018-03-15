@@ -43,6 +43,7 @@ namespace PS8
         /// <param name="d"> an object from the client containing the game properties</param>
         public void StartGame(dynamic d)
         {
+            // handle null
             GameState = d.GameState;
             TimeLeft = d.TimeLeft;
             TimeLimit = d.TimeLimit;
@@ -52,6 +53,11 @@ namespace PS8
 
             dynamic player2 = d.Player2;
             Player2 = new Player((string)player2.Nickname, (int)player2.Score);
+        }
+
+        public void UpdateTime(int time)
+        {
+            TimeLeft = time;
         }
 
         /// <summary>

@@ -23,6 +23,8 @@ namespace PS8
         /// </summary>
         private IBoggleClient view;
 
+        private GameController gameController;
+
         /// <summary>
         /// The domain address provided by the view
         /// </summary>
@@ -70,28 +72,31 @@ namespace PS8
             MessageBox.Show("Cancelled registration");
         }
 
-        private async void HandleJoinGameCancel()
+        private void HandleJoinGameCancel()
         {
-            try
-            {
-                using (HttpClient client = CreateClient())
-                {
-                    dynamic user = new ExpandoObject();
-                    user.UserToken = userToken;
+            cancelToken.ThrowIfCancellationRequested();
+            view.SetJoinGameControlState(false);
 
-                    cancelToken = new CancellationToken();
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+            //try
+            //{
+            //    using (HttpClient client = CreateClient())
+            //    {
+            //        dynamic user = new ExpandoObject();
+            //        user.UserToken = userToken;
 
-                    HttpResponseMessage response = await client.PutAsync("games", content, cancelToken);
+            //        cancelToken = new CancellationToken();
+            //        StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Cancelled game request");
-                        view.SetJoinGameControlState(true);
-                    }
-                }
-            }
-            catch { }
+            //        HttpResponseMessage response = await client.PutAsync("games", content, cancelToken);
+
+            //        if (response.IsSuccessStatusCode)
+            //        {
+            //            MessageBox.Show("Cancelled game request");
+            //            view.SetJoinGameControlState(true);
+            //        }
+            //    }
+            //}
+            //catch { }
         }
 
         private async void HandleRegister(string domainName, string playerName)
@@ -199,25 +204,14 @@ namespace PS8
         private void StartGame()
         {
             // Just a place holder
-            Application.Run(new BoggleGame(game));
+            BoggleGame board = new BoggleGame(game);
+            gameController = new GameController(this, game, board);
+            gameController.StartGameTimer();
+            Application.Run(board);
+            
         }
 
-        /// <summary>
-        /// fired every second from the pregame timer when waiting for a new game
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="e"></param>
-        private void PregameTimerElapsed(object source, ElapsedEventArgs e)
-        {
-            CheckIfStarted();
-        }
-
-
-        /// <summary>
-        /// loads the initial game
-        /// </summary>
-        /// <returns>returns true if the game has started</returns>
-        private async void CheckIfStarted()
+        public async void FetchGame(bool isStarted)
         {
             using (HttpClient client = CreateClient())
             {
@@ -234,20 +228,48 @@ namespace PS8
                     dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
                     game.SetState((string)dynamic.GameState);
                     game.Board = (string)dynamic.Board;
-                    if (game.GameState == "active")
+                    if (!isStarted)
                     {
                         game.StartGame(dynamic);
-                        pregameTimer.Stop();
-                        view.IsInActiveGame = true;
-                        StartGame();
                     }
-
-                    // Add functionality for game.GameStatus == "completed"
+                    else
+                    {
+                        dynamic player1 = dynamic.Player1;
+                        dynamic player2 = dynamic.Player2;
+                        game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
+                        game.UpdateTime((int)dynamic.TimeLeft);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Error getting game: " + response.StatusCode + "\n" + response.ReasonPhrase);
+                    MessageBox.Show("Error loading game: " + response.StatusCode + "\n" + response.ReasonPhrase);
                 }
+            }
+        }
+        
+        /// <summary>
+        /// fired every second from the pregame timer when waiting for a new game
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        private void PregameTimerElapsed(object source, ElapsedEventArgs e)
+        {
+            CheckIfStarted();
+        }
+
+
+        /// <summary>
+        /// loads the initial game
+        /// </summary>
+        /// <returns>returns true if the game has started</returns>
+        private void CheckIfStarted()
+        {
+            FetchGame(false);
+            if (game.GameState == "active")
+            {
+                pregameTimer.Stop();
+                view.IsInActiveGame = true;
+                StartGame();
             }
         }
     }
