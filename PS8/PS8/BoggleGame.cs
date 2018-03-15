@@ -35,12 +35,13 @@ namespace PS8
             player2Score.Text = game.Player2.Score.ToString();
             timeLeft.Text = game.TimeLeft.ToString();
         }
+   
 
         public void UpdateBoard(Game game)
         {
-            timeLeft.Text = game.TimeLeft.ToString();
-            player1Score.Text = game.Player1.Score.ToString();
-            player2Score.Text = game.Player2.Score.ToString();
+            timeLeft.Invoke(new Action(() => timeLeft.Text = game.TimeLeft.ToString()));
+            player1Score.Invoke(new Action(() => player1Score.Text = game.Player1.Score.ToString()));
+            player2Score.Invoke(new Action(() => player2Score.Text = game.Player2.Score.ToString()));
         }
 
         private void Enter_Click(object sender, EventArgs e)

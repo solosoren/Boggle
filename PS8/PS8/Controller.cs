@@ -208,7 +208,7 @@ namespace PS8
             gameController = new GameController(this, game, board);
             gameController.StartGameTimer();
             Application.Run(board);
-            
+
         }
 
         public async void FetchGame(bool isStarted)
@@ -236,6 +236,14 @@ namespace PS8
                     {
                         dynamic player1 = dynamic.Player1;
                         dynamic player2 = dynamic.Player2;
+                        if (player1.Player1Score == null)
+                        {
+                            player1.Player1Score = 0;
+                        }
+                        if (player2.Player2Score == null)
+                        {
+                            player2.Player2Score = 0;
+                        }
                         game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
                         game.UpdateTime((int)dynamic.TimeLeft);
                     }
@@ -246,7 +254,7 @@ namespace PS8
                 }
             }
         }
-        
+
         /// <summary>
         /// fired every second from the pregame timer when waiting for a new game
         /// </summary>

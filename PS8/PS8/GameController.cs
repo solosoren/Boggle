@@ -7,7 +7,7 @@ using System.Timers;
 
 namespace PS8
 {
-    class GameController: IBoggleGame
+    class GameController : IBoggleGame
     {
         private Controller controller;
         private IBoggleGame board;
@@ -22,7 +22,6 @@ namespace PS8
             gameTimer = new System.Timers.Timer(1000);
             gameTimer.Elapsed += new ElapsedEventHandler(GameTimerElapsed);
         }
-
         public void StartGameTimer()
         {
             gameTimer.Start();
