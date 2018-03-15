@@ -59,13 +59,8 @@ namespace PS8
         {
             TimeLeft = d.TimeLeft ?? 0;
 
-            UpdateScore(Convert.ToInt32(d.Player2.Score), Convert.ToInt32(d.Player2.Score));
+            UpdateScore(Convert.ToInt32(d.Player1.Score), Convert.ToInt32(d.Player2.Score));
 
-        }
-
-        public void UpdateTime(int time)
-        {
-            TimeLeft = time;
         }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace PS8
     /// <summary>
     /// Used to separate players and scores cleanly
     /// </summary>
-    public struct Player
+    public class Player
     {
         public string Nickname { get; private set; }
         public int? Score { get; private set; }
@@ -31,7 +31,10 @@ namespace PS8
         /// <param name="score"></param>
         public void SetScore(int score)
         {
-            Score = score;
+            lock (this)
+            {
+                Score = score;
+            }
         }
     }
 }

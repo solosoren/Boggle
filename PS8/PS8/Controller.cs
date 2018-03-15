@@ -29,7 +29,6 @@ namespace PS8
         /// The player name provided by the view
         /// </summary>
         private string playerName;
-        public int playerNumber { get; private set; }
         public string userToken { get; private set; }
         private System.Timers.Timer pregameTimer;
         private Game game;
@@ -170,14 +169,6 @@ namespace PS8
 
                     if (response.IsSuccessStatusCode)
                     {
-                        if (response.ReasonPhrase == "202")
-                        {
-                            playerNumber = 1;
-                        }
-                        else
-                        {
-                            playerNumber = 2;
-                        }
                         String result = await response.Content.ReadAsStringAsync();
                         string gameID = JsonConvert.DeserializeObject<dynamic>(result).GameID;
                         game = new Game(gameID);
