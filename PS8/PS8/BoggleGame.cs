@@ -5,6 +5,13 @@ namespace PS8
 {
     public partial class BoggleGame : Form, IBoggleGame
     {
+
+        public event Action<string> EnterPressed;
+
+        /// <summary>
+        /// Creates a new BoggleGame with the given game
+        /// </summary>
+        /// <param name="game"></param>
         public BoggleGame(Game game)
         {
             InitializeComponent();
@@ -21,7 +28,6 @@ namespace PS8
                 }
             }
 
-
             player1Name.Text = game.Player1.Nickname;
             player1Score.Text = game.Player1.Score.ToString();
 
@@ -30,17 +36,45 @@ namespace PS8
             timeLeft.Text = game.TimeLeft.ToString();
         }
 
-
+        /// <summary>
+        /// updates the form
+        /// </summary>
+        /// <param name="game"></param>
         public void UpdateBoard(Game game)
         {
-            timeLeft.Invoke(new Action(() => timeLeft.Text = game.TimeLeft.ToString()));
-            player1Score.Invoke(new Action(() => player1Score.Text = game.Player1.Score.ToString()));
-            player2Score.Invoke(new Action(() => player2Score.Text = game.Player2.Score.ToString()));
+            lock()
+                {
+                timeLeft.Invoke(new Action(() => timeLeft.Text = game.TimeLeft.ToString()));
+                player1Score.Invoke(new Action(() => player1Score.Text = game.Player1.Score.ToString()));
+                player2Score.Invoke(new Action(() => player2Score.Text = game.Player2.Score.ToString()));
+            };
+            
         }
 
+        /// <summary>
+        /// Play word button clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Enter_Click(object sender, EventArgs e)
         {
-            // check word
+            if (ValidWord())
+            {
+                EnterPressed?.Invoke(wordTextBox.Text);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the word is valid
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidWord()
+        {
+            if (wordTextBox.Text != null && wordTextBox.Text.Trim() != "" && wordTextBox.Text.Trim().Length < 30)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

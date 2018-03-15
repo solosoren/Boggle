@@ -9,6 +9,8 @@ namespace PS8
     interface IBoggleGame
     {
 
+        event Action<string> EnterPressed;
+
         void UpdateBoard(Game game);
 
 

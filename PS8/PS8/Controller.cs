@@ -20,23 +20,18 @@ namespace PS8
         /// The Boggle client view controlled by this controller
         /// </summary>
         private IBoggleClient view;
-
         private GameController gameController;
-
         /// <summary>
         /// The domain address provided by the view
         /// </summary>
         private string domainAddress;
-
         /// <summary>
         /// The player name provided by the view
         /// </summary>
         private string playerName;
-
-        private string userToken;
-
+        public int playerNumber { get; private set; }
+        public string userToken { get; private set; }
         private System.Timers.Timer pregameTimer;
-
         private Game game;
 
         /// <summary>
@@ -138,7 +133,7 @@ namespace PS8
         /// Creates an HttpClient for communicating with the server
         /// </summary>
         /// <returns></returns>
-        private HttpClient CreateClient()
+        public HttpClient CreateClient()
         {
             HttpClient client = new HttpClient();
             // Added for debugging purposes
@@ -175,6 +170,14 @@ namespace PS8
 
                     if (response.IsSuccessStatusCode)
                     {
+                        if (response.ReasonPhrase == "202")
+                        {
+                            playerNumber = 1;
+                        }
+                        else
+                        {
+                            playerNumber = 2;
+                        }
                         String result = await response.Content.ReadAsStringAsync();
                         string gameID = JsonConvert.DeserializeObject<dynamic>(result).GameID;
                         game = new Game(gameID);
@@ -204,6 +207,7 @@ namespace PS8
             gameController.StartGameTimer();
             Application.Run(board);
         }
+
         private async Task<HttpResponseMessage> GetResponse(HttpClient client)
         {
             cancelTokenSource = new CancellationTokenSource();
@@ -211,6 +215,7 @@ namespace PS8
 
             return await client.GetAsync(url, cancelTokenSource.Token);
         }
+
         public void FetchGame(bool isStarted)
         {
             try
@@ -238,18 +243,6 @@ namespace PS8
                         else
                         {
                             game.UpdateGame(dynamic);
-                            //dynamic player1 = dynamic.Player1;
-                            //dynamic player2 = dynamic.Player2;
-                            //if (player1.Player1Score == null)
-                            //{
-                            //    player1.Player1Score = 0;
-                            //}
-                            //if (player2.Player2Score == null)
-                            //{
-                            //    player2.Player2Score = 0;
-                            //}
-                            //game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
-                            //game.UpdateTime((int)dynamic.TimeLeft);
                         }
                     }
                     else
@@ -286,7 +279,6 @@ namespace PS8
             pregameTimer.Stop();
             if (game.GameState == "active")
             {
-                MessageBox.Show("Active");
                 pregameTimer.Stop();
                 view.IsInActiveGame = true;
                 StartGame();
