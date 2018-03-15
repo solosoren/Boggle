@@ -22,10 +22,10 @@ namespace PS8
             }
 
 
-            player1Name.Text = game.Player1.NickName;
+            player1Name.Text = game.Player1.Nickname;
             player1Score.Text = game.Player1.Score.ToString();
 
-            player2Name.Text = game.Player2.NickName;
+            player2Name.Text = game.Player2.Nickname;
             player2Score.Text = game.Player2.Score.ToString();
             timeLeft.Text = game.TimeLeft.ToString();
         }

@@ -11,7 +11,7 @@ namespace PS8
     /// </summary>
     public struct Player
     {
-        public string NickName { get; private set; }
+        public string Nickname { get; private set; }
         public int? Score { get; private set; }
 
         /// <summary>
@@ -19,9 +19,9 @@ namespace PS8
         /// </summary>
         /// <param name="nickName"></param>
         /// <param name="score"></param>
-        public Player(string nickName, int score)
+        public Player(string nickName, int? score)
         {
-            NickName = nickName;
+            Nickname = nickName;
             Score = score;
         }
 

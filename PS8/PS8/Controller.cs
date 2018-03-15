@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -206,18 +204,21 @@ namespace PS8
             gameController.StartGameTimer();
             Application.Run(board);
         }
+        private async Task<HttpResponseMessage> GetResponse(HttpClient client)
+        {
+            cancelTokenSource = new CancellationTokenSource();
+            String url = String.Format("games/{0}", game.GameID);
 
-        public async void FetchGame(bool isStarted)
+            return await client.GetAsync(url, cancelTokenSource.Token);
+        }
+        public void FetchGame(bool isStarted)
         {
             try
             {
                 using (HttpClient client = CreateClient())
                 {
-                    // Compose and send the request
-                    cancelTokenSource = new CancellationTokenSource();
-                    String url = String.Format("games/{0}", game.GameID);
-
-                    HttpResponseMessage response = await client.GetAsync(url, cancelTokenSource.Token);
+                    Task<HttpResponseMessage> t = GetResponse(client);
+                    HttpResponseMessage response = t.Result;
 
                     // Deal with the response
                     if (response.IsSuccessStatusCode)
@@ -226,11 +227,15 @@ namespace PS8
                         dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
                         game.SetState((string)dynamic.GameState);
                         game.Board = (string)dynamic.Board;
-                        if (!isStarted)
+                        if (((String)game.GameState).Equals("pending"))
+                        {
+
+                        }
+                        else if (!isStarted)
                         {
                             game.StartGame(dynamic);
                         }
-                        else if (((string)dynamic.GameState).Equals("active"))
+                        else
                         {
                             dynamic player1 = dynamic.Player1;
                             dynamic player2 = dynamic.Player2;
@@ -244,10 +249,6 @@ namespace PS8
                             }
                             game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
                             game.UpdateTime((int)dynamic.TimeLeft);
-                        }
-                        else if (((string)dynamic.GameState).Equals("completed"))
-                        {
-                            MessageBox.Show("Completed.");
                         }
                     }
                     else
@@ -281,11 +282,22 @@ namespace PS8
         private void CheckIfStarted()
         {
             FetchGame(false);
+            pregameTimer.Stop();
             if (game.GameState == "active")
             {
+                MessageBox.Show("Active");
                 pregameTimer.Stop();
                 view.IsInActiveGame = true;
                 StartGame();
+            }
+            else if (game.GameState == "completed")
+            {
+                pregameTimer.Stop();
+                MessageBox.Show("Game's completed");
+            }
+            else
+            {
+                pregameTimer.Start();
             }
         }
     }
