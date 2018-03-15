@@ -72,31 +72,28 @@ namespace PS8
             MessageBox.Show("Cancelled registration");
         }
 
-        private void HandleJoinGameCancel()
+        private async void HandleJoinGameCancel()
         {
-            cancelTokenSource.Cancel();
-            view.SetJoinGameControlState(false);
+            try
+            {
+                using (HttpClient client = CreateClient())
+                {
+                    dynamic user = new ExpandoObject();
+                    user.UserToken = userToken;
 
-            //try
-            //{
-            //    using (HttpClient client = CreateClient())
-            //    {
-            //        dynamic user = new ExpandoObject();
-            //        user.UserToken = userToken;
+                    cancelTokenSource = new CancellationTokenSource();
+                    StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
 
-            //        cancelToken = new CancellationToken();
-            //        StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("games", content, cancelTokenSource.Token);
 
-            //        HttpResponseMessage response = await client.PutAsync("games", content, cancelToken);
-
-            //        if (response.IsSuccessStatusCode)
-            //        {
-            //            MessageBox.Show("Cancelled game request");
-            //            view.SetJoinGameControlState(true);
-            //        }
-            //    }
-            //}
-            //catch { }
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Cancelled game request");
+                        view.SetJoinGameControlState(true);
+                    }
+                }
+            }
+            catch { }
         }
 
         private async void HandleRegister(string domainName, string playerName)
@@ -208,51 +205,62 @@ namespace PS8
             gameController = new GameController(this, game, board);
             gameController.StartGameTimer();
             Application.Run(board);
-
         }
 
         public async void FetchGame(bool isStarted)
         {
-            using (HttpClient client = CreateClient())
+            try
             {
-                // Compose and send the request
-                cancelTokenSource = new CancellationTokenSource();
-                String url = String.Format("games/{0}", game.GameID);
-
-                HttpResponseMessage response = await client.GetAsync(url, cancelTokenSource.Token);
-
-                // Deal with the response
-                if (response.IsSuccessStatusCode)
+                using (HttpClient client = CreateClient())
                 {
-                    String result = response.Content.ReadAsStringAsync().Result;
-                    dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
-                    game.SetState((string)dynamic.GameState);
-                    game.Board = (string)dynamic.Board;
-                    if (!isStarted)
+                    // Compose and send the request
+                    cancelTokenSource = new CancellationTokenSource();
+                    String url = String.Format("games/{0}", game.GameID);
+
+                    HttpResponseMessage response = await client.GetAsync(url, cancelTokenSource.Token);
+
+                    // Deal with the response
+                    if (response.IsSuccessStatusCode)
                     {
-                        game.StartGame(dynamic);
+                        String result = response.Content.ReadAsStringAsync().Result;
+                        dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
+                        game.SetState((string)dynamic.GameState);
+                        game.Board = (string)dynamic.Board;
+                        if (!isStarted)
+                        {
+                            game.StartGame(dynamic);
+                        }
+                        else if (((string)dynamic.GameState).Equals("active"))
+                        {
+                            dynamic player1 = dynamic.Player1;
+                            dynamic player2 = dynamic.Player2;
+                            if (player1.Player1Score == null)
+                            {
+                                player1.Player1Score = 0;
+                            }
+                            if (player2.Player2Score == null)
+                            {
+                                player2.Player2Score = 0;
+                            }
+                            game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
+                            game.UpdateTime((int)dynamic.TimeLeft);
+                        }
+                        else if (((string)dynamic.GameState).Equals("completed"))
+                        {
+                            MessageBox.Show("Completed.");
+                        }
                     }
                     else
                     {
-                        dynamic player1 = dynamic.Player1;
-                        dynamic player2 = dynamic.Player2;
-                        if (player1.Player1Score == null)
-                        {
-                            player1.Player1Score = 0;
-                        }
-                        if (player2.Player2Score == null)
-                        {
-                            player2.Player2Score = 0;
-                        }
-                        game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
-                        game.UpdateTime((int)dynamic.TimeLeft);
+                        MessageBox.Show("Error loading game: " + response.StatusCode + "\n" + response.ReasonPhrase);
                     }
                 }
-                else
-                {
-                    MessageBox.Show("Error loading game: " + response.StatusCode + "\n" + response.ReasonPhrase);
-                }
             }
+            catch (TaskCanceledException e)
+            {
+
+            }
+
         }
 
         /// <summary>

@@ -44,25 +44,13 @@ namespace PS8
         public void StartGame(dynamic d)
         {
             // handle null
-      
+
             GameState = d.GameState;
             TimeLeft = d.TimeLeft ?? 0;
             TimeLimit = d.TimeLimit ?? 0;
 
-
-            dynamic player1 = d.Player1;
-            if(player1 == null)
-            {
-                player1.Score = 0;
-            }
-            Player1 = new Player(Convert.ToString(player1.Nickname), (int)player1.Score);
-
-            dynamic player2 = d.Player2;
-            if(player2 == null)
-            {
-                player2.Score = 0;
-            }
-            Player2 = new Player(Convert.ToString(player2.Nickname), (int)player2.Score);
+            Player1 = new Player(d.Player1.Nickname, d.Player1.Score);
+            Player2 = new Player(d.Player2.NickName, d.Player2.Score);
         }
 
         public void UpdateTime(int time)

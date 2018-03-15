@@ -123,15 +123,14 @@ namespace PS8
                 gameDurationLabel.Enabled = false;
                 gameDurationTextBox.Enabled = false;
                 joinGameButton.AutoSize = true;
-                joinGameButton.Text = "Joined Game";
-                joinGameButton.Update();
-
+                joinGameButton.Invoke(new Action(() => joinGameButton.Text = "Joined Game"));
+                joinGameButton.Invoke(new Action(() => joinGameButton.Update()));
             }
             gameDurationLabel.Enabled = state;
             gameDurationTextBox.Enabled = state;
             joinGameButton.AutoSize = true;
-            joinGameButton.Text = state == true ? "Join Game" : "Cancel game request";
-            joinGameButton.Update();
+            joinGameButton.Invoke(new Action(() => joinGameButton.Text = state == true ? "Join Game" : "Cancel game request"));
+            joinGameButton.Invoke(new Action(() => joinGameButton.Update()));
         }
     }
 }
