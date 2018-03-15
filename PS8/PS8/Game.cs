@@ -51,8 +51,16 @@ namespace PS8
 
             string player1Name = d.Player1.Nickname;
             string player2Name = d.Player2.Nickname;
-            Player1 = new Player(player1Name,Convert.ToInt32( d.Player1.Score));
+            Player1 = new Player(player1Name, Convert.ToInt32(d.Player1.Score));
             Player2 = new Player(player2Name, Convert.ToInt32(d.Player2.Score));
+        }
+
+        public void UpdateGame(dynamic d)
+        {
+            TimeLeft = d.TimeLeft ?? 0;
+
+            UpdateScore(Convert.ToInt32(d.Player2.Score), Convert.ToInt32(d.Player2.Score));
+
         }
 
         public void UpdateTime(int time)

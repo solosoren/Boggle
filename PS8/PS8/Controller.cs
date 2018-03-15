@@ -237,18 +237,19 @@ namespace PS8
                         }
                         else
                         {
-                            dynamic player1 = dynamic.Player1;
-                            dynamic player2 = dynamic.Player2;
-                            if (player1.Player1Score == null)
-                            {
-                                player1.Player1Score = 0;
-                            }
-                            if (player2.Player2Score == null)
-                            {
-                                player2.Player2Score = 0;
-                            }
-                            game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
-                            game.UpdateTime((int)dynamic.TimeLeft);
+                            game.UpdateGame(dynamic);
+                            //dynamic player1 = dynamic.Player1;
+                            //dynamic player2 = dynamic.Player2;
+                            //if (player1.Player1Score == null)
+                            //{
+                            //    player1.Player1Score = 0;
+                            //}
+                            //if (player2.Player2Score == null)
+                            //{
+                            //    player2.Player2Score = 0;
+                            //}
+                            //game.UpdateScore((int)player1.Player1Score, (int)player2.Player2Score);
+                            //game.UpdateTime((int)dynamic.TimeLeft);
                         }
                     }
                     else
