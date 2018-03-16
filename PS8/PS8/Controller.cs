@@ -268,22 +268,20 @@ namespace PS8
         /// <returns>returns true if the game has started</returns>
         private void CheckIfStarted()
         {
-            FetchGame(false);
-            pregameTimer.Stop();
-            if (game.GameState == "active")
+            lock (this)
             {
-                pregameTimer.Stop();
-                view.IsInActiveGame = true;
-                StartGame();
-            }
-            else if (game.GameState == "completed")
-            {
-                pregameTimer.Stop();
-                MessageBox.Show("Game's completed");
-            }
-            else
-            {
-                pregameTimer.Start();
+                FetchGame(false);
+                if (game.GameState == "active")
+                {
+                    pregameTimer.Stop();
+                    view.IsInActiveGame = true;
+                    StartGame();
+                }
+                else if (game.GameState == "completed")
+                {
+                    pregameTimer.Stop();
+                    MessageBox.Show("Game's completed");
+                }
             }
         }
     }

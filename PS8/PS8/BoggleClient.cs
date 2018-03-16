@@ -41,11 +41,11 @@ namespace PS8
                 playerNameTextBox.Enabled = false;
                 registerButton.AutoSize = true;
                 registerButton.Text = "Registered";
-                registerButton.Update();
                 registerButton.Enabled = false;
                 gameDurationLabel.Enabled = true;
                 gameDurationTextBox.Enabled = true;
                 joinGameButton.Enabled = true;
+                this.Update();
             }
             else
             {
@@ -55,7 +55,7 @@ namespace PS8
                 gameDurationTextBox.Enabled = false;
                 joinGameButton.Enabled = false;
                 registerButton.Text = state == true ? "Register" : "Cancel";
-                registerButton.Update();
+                this.Update();
             }
         }
 
