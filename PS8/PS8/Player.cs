@@ -31,10 +31,8 @@ namespace PS8
         /// <param name="score"></param>
         public void SetScore(int score)
         {
-            lock (this)
-            {
-                Score = score;
-            }
+            Score = score;
+            
         }
     }
 }

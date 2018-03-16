@@ -42,10 +42,16 @@ namespace PS8
         /// <param name="game"></param>
         public void UpdateBoard(Game game)
         {
-            timeLeft.Invoke((Action)(() => timeLeft.Text = game.TimeLeft.ToString()));
-            player1Score.Invoke((Action)(() => player1Score.Text = game.Player1.Score.ToString()));
-            player2Score.Invoke((Action)(() => player2Score.Text = game.Player2.Score.ToString()));
+            this.Invoke((Action)(() => {  
+                timeLeft.Text = game.TimeLeft.ToString();
+                player1Score.Text = game.Player1.Score.ToString();
+                player2Score.Text = game.Player2.Score.ToString();
 
+            }));
+             //timeLeft.Invoke((Action)(() => timeLeft.Text = game.TimeLeft.ToString()));
+             //player1Score.Invoke((Action)(() => player1Score.Text = game.Player1.Score.ToString()));
+             //player2Score.Invoke((Action)(() => player2Score.Text = game.Player2.Score.ToString()));
+            
         }
 
         /// <summary>

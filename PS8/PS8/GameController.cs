@@ -76,7 +76,6 @@ namespace PS8
                     {
                         String result = await response.Content.ReadAsStringAsync();
                         int score = JsonConvert.DeserializeObject<dynamic>(result).Score;
-                        UpdateGame();
                     }
                     else
                     {
