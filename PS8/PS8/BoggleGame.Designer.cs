@@ -52,7 +52,10 @@
             this.label12 = new System.Windows.Forms.Label();
             this.timeLeft = new System.Windows.Forms.Label();
             this.EnterButton = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // player1Name
@@ -297,6 +300,24 @@
             this.EnterButton.UseVisualStyleBackColor = true;
             this.EnterButton.Click += new System.EventHandler(this.Enter_Click);
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.helpToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(479, 24);
+            this.menuStrip1.TabIndex = 35;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
+            // 
             // BoggleGame
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -310,6 +331,8 @@
             this.Controls.Add(this.player1Score);
             this.Controls.Add(this.player2Name);
             this.Controls.Add(this.player1Name);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.MaximumSize = new System.Drawing.Size(495, 385);
             this.MinimumSize = new System.Drawing.Size(495, 385);
             this.Name = "BoggleGame";
@@ -317,6 +340,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BoggleGame_FormClosing);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -348,5 +373,7 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label timeLeft;
         private System.Windows.Forms.Button EnterButton;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
     }
 }

@@ -53,6 +53,17 @@ namespace PS8
             view.RegisterCancelPressed += HandleRegisterCancel;
             view.JoinGameCancelPressed += HandleJoinGameCancel;
             view.JoinGamePressed += HandleJoinGame;
+            view.HelpPressed += HandleHelp;
+        }
+
+        private void HandleHelp()
+        {
+            Thread thread = new Thread(() =>
+            {
+                Application.Run(new ClientHelp());
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private void HandleRegisterCancel()

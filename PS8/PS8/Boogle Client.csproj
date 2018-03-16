@@ -63,9 +63,21 @@
     <Compile Include="BoggleGame.Designer.cs">
       <DependentUpon>BoggleGame.cs</DependentUpon>
     </Compile>
+    <Compile Include="ClientHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientHelp.Designer.cs">
+      <DependentUpon>ClientHelp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameController.cs" />
+    <Compile Include="GameHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameHelp.Designer.cs">
+      <DependentUpon>GameHelp.cs</DependentUpon>
+    </Compile>
     <Compile Include="IBoggleClient.cs" />
     <Compile Include="IBoggleGame.cs" />
     <Compile Include="Player.cs" />
@@ -77,6 +89,12 @@
     <EmbeddedResource Include="BoggleGame.resx">
       <DependentUpon>BoggleGame.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ClientHelp.resx">
+      <DependentUpon>ClientHelp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GameHelp.resx">
+      <DependentUpon>GameHelp.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -85,6 +103,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -99,6 +118,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Domain_PlayerName_Help.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Register_Help.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cancel_Help.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Join_Game_Help.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

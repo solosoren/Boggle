@@ -12,6 +12,7 @@ namespace PS8
 
         event Action<string, Button> EnterPressed;
         event Action GameClosed;
+        event Action HelpPressed;
         void UpdateBoard(Game game);
 
         void EndGame();

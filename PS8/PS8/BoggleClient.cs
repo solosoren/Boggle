@@ -25,6 +25,7 @@ namespace PS8
         public event Action RegisterCancelPressed;
         public event Action<int> JoinGamePressed;
         public event Action JoinGameCancelPressed;
+        public event Action HelpPressed;
 
         /// <summary>
         /// If state == true, enables all controls
@@ -135,6 +136,11 @@ namespace PS8
              joinGameButton.Text = state == true ? "Join Game" : "Cancel game request";
              joinGameButton.Update();
          }));
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpPressed?.Invoke();
         }
     }
 }

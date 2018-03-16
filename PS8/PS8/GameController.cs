@@ -30,7 +30,19 @@ namespace PS8
 
             board.GameClosed += () => gameTimer.Stop();
             board.EnterPressed += HandlePlayWord;
+            board.HelpPressed += HandleHelp;
         }
+
+        private void HandleHelp()
+        {
+            Thread thread = new Thread(() =>
+            {
+                Application.Run(new GameHelp());
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+        }
+
         public void StartGameTimer()
         {
             gameTimer.Start();

@@ -8,6 +8,7 @@ namespace PS8
 
         public event Action<string, Button> EnterPressed;
         public event Action GameClosed;
+        public event Action HelpPressed;
 
         /// <summary>
         /// Creates a new BoggleGame with the given game
@@ -35,6 +36,7 @@ namespace PS8
             player2Name.Text = game.Player2.Nickname;
             player2Score.Text = game.Player2.Score.ToString();
             timeLeft.Text = game.TimeLeft.ToString();
+            this.Update();
         }
 
         /// <summary>
@@ -48,11 +50,8 @@ namespace PS8
                 timeLeft.Text = game.TimeLeft.ToString();
                 player1Score.Text = game.Player1.Score.ToString();
                 player2Score.Text = game.Player2.Score.ToString();
-
+                this.Update();
             }));
-            //timeLeft.Invoke((Action)(() => timeLeft.Text = game.TimeLeft.ToString()));
-            //player1Score.Invoke((Action)(() => player1Score.Text = game.Player1.Score.ToString()));
-            //player2Score.Invoke((Action)(() => player2Score.Text = game.Player2.Score.ToString()));
         }
 
         /// <summary>
@@ -88,6 +87,7 @@ namespace PS8
                 EnterButton.Enabled = false;
                 wordTextBox.Enabled = false;
                 timeLeft.Text = "Finished";
+                this.Update();
             }));
 
         }
@@ -95,6 +95,11 @@ namespace PS8
         private void BoggleGame_FormClosing(object sender, FormClosingEventArgs e)
         {
             GameClosed?.Invoke();
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpPressed?.Invoke();
         }
     }
 }
