@@ -28,6 +28,7 @@ namespace PS8
             gameTimer = new System.Timers.Timer(1000);
             gameTimer.Elapsed += new ElapsedEventHandler(GameTimerElapsed);
 
+            board.GameClosed += () => gameTimer.Stop();
             board.EnterPressed += HandlePlayWord;
         }
         public void StartGameTimer()
@@ -48,34 +49,35 @@ namespace PS8
             if (game.GameState == "completed")
             {
                 gameTimer.Stop();
-                // TODO: End Game
+                board.EndGame();
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="word"></param>
-        private async void HandlePlayWord(string word)
+        private async void HandlePlayWord(string word, Button enterButton)
         {
+            enterButton.Enabled = false;
             try
             {
                 using (HttpClient client = controller.CreateClient())
                 {
                     dynamic dynamic = new ExpandoObject();
-                    dynamic.Word = word;
                     dynamic.UserToken = controller.userToken;
+                    dynamic.Word = word;
 
                     String url = String.Format("games/{0}", game.GameID);
                     cancelTokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(dynamic), Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await client.PutAsync(url, content, cancelTokenSource.Token);
-                    
 
                     if (response.IsSuccessStatusCode)
                     {
                         String result = await response.Content.ReadAsStringAsync();
                         int score = JsonConvert.DeserializeObject<dynamic>(result).Score;
+                        enterButton.Enabled = true;
                     }
                     else
                     {
@@ -87,6 +89,7 @@ namespace PS8
             {
                 MessageBox.Show("Error Playing Word");
             }
+
         }
 
     }

@@ -314,6 +314,7 @@
             this.MinimumSize = new System.Drawing.Size(495, 385);
             this.Name = "BoggleGame";
             this.Text = "Boggle Game";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BoggleGame_FormClosing);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);

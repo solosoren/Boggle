@@ -6,7 +6,8 @@ namespace PS8
     public partial class BoggleGame : Form, IBoggleGame
     {
 
-        public event Action<string> EnterPressed;
+        public event Action<string, Button> EnterPressed;
+        public event Action GameClosed;
 
         /// <summary>
         /// Creates a new BoggleGame with the given game
@@ -42,16 +43,16 @@ namespace PS8
         /// <param name="game"></param>
         public void UpdateBoard(Game game)
         {
-            this.Invoke((Action)(() => {  
+            this.Invoke((Action)(() =>
+            {
                 timeLeft.Text = game.TimeLeft.ToString();
                 player1Score.Text = game.Player1.Score.ToString();
                 player2Score.Text = game.Player2.Score.ToString();
 
             }));
-             //timeLeft.Invoke((Action)(() => timeLeft.Text = game.TimeLeft.ToString()));
-             //player1Score.Invoke((Action)(() => player1Score.Text = game.Player1.Score.ToString()));
-             //player2Score.Invoke((Action)(() => player2Score.Text = game.Player2.Score.ToString()));
-            
+            //timeLeft.Invoke((Action)(() => timeLeft.Text = game.TimeLeft.ToString()));
+            //player1Score.Invoke((Action)(() => player1Score.Text = game.Player1.Score.ToString()));
+            //player2Score.Invoke((Action)(() => player2Score.Text = game.Player2.Score.ToString()));
         }
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace PS8
         {
             if (ValidWord())
             {
-                EnterPressed?.Invoke(wordTextBox.Text);
+                EnterPressed?.Invoke(wordTextBox.Text, EnterButton);
             }
         }
 
@@ -78,6 +79,22 @@ namespace PS8
                 return true;
             }
             return false;
+        }
+
+        public void EndGame()
+        {
+            this.Invoke((Action)(() =>
+            {
+                EnterButton.Enabled = false;
+                wordTextBox.Enabled = false;
+                timeLeft.Text = "Finished";
+            }));
+
+        }
+
+        private void BoggleGame_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            GameClosed?.Invoke();
         }
     }
 }

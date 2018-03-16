@@ -60,8 +60,6 @@ namespace PS8
             cancelTokenSource.Cancel();
             view.SetControlState(true);
 
-            // Just for debugging. Delete later.
-            MessageBox.Show("Cancelled registration");
         }
 
         private async void HandleJoinGameCancel()
@@ -80,7 +78,7 @@ namespace PS8
 
                     if (response.IsSuccessStatusCode)
                     {
-                        MessageBox.Show("Cancelled game request");
+                        cancelTokenSource.Cancel();
                         view.SetJoinGameControlState(true);
                     }
                 }
@@ -117,9 +115,10 @@ namespace PS8
                     }
                 }
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException e)
             {
-
+                MessageBox.Show("Cancelled registration request");
+                return;
             }
             finally
             {
@@ -181,9 +180,10 @@ namespace PS8
                     }
                 }
             }
-            catch
+            catch (TaskCanceledException e)
             {
-
+                MessageBox.Show("Cancelled game request");
+                return;
             }
         }
 
@@ -197,6 +197,8 @@ namespace PS8
             gameController = new GameController(this, game, board);
             gameController.StartGameTimer();
             Application.Run(board);
+            view.SetJoinGameControlState(true);
+
         }
 
         private async Task<HttpResponseMessage> GetResponse(HttpClient client)
