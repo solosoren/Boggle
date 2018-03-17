@@ -106,6 +106,7 @@
             this.wordTextBox.Name = "wordTextBox";
             this.wordTextBox.Size = new System.Drawing.Size(108, 20);
             this.wordTextBox.TabIndex = 4;
+            this.wordTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.wordTextBox_KeyDown);
             // 
             // tableLayoutPanel1
             // 

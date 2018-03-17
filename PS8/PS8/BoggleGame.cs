@@ -110,5 +110,16 @@ namespace PS8
         {
             HelpPressed?.Invoke();
         }
+
+        private void wordTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode.Equals(Keys.Enter))
+            {
+                if (ValidWord())
+                {
+                    EnterPressed?.Invoke(wordTextBox.Text, EnterButton);
+                }
+            }
+        }
     }
 }

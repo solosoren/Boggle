@@ -224,7 +224,6 @@ namespace PS8
 
         public void GetWordList(out List<string> player1WordList, out List<string> player2WordList)
         {
-            MessageBox.Show("Time to get it");
             List<string> player1Words = new List<string>();
             List<string> player2Words = new List<string>();
             try
@@ -240,12 +239,10 @@ namespace PS8
                         dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
                         foreach (dynamic word in dynamic.Player1.WordsPlayed)
                         {
-                            MessageBox.Show(word.Word.ToString());
                             player1Words.Add(word.Word.ToString());
                         }
                         foreach (dynamic word in dynamic.Player2.WordsPlayed)
                         {
-                            MessageBox.Show(word.Word.ToString());
                             player2Words.Add(word.Word.ToString());
                         }
                     }

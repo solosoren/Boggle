@@ -63,7 +63,6 @@ namespace PS8
                 gameTimer.Stop();
                 List<string> player1Words = new List<string>();
                 List<string> player2Words = new List<string>();
-                MessageBox.Show("Completed Cntrooler");
                 controller.GetWordList(out player1Words, out player2Words);
                 board.EndGame(player1Words, player2Words);
             }
