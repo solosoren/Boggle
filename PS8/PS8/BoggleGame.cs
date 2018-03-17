@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace PS8
@@ -80,13 +81,21 @@ namespace PS8
             return false;
         }
 
-        public void EndGame()
+        public void EndGame(List<string> player1Words, List<string> player2Words)
         {
             this.Invoke((Action)(() =>
             {
                 EnterButton.Enabled = false;
                 wordTextBox.Enabled = false;
                 timeLeft.Text = "Finished";
+                foreach (string word in player1Words)
+                {
+                    player1WordList.Items.Add(new Label().Text = word);
+                }
+                foreach (string word in player2Words)
+                {
+                    player2WordList.Items.Add(new Label().Text = word);
+                }
                 this.Update();
             }));
 

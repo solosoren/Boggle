@@ -15,7 +15,7 @@ namespace PS8
         event Action HelpPressed;
         void UpdateBoard(Game game);
 
-        void EndGame();
+        void EndGame(List<string> player1Words, List<string> player2Words);
 
     }
 }

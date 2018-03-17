@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Timers;
+using System.Collections.Generic;
 
 namespace PS8
 {
@@ -218,6 +219,47 @@ namespace PS8
             String url = String.Format("games/{0}", game.GameID);
 
             return await client.GetAsync(url, cancelTokenSource.Token);
+        }
+
+
+        public void GetWordList(out List<string> player1WordList, out List<string> player2WordList)
+        {
+            MessageBox.Show("Time to get it");
+            List<string> player1Words = new List<string>();
+            List<string> player2Words = new List<string>();
+            try
+            {
+                using (HttpClient client = CreateClient())
+                {
+                    Task<HttpResponseMessage> t = GetResponse(client);
+                    HttpResponseMessage response = t.Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        String result = response.Content.ReadAsStringAsync().Result;
+                        dynamic dynamic = JsonConvert.DeserializeObject<dynamic>(result);
+                        foreach (dynamic word in dynamic.Player1.WordsPlayed)
+                        {
+                            MessageBox.Show(word.Word.ToString());
+                            player1Words.Add(word.Word.ToString());
+                        }
+                        foreach (dynamic word in dynamic.Player2.WordsPlayed)
+                        {
+                            MessageBox.Show(word.Word.ToString());
+                            player2Words.Add(word.Word.ToString());
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error getting word lists for players.");
+                    }
+                }
+            }
+            finally
+            {
+                player1WordList = player1Words;
+                player2WordList = player2Words;
+            }
         }
 
         public void FetchGame(bool isStarted)

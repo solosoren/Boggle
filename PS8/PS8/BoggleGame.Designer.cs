@@ -54,6 +54,8 @@
             this.EnterButton = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.player1WordList = new System.Windows.Forms.ListBox();
+            this.player2WordList = new System.Windows.Forms.ListBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -61,36 +63,40 @@
             // player1Name
             // 
             this.player1Name.AutoSize = true;
-            this.player1Name.Location = new System.Drawing.Point(37, 33);
+            this.player1Name.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.player1Name.Location = new System.Drawing.Point(30, 33);
             this.player1Name.Name = "player1Name";
-            this.player1Name.Size = new System.Drawing.Size(69, 13);
+            this.player1Name.Size = new System.Drawing.Size(80, 13);
             this.player1Name.TabIndex = 0;
             this.player1Name.Text = "player1Name";
             // 
             // player2Name
             // 
             this.player2Name.AutoSize = true;
-            this.player2Name.Location = new System.Drawing.Point(373, 33);
+            this.player2Name.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.player2Name.Location = new System.Drawing.Point(366, 33);
             this.player2Name.Name = "player2Name";
-            this.player2Name.Size = new System.Drawing.Size(69, 13);
+            this.player2Name.Size = new System.Drawing.Size(80, 13);
             this.player2Name.TabIndex = 1;
             this.player2Name.Text = "player2Name";
             // 
             // player1Score
             // 
             this.player1Score.AutoSize = true;
-            this.player1Score.Location = new System.Drawing.Point(37, 67);
+            this.player1Score.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.player1Score.Location = new System.Drawing.Point(30, 67);
             this.player1Score.Name = "player1Score";
-            this.player1Score.Size = new System.Drawing.Size(69, 13);
+            this.player1Score.Size = new System.Drawing.Size(81, 13);
             this.player1Score.TabIndex = 2;
             this.player1Score.Text = "player1Score";
             // 
             // player2Score
             // 
             this.player2Score.AutoSize = true;
-            this.player2Score.Location = new System.Drawing.Point(373, 67);
+            this.player2Score.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.player2Score.Location = new System.Drawing.Point(366, 67);
             this.player2Score.Name = "player2Score";
-            this.player2Score.Size = new System.Drawing.Size(69, 13);
+            this.player2Score.Size = new System.Drawing.Size(81, 13);
             this.player2Score.TabIndex = 3;
             this.player2Score.Text = "player2Score";
             // 
@@ -282,10 +288,11 @@
             // timeLeft
             // 
             this.timeLeft.AutoSize = true;
-            this.timeLeft.Location = new System.Drawing.Point(228, 33);
+            this.timeLeft.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeLeft.Location = new System.Drawing.Point(225, 33);
             this.timeLeft.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.timeLeft.Name = "timeLeft";
-            this.timeLeft.Size = new System.Drawing.Size(19, 13);
+            this.timeLeft.Size = new System.Drawing.Size(21, 13);
             this.timeLeft.TabIndex = 33;
             this.timeLeft.Text = "00";
             // 
@@ -318,11 +325,30 @@
             this.helpToolStripMenuItem.Text = "Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
+            // player1WordList
+            // 
+            this.player1WordList.FormattingEnabled = true;
+            this.player1WordList.Location = new System.Drawing.Point(12, 112);
+            this.player1WordList.Name = "player1WordList";
+            this.player1WordList.Size = new System.Drawing.Size(120, 147);
+            this.player1WordList.TabIndex = 36;
+            // 
+            // player2WordList
+            // 
+            this.player2WordList.FormattingEnabled = true;
+            this.player2WordList.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.player2WordList.Location = new System.Drawing.Point(347, 112);
+            this.player2WordList.Name = "player2WordList";
+            this.player2WordList.Size = new System.Drawing.Size(120, 147);
+            this.player2WordList.TabIndex = 37;
+            // 
             // BoggleGame
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(479, 346);
+            this.Controls.Add(this.player2WordList);
+            this.Controls.Add(this.player1WordList);
             this.Controls.Add(this.EnterButton);
             this.Controls.Add(this.timeLeft);
             this.Controls.Add(this.tableLayoutPanel1);
@@ -375,5 +401,7 @@
         private System.Windows.Forms.Button EnterButton;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ListBox player1WordList;
+        private System.Windows.Forms.ListBox player2WordList;
     }
 }
