@@ -146,12 +146,6 @@ namespace PS8
         public HttpClient CreateClient()
         {
             HttpClient client = new HttpClient();
-            // Added for debugging purposes
-            if (domainAddress.Trim().Equals(""))
-            {
-                domainAddress = "http://ice.eng.utah.edu";
-            }
-
             client.BaseAddress = new Uri(domainAddress + "/BoggleService.svc/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Add("Accept", "application/json");

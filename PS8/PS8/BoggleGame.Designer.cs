@@ -328,6 +328,7 @@
             // 
             // player1WordList
             // 
+            this.player1WordList.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.player1WordList.FormattingEnabled = true;
             this.player1WordList.Location = new System.Drawing.Point(12, 112);
             this.player1WordList.Name = "player1WordList";
@@ -336,6 +337,7 @@
             // 
             // player2WordList
             // 
+            this.player2WordList.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.player2WordList.FormattingEnabled = true;
             this.player2WordList.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.player2WordList.Location = new System.Drawing.Point(347, 112);

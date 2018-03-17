@@ -65,6 +65,8 @@ namespace PS8
             if (ValidWord())
             {
                 EnterPressed?.Invoke(wordTextBox.Text, EnterButton);
+                wordTextBox.Text = "";
+                this.Update();
             }
         }
 
@@ -118,6 +120,9 @@ namespace PS8
                 if (ValidWord())
                 {
                     EnterPressed?.Invoke(wordTextBox.Text, EnterButton);
+                    wordTextBox.Text = "";
+                    e.SuppressKeyPress = true;
+                    this.Update();
                 }
             }
         }
