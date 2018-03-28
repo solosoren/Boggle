@@ -9,28 +9,22 @@ namespace Boggle
     public interface IBoggleService
     {
         /// <summary>
-        /// Sends back index.html as the response body.
-        /// </summary>
-        [WebGet(UriTemplate = "/api")]
-        Stream API();
-
-        /// <summary>
         /// Returns the Token of the new User
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/users")]
-        User PostUser(string nickname);
+        string CreateUser(User user);
 
         /// <summary>
         /// Returns the string ID of the new game
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/games")]
-        Game PostGame(int timeLimit, string token);
+        Game JoinGame(int timeLimit, string token);
 
         /// <summary>
         /// Cancel join game
         /// </summary>
         [WebInvoke(Method = "PUT", UriTemplate = "/games")]
-        void CancelGame(string userToken);
+        void CancelJoinRequest(string userToken);
 
         /// <summary>
         /// Returns a score for the played word
@@ -42,6 +36,6 @@ namespace Boggle
         /// Returns the GameState
         /// </summary>
         [WebGet(UriTemplate = "/games/{GameID}&?Brief={brief}")]
-        Game GetGameState(string GameID, string brief);
+        Game GameStatus(string GameID, string brief);
     }
 }

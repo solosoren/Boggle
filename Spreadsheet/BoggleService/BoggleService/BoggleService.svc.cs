@@ -9,6 +9,11 @@ namespace Boggle
 {
     public class BoggleService : IBoggleService
     {
+
+        private readonly static Dictionary<String, User> users = new Dictionary<string, User>();
+        private readonly static Dictionary<String, Game> games = new Dictionary<string, Game>();
+        private static readonly object sync = new object();
+
         /// <summary>
         /// The most recent call to SetStatus determines the response code used when
         /// an http response is sent.
@@ -19,47 +24,42 @@ namespace Boggle
             WebOperationContext.Current.OutgoingResponse.StatusCode = status;
         }
 
-        /// <summary>
-        /// Returns a Stream version of index.html.
-        /// </summary>
-        /// <returns></returns>
-        public Stream API()
-        {
-            SetStatus(OK);
-            WebOperationContext.Current.OutgoingResponse.ContentType = "text/html";
-            return File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + "index.html");
-        }
-
-
-        public User PostUser(string nickname)
-        {
-            if (nickname == null || nickname.Trim().Length == 0 || nickname.Trim().Length > 50)
-            {
-                SetStatus(Forbidden);
-                return null;
-            }
-            
-            //TODO: Return User Token 
-            SetStatus(Created);
-        }
-
-
-        public Game PostGame(int timeLimit, string token)
+        public void CancelJoinRequest(string userToken)
         {
             throw new NotImplementedException();
         }
 
-        public void CancelGame(string userToken)
+        public string CreateUser(User user)
+        {
+            lock (sync)
+            {
+                if (user.Nickname == null || user.Nickname.Trim().Length == 0 || user.Nickname.Trim().Length > 50)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
+
+                string userID = Guid.NewGuid().ToString();
+                users.Add(userID, user);
+                //TODO: Return User Token 
+                SetStatus(Created);
+                return userID;
+            }
+
+        }
+
+
+        public Game JoinGame(int timeLimit, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Game GameStatus(string GameID, string brief)
         {
             throw new NotImplementedException();
         }
 
         public void PlayWord(string UserToken, string Word, string GameID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Game GetGameState(string GameID, string brief)
         {
             throw new NotImplementedException();
         }
