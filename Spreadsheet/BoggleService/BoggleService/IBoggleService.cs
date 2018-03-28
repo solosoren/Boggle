@@ -18,24 +18,24 @@ namespace Boggle
         /// Returns the string ID of the new game
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/games")]
-        Game JoinGame(int timeLimit, string token);
+        string JoinGame(SetGame setGame);
 
-        /// <summary>
-        /// Cancel join game
-        /// </summary>
-        [WebInvoke(Method = "PUT", UriTemplate = "/games")]
-        void CancelJoinRequest(string userToken);
+        //    /// <summary>
+        //    /// Cancel join game
+        //    /// </summary>
+        //    [WebInvoke(Method = "PUT", UriTemplate = "/games")]
+        //    void CancelJoinRequest(string userToken);
 
-        /// <summary>
-        /// Returns a score for the played word
-        /// </summary>
-        [WebInvoke(Method = "PUT", UriTemplate = "/games/{GameID}")]
-        void PlayWord(string UserToken, string Word, string GameID);
+        //    /// <summary>
+        //    /// Returns a score for the played word
+        //    /// </summary>
+        //    [WebInvoke(Method = "PUT", UriTemplate = "/games/{GameID}")]
+        //    void PlayWord(string UserToken, string Word, string GameID);
 
-        /// <summary>
-        /// Returns the GameState
-        /// </summary>
-        [WebGet(UriTemplate = "/games/{GameID}&?Brief={brief}")]
-        Game GameStatus(string GameID, string brief);
+        //    /// <summary>
+        //    /// Returns the GameState
+        //    /// </summary>
+        //    [WebGet(UriTemplate = "/games/{GameID}&?Brief={brief}")]
+        //    Game GameStatus(string GameID, string brief);
     }
 }

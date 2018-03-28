@@ -11,18 +11,27 @@ namespace Boggle
     {
         public string Nickname { get; set; }
         public string UserToken { get; set; }
-        public int PlayerNumber { get; set; }
+        //public int PlayerNumber { get; set; }
         public int Score { get; set; }
-
+        public bool IsInGame { get; set; }
     }
 
     public class Game
     {
-        public Boolean GameState { get; set; }
+        // Can be pending, active or completed
+        public string GameState { get; set; }
         public string Board { get; set; }
         public DateTime StartTime { get; set; }
         public int TimeLimit { get; set; }
         public string GameID { get; set; }
+        public User firstPlayer { get; set; }
+        public User secondPlayer { get; set; }
 
+    }
+
+    public class SetGame
+    {
+        public string UserToken { get; set; }
+        public int TimeLimit { get; set; }
     }
 }

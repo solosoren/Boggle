@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.ServiceModel.Web;
 using static System.Net.HttpStatusCode;
@@ -12,6 +13,7 @@ namespace Boggle
 
         private readonly static Dictionary<String, User> users = new Dictionary<string, User>();
         private readonly static Dictionary<String, Game> games = new Dictionary<string, Game>();
+        private readonly static HashSet<Game> pendingGames = new HashSet<Game>();
         private static readonly object sync = new object();
 
         /// <summary>
@@ -29,29 +31,108 @@ namespace Boggle
             throw new NotImplementedException();
         }
 
+
+        /// <summary>
+        /// Returns true or false depending on if the nickname is valid
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <returns></returns>
+        private bool IsNicknameValid(string nickname)
+        {
+            if (nickname == null || nickname.Trim().Length == 0 || nickname.Trim().Length > 50)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public string CreateUser(User user)
         {
             lock (sync)
             {
-                if (user.Nickname == null || user.Nickname.Trim().Length == 0 || user.Nickname.Trim().Length > 50)
+                if (!IsNicknameValid(user.Nickname))
                 {
                     SetStatus(Forbidden);
                     return null;
                 }
 
                 string userID = Guid.NewGuid().ToString();
-                users.Add(userID, user);
-                //TODO: Return User Token 
-                SetStatus(Created);
-                return userID;
-            }
 
+                //Setup user object
+                user.UserToken = userID;
+                user.Score = 0;
+                user.IsInGame = false;
+
+                users.Add(userID, user);
+                SetStatus(Created);
+                return user.UserToken;
+            }
         }
 
-
-        public Game JoinGame(int timeLimit, string token)
+        public string JoinGame(SetGame setGame)
         {
-            throw new NotImplementedException();
+            lock (sync)
+            {
+                if(!users.ContainsKey(setGame.UserToken))
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
+
+                User user = users[setGame.UserToken];
+
+                if (!IsNicknameValid(user.Nickname) || setGame.TimeLimit < 5 ||
+                    setGame.TimeLimit > 120)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
+
+                
+                // Is user already in a game ?
+                if (user.IsInGame)
+                {
+                    SetStatus(Conflict);
+                    return null;
+                }
+
+                // If there is a user waiting with the same time limit, add current user to game
+                if (pendingGames.Count != 0)
+                {
+                    foreach (Game item in pendingGames.ToList())
+                    {
+                        if(item.TimeLimit == setGame.TimeLimit)
+                        {
+                            // start pending game
+                            item.secondPlayer = user;
+                            user.IsInGame = true;
+                            item.StartTime = DateTime.Now;
+
+                            // Remove game from pendingGame
+                            pendingGames.Remove(item);
+
+                            SetStatus(Created);
+                            return item.GameID;
+                        }
+                    }
+                }
+
+                // No game exists with user preferences, make new game
+                Game game = new Game();
+                game.GameState = "pending";
+                game.Board = new BoggleBoard().ToString();
+                game.TimeLimit = setGame.TimeLimit;
+                // May want to change this to a better way for getting game id
+                game.GameID = games.Count + 1.ToString();
+                game.firstPlayer = user;
+
+                games.Add(game.GameID, game);
+                user.IsInGame = true;
+
+                SetStatus(Accepted);
+                return game.GameID;
+
+            }
         }
 
         public Game GameStatus(string GameID, string brief)
