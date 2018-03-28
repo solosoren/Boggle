@@ -30,37 +30,38 @@ namespace Boggle
             return File.OpenRead(AppDomain.CurrentDomain.BaseDirectory + "index.html");
         }
 
-        /// <summary>
-        /// Demo.  You can delete this.
-        /// </summary>
-        public string WordAtIndex(int n)
+
+        public User PostUser(string nickname)
         {
-            if (n < 0)
+            if (nickname == null || nickname.Trim().Length == 0 || nickname.Trim().Length > 50)
             {
                 SetStatus(Forbidden);
                 return null;
             }
+            
+            //TODO: Return User Token 
+            SetStatus(Created);
+        }
 
-            string line;
-            using (StreamReader file = new System.IO.StreamReader(AppDomain.CurrentDomain.BaseDirectory + "dictionary.txt"))
-            {
-                while ((line = file.ReadLine()) != null)
-                {
-                    if (n == 0) break;
-                    n--;
-                }
-            }
 
-            if (n == 0)
-            {
-                SetStatus(OK);
-                return line;
-            }
-            else
-            {
-                SetStatus(Forbidden);
-                return null;
-            }
+        public Game PostGame(int timeLimit, string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CancelGame(string userToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PlayWord(string UserToken, string Word, string GameID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Game GetGameState(string GameID, string brief)
+        {
+            throw new NotImplementedException();
         }
     }
 }
