@@ -98,7 +98,7 @@ namespace Boggle
                         if (item.TimeLimit == setGame.TimeLimit)
                         {
                             // start pending game
-                            item.secondPlayer = user;
+                            item.SecondPlayer = user;
                             user.IsInGame = true;
                             user.GameID = item.GameID;
                             item.StartTime = DateTime.Now;
@@ -115,11 +115,13 @@ namespace Boggle
                 // No game exists with user preferences, make new game
                 Game game = new Game();
                 game.GameState = "pending";
-                game.Board = new BoggleBoard().ToString();
+                BoggleBoard board = new BoggleBoard();
                 game.TimeLimit = setGame.TimeLimit;
                 // May want to change this to a better way for getting game id
                 game.GameID = games.Count + 1.ToString();
-                game.firstPlayer = user;
+                game.FirstPlayer = user;
+                game.FirstPlayerWords = null;
+                game.SecondPlayerWords = null;
 
                 games.Add(game.GameID, game);
                 pendingGames.Add(game);
@@ -143,18 +145,18 @@ namespace Boggle
                 }
                 User user = users[cancelRequestDetails.UserToken];
 
-                if(!user.IsInGame)
+                if (!user.IsInGame)
                 {
                     SetStatus(Forbidden);
                     return;
                 }
 
-                if(games[user.GameID].GameState != "pending")
+                if (games[user.GameID].GameState != "pending")
                 {
                     SetStatus(Forbidden);
                     return;
                 }
-                
+
                 pendingGames.Remove(games[user.GameID]);
                 games.Remove(user.GameID);
                 user.IsInGame = false;
@@ -164,13 +166,100 @@ namespace Boggle
             }
         }
 
-
-        public Game GameStatus(string GameID, string brief)
+        public int PlayWord(string GameID, PlayWordDetails PlayWordDetails)
         {
-            throw new NotImplementedException();
+            lock (sync)
+            {
+                string word = PlayWordDetails.Word.Trim();
+
+                if (word == "" || word == null || word.Length > 30)
+                {
+                    SetStatus(Forbidden);
+                    return 0;
+                }
+
+                if (!games.ContainsKey(GameID) || !users.ContainsKey(PlayWordDetails.UserToken))
+                {
+                    SetStatus(Forbidden);
+                    return 0;
+                }
+
+                Game game = games[GameID];
+
+                if (game.GameState != "active")
+                {
+                    SetStatus(Conflict);
+                    return 0;
+                }
+
+                if (game.FirstPlayer.UserToken == PlayWordDetails.UserToken)
+                {
+                    game.FirstPlayerWords.Add(word);
+                    // Add score here
+                    int score = GetWordScore(word, game.BoggleBoard, game.FirstPlayerWords);
+                    game.FirstPlayer.Score += score;
+                    return score;
+                }
+                else
+                {
+                    game.SecondPlayerWords.Add(word);
+                    int score = GetWordScore(word, game.BoggleBoard, game.SecondPlayerWords);
+                    game.SecondPlayer.Score += score;
+                    return score;
+                }
+            }
         }
 
-        public void PlayWord(string UserToken, string Word, string GameID)
+        /// <summary>
+        /// Returns score of given word whilist accounting for words played
+        /// </summary>
+        /// <param name="word"></param>
+        /// <param name="board"></param>
+        /// <param name="playerWordList"></param>
+        /// <returns></returns>
+        private int GetWordScore(string word, BoggleBoard board, List<string> playerWordList)
+        {
+            // Check if word can be formed
+            if (!board.CanBeFormed(word))
+            {
+                return 0;
+            }
+
+            // Check if word is legal
+            string contents = File.ReadAllText("./dictionary.txt");
+            if (contents.Contains(word))
+            {
+                if (word.Length < 3)
+                {
+                    return 0;
+                }
+                if (playerWordList.Contains(word))
+                {
+                    return 0;
+                }
+                switch (word.Length)
+                {
+                    case 3:
+                    case 4:
+                        return 1;
+                    case 5:
+                        return 2;
+                    case 6:
+                        return 3;
+                    case 7:
+                        return 5;
+                    // In this case, default is being used for if word length > 7
+                    // Must be a better way to do this
+                    default:
+                        return 11;
+                }
+            }
+
+            return -1;
+
+        }
+
+        public Game GameStatus(string GameID, string brief)
         {
             throw new NotImplementedException();
         }

@@ -26,11 +26,11 @@ namespace Boggle
         [WebInvoke(Method = "PUT", UriTemplate = "/games")]
         void CancelJoinRequest(CancelRequestDetails cancelRequestDetails);
 
-        //    /// <summary>
-        //    /// Returns a score for the played word
-        //    /// </summary>
-        //    [WebInvoke(Method = "PUT", UriTemplate = "/games/{GameID}")]
-        //    void PlayWord(string UserToken, string Word, string GameID);
+        /// <summary>
+        /// Returns a score for the played word
+        /// </summary>
+        [WebInvoke(Method = "PUT", UriTemplate = "/games/{GameID}")]
+        int PlayWord(string GameID, PlayWordDetails PlayWordDetails);
 
         //    /// <summary>
         //    /// Returns the GameState

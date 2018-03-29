@@ -21,12 +21,15 @@ namespace Boggle
     {
         // Can be pending, active or completed
         public string GameState { get; set; }
-        public string Board { get; set; }
+        //public string Board { get; set; }
         public DateTime StartTime { get; set; }
         public int TimeLimit { get; set; }
         public string GameID { get; set; }
-        public User firstPlayer { get; set; }
-        public User secondPlayer { get; set; }
+        public User FirstPlayer { get; set; }
+        public List<string> FirstPlayerWords { get; set; }
+        public User SecondPlayer { get; set; }
+        public List<string> SecondPlayerWords { get; set; }
+        public BoggleBoard BoggleBoard { get; set; }
 
     }
 
@@ -39,5 +42,11 @@ namespace Boggle
     public class CancelRequestDetails
     {
         public string UserToken { get; set; }
+    }
+
+    public class PlayWordDetails
+    {
+        public string UserToken { get; set; }
+        public string Word { get; set; }
     }
 }
