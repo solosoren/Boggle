@@ -12,6 +12,7 @@ namespace Boggle
     {
 
         private readonly static Dictionary<String, User> users = new Dictionary<string, User>();
+        // Games only contain active and completed
         private readonly static Dictionary<String, Game> games = new Dictionary<string, Game>();
         private readonly static HashSet<Game> pendingGames = new HashSet<Game>();
         private readonly static HashSet<User> pendingUsers = new HashSet<User>();
@@ -274,13 +275,12 @@ namespace Boggle
                 SetStatus(OK);
                 return game;
             }
-
             if (brief == "yes" && games.ContainsKey(gameID))
             {
                 SetStatus(OK);
                 return game.BriefGame();
             }
-            else if ( brief != "yes" && games.ContainsKey(gameID))
+            if ( brief != "yes" && games.ContainsKey(gameID))
             {
                 SetStatus(OK);
                 return game;
@@ -288,8 +288,6 @@ namespace Boggle
 
             SetStatus(Forbidden);
             return null;
-
-
         }
     }
 }

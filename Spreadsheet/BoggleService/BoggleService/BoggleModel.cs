@@ -8,15 +8,15 @@ using static System.Net.HttpStatusCode;
 
 namespace Boggle
 {
+
     public class User
     {
+
         public string Nickname { get; set; }
         public string UserToken { get; set; }
         public int Score { get; set; }
         public bool IsInGame { get; set; }
         public string GameID { get; set; }
-
-        [DataMember(EmitDefaultValue = false)]
         public List<string> Words { get; set; }
 
         public User BriefUser()
