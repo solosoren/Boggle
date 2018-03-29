@@ -163,6 +163,8 @@ namespace Boggle
                 }
 
                 pendingGames.Remove(games[user.GameID]);
+                pendingUsers.Remove(user);
+                pendingTimeLimits.Remove(pendingTimeLimits.First());
                 games.Remove(user.GameID);
                 user.IsInGame = false;
                 user.GameID = null;
