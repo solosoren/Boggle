@@ -26,12 +26,6 @@ namespace Boggle
             WebOperationContext.Current.OutgoingResponse.StatusCode = status;
         }
 
-        public void CancelJoinRequest(string userToken)
-        {
-            throw new NotImplementedException();
-        }
-
-
         /// <summary>
         /// Returns true or false depending on if the nickname is valid
         /// </summary>
@@ -73,7 +67,7 @@ namespace Boggle
         {
             lock (sync)
             {
-                if(!users.ContainsKey(setGame.UserToken))
+                if (!users.ContainsKey(setGame.UserToken))
                 {
                     SetStatus(Forbidden);
                     return null;
@@ -88,7 +82,7 @@ namespace Boggle
                     return null;
                 }
 
-                
+
                 // Is user already in a game ?
                 if (user.IsInGame)
                 {
@@ -101,11 +95,12 @@ namespace Boggle
                 {
                     foreach (Game item in pendingGames.ToList())
                     {
-                        if(item.TimeLimit == setGame.TimeLimit)
+                        if (item.TimeLimit == setGame.TimeLimit)
                         {
                             // start pending game
                             item.secondPlayer = user;
                             user.IsInGame = true;
+                            user.GameID = item.GameID;
                             item.StartTime = DateTime.Now;
 
                             // Remove game from pendingGame
@@ -127,13 +122,48 @@ namespace Boggle
                 game.firstPlayer = user;
 
                 games.Add(game.GameID, game);
+                pendingGames.Add(game);
                 user.IsInGame = true;
-
+                user.GameID = game.GameID;
                 SetStatus(Accepted);
                 return game.GameID;
 
             }
         }
+
+
+        public void CancelJoinRequest(CancelRequestDetails cancelRequestDetails)
+        {
+            lock (sync)
+            {
+                if (!users.ContainsKey(cancelRequestDetails.UserToken))
+                {
+                    SetStatus(Forbidden);
+                    return;
+                }
+                User user = users[cancelRequestDetails.UserToken];
+
+                if(!user.IsInGame)
+                {
+                    SetStatus(Forbidden);
+                    return;
+                }
+
+                if(games[user.GameID].GameState != "pending")
+                {
+                    SetStatus(Forbidden);
+                    return;
+                }
+                
+                pendingGames.Remove(games[user.GameID]);
+                games.Remove(user.GameID);
+                user.IsInGame = false;
+                user.GameID = null;
+
+                SetStatus(OK);
+            }
+        }
+
 
         public Game GameStatus(string GameID, string brief)
         {

@@ -14,6 +14,7 @@ namespace Boggle
         //public int PlayerNumber { get; set; }
         public int Score { get; set; }
         public bool IsInGame { get; set; }
+        public string GameID { get; set; }
     }
 
     public class Game
@@ -33,5 +34,10 @@ namespace Boggle
     {
         public string UserToken { get; set; }
         public int TimeLimit { get; set; }
+    }
+
+    public class CancelRequestDetails
+    {
+        public string UserToken { get; set; }
     }
 }
