@@ -97,7 +97,7 @@ namespace Boggle
                 if (pendingGames.Count != 0)
                 {
                     Game newGame = pendingGames.First();
-                        
+
                     // start pending game
                     newGame.Player1 = pendingUsers.First();
                     user.IsInGame = true;
@@ -108,6 +108,7 @@ namespace Boggle
                     newGame.TimeLimit = (pendingTimeLimits.First() + setGame.TimeLimit) / 2;
                     newGame.SetStartTime();
                     newGame.GameID = newGame.Player1.GameID;
+                    newGame.GameState = "active";
 
                     // Remove game from pendingGame
                     pendingGames.Remove(newGame);
@@ -120,7 +121,7 @@ namespace Boggle
 
                 user.IsInGame = true;
                 // May want to change this to a better way for getting game id
-                user.GameID = games.Count + 1.ToString();
+                user.GameID = (games.Count + 1).ToString();
                 pendingUsers.Add(user);
 
                 // No game exists with user preferences, make new game
@@ -230,7 +231,7 @@ namespace Boggle
             // Check if word can be formed
             if (!board.CanBeFormed(word))
             {
-                return 0;
+                return -1;
             }
 
             // Check if word is legal
@@ -268,22 +269,40 @@ namespace Boggle
         }
 
 
-        public Game GameStatus(string gameID, string brief, Game game)
+        public Game GameStatus(string gameID, string brief)
         {
+            if (!games.ContainsKey(gameID))
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+            Game game = games[gameID];
+
             if (pendingGames.Contains(game))
             {
+                Game pendingGame = new Game();
+                pendingGame.GameState = "pending";
                 SetStatus(OK);
-                return game;
+                return pendingGame;
             }
-            if (brief == "yes" && games.ContainsKey(gameID))
+            if (brief == "yes")
             {
                 SetStatus(OK);
                 return game.BriefGame();
             }
-            if ( brief != "yes" && games.ContainsKey(gameID))
+            if (brief != "yes")
             {
-                SetStatus(OK);
-                return game;
+                if (game.GameState == "active")
+                {
+                    SetStatus(OK);
+                    return game.ActiveStatusLong();
+                }
+                else
+                {
+                    SetStatus(OK);
+                    return game.CompletedStatusLong();
+                }
+
             }
 
             SetStatus(Forbidden);

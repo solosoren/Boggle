@@ -35,7 +35,7 @@ namespace Boggle
         /// <summary>
         /// Returns the GameState
         /// </summary>
-        [WebGet(UriTemplate = "/games/{GameID}&?Brief={brief}")]
-        Game GameStatus(string gameID, string brief, Game game);
+        [WebInvoke(Method = "GET", UriTemplate = "/games/{GameID}?brief={brief}")]
+        Game GameStatus(string gameID, string brief);
     }
 }

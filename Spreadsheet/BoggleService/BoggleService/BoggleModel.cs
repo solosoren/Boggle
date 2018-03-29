@@ -25,6 +25,23 @@ namespace Boggle
             user.Score = this.Score;
             return user;
         }
+
+        public User ActiveLongUser()
+        {
+            User user = new User();
+            user.Nickname = this.Nickname;
+            user.Score = this.Score;
+
+            return user;
+        }
+
+        public User CompletedLongUser()
+        {
+            User user = ActiveLongUser();
+            user.Words = this.Words;
+
+            return user;
+        }
     }
 
 
@@ -53,6 +70,15 @@ namespace Boggle
         [DataMember(EmitDefaultValue = false)]
         public BoggleBoard BoggleBoard { get; set; }
 
+        public string board
+        {
+            get
+            {
+                return BoggleBoard.ToString();
+            }
+            set { }
+        }
+
         [DataMember(EmitDefaultValue = false)]
         public int TimeLeft
         {
@@ -79,6 +105,29 @@ namespace Boggle
             game.TimeLeft = TimeLeft;
             game.Player1 = Player1.BriefUser();
             game.Player2 = Player2.BriefUser();
+            return game;
+        }
+
+        public Game ActiveStatusLong()
+        {
+            Game game = new Game();
+            game.GameState = GameState;
+            game.board = board;
+            game.TimeLimit = TimeLimit;
+            game.TimeLeft = TimeLeft;
+
+            game.Player1 = Player1.ActiveLongUser();
+            game.Player2 = Player2.ActiveLongUser();
+
+            return game;
+        }
+
+        public Game CompletedStatusLong()
+        {
+            Game game = ActiveStatusLong();
+            game.Player1 = Player1.CompletedLongUser();
+            game.Player2 = Player2.CompletedLongUser();
+
             return game;
         }
 
