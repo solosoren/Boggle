@@ -14,6 +14,8 @@ namespace Boggle
         private readonly static Dictionary<String, User> users = new Dictionary<string, User>();
         private readonly static Dictionary<String, Game> games = new Dictionary<string, Game>();
         private readonly static HashSet<Game> pendingGames = new HashSet<Game>();
+        private readonly static HashSet<User> pendingUsers = new HashSet<User>();
+        private readonly static HashSet<int> pendingTimeLimits = new HashSet<int>();
         private static readonly object sync = new object();
 
         /// <summary>
@@ -93,40 +95,43 @@ namespace Boggle
                 // If there is a user waiting with the same time limit, add current user to game
                 if (pendingGames.Count != 0)
                 {
-                    foreach (Game item in pendingGames.ToList())
-                    {
-                        if (item.TimeLimit == setGame.TimeLimit)
-                        {
-                            // start pending game
-                            item.SecondPlayer = user;
-                            user.IsInGame = true;
-                            user.GameID = item.GameID;
-                            item.StartTime = DateTime.Now;
+                    Game newGame = pendingGames.First();
+                        
+                    // start pending game
+                    newGame.Player1 = pendingUsers.First();
+                    user.IsInGame = true;
+                    user.GameID = newGame.GameID;
+                    newGame.Player2 = user;
 
-                            // Remove game from pendingGame
-                            pendingGames.Remove(item);
+                    newGame.BoggleBoard = new BoggleBoard();
+                    newGame.TimeLimit = (pendingTimeLimits.First() + setGame.TimeLimit) / 2;
+                    newGame.SetStartTime();
+                    newGame.GameID = newGame.Player1.GameID;
 
-                            SetStatus(Created);
-                            return item.GameID;
-                        }
-                    }
+                    // Remove game from pendingGame
+                    pendingGames.Remove(newGame);
+                    pendingUsers.Remove(pendingUsers.First());
+                    pendingTimeLimits.Remove(pendingTimeLimits.First());
+
+                    SetStatus(Created);
+                    return newGame.GameID;
                 }
+
+                user.IsInGame = true;
+                // May want to change this to a better way for getting game id
+                user.GameID = games.Count + 1.ToString();
+                pendingUsers.Add(user);
 
                 // No game exists with user preferences, make new game
                 Game game = new Game();
                 game.GameState = "pending";
-                BoggleBoard board = new BoggleBoard();
-                game.TimeLimit = setGame.TimeLimit;
-                // May want to change this to a better way for getting game id
-                game.GameID = games.Count + 1.ToString();
-                game.FirstPlayer = user;
-                game.FirstPlayerWords = null;
-                game.SecondPlayerWords = null;
+
+                pendingTimeLimits.Add(setGame.TimeLimit);
+
 
                 games.Add(game.GameID, game);
                 pendingGames.Add(game);
-                user.IsInGame = true;
-                user.GameID = game.GameID;
+
                 SetStatus(Accepted);
                 return game.GameID;
 
@@ -192,19 +197,19 @@ namespace Boggle
                     return 0;
                 }
 
-                if (game.FirstPlayer.UserToken == PlayWordDetails.UserToken)
+                if (game.Player1.UserToken == PlayWordDetails.UserToken)
                 {
-                    game.FirstPlayerWords.Add(word);
+                    game.Player1.Words.Add(word);
                     // Add score here
-                    int score = GetWordScore(word, game.BoggleBoard, game.FirstPlayerWords);
-                    game.FirstPlayer.Score += score;
+                    int score = GetWordScore(word, game.BoggleBoard, game.Player1.Words);
+                    game.Player1.Score += score;
                     return score;
                 }
                 else
                 {
-                    game.SecondPlayerWords.Add(word);
-                    int score = GetWordScore(word, game.BoggleBoard, game.SecondPlayerWords);
-                    game.SecondPlayer.Score += score;
+                    game.Player2.Words.Add(word);
+                    int score = GetWordScore(word, game.BoggleBoard, game.Player2.Words);
+                    game.Player2.Score += score;
                     return score;
                 }
             }
@@ -259,9 +264,30 @@ namespace Boggle
 
         }
 
-        public Game GameStatus(string GameID, string brief)
+
+        public Game GameStatus(string gameID, string brief, Game game)
         {
-            throw new NotImplementedException();
+            if (pendingGames.Contains(game))
+            {
+                SetStatus(OK);
+                return game;
+            }
+
+            if (brief == "yes" && games.ContainsKey(gameID))
+            {
+                SetStatus(OK);
+                return game.BriefGame();
+            }
+            else if ( brief != "yes" && games.ContainsKey(gameID))
+            {
+                SetStatus(OK);
+                return game;
+            }
+
+            SetStatus(Forbidden);
+            return null;
+
+
         }
     }
 }
