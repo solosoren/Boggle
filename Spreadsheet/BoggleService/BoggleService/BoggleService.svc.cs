@@ -295,15 +295,19 @@ namespace Boggle
             }
             if (brief == "yes")
             {
-                SetStatus(OK);
-                return game.BriefGame();
+                if (game.GameState == "active")
+                {
+                    SetStatus(OK);
+                    return game.BriefGame();
+                }
             }
             if (brief != "yes")
             {
                 if (game.GameState == "active")
                 {
                     SetStatus(OK);
-                    return game.ActiveStatusLong();
+                    game = game.ActiveStatusLong();
+                    return game;
                 }
                 else
                 {

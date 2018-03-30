@@ -9,13 +9,21 @@ using static System.Net.HttpStatusCode;
 namespace Boggle
 {
 
+    [DataContract]
     public class User
     {
+        [DataMember(EmitDefaultValue = false)]
         public string Nickname { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public string UserToken { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public int Score { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public bool IsInGame { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public string GameID { get; set; }
+
+        [DataMember(EmitDefaultValue = false)]
         public Dictionary<string, int> WordsPlayed { get; set; }
 
         public User()
@@ -73,7 +81,7 @@ namespace Boggle
 
         public BoggleBoard BoggleBoard { get; set; }
 
-        [DataMember (EmitDefaultValue = false)]
+        [DataMember(EmitDefaultValue = false)]
         public string board { get; set; }
 
         public Game()
@@ -104,7 +112,7 @@ namespace Boggle
         {
             Game game = new Game();
             game.GameState = GameState;
-            game.TimeLeft = TimeLeft;
+            game.TimeLeft = this.TimeLeft;
             game.Player1 = Player1.BriefUser();
             game.Player2 = Player2.BriefUser();
             return game;
