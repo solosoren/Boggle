@@ -120,13 +120,15 @@ namespace Boggle
                 }
 
                 user.IsInGame = true;
+                string GameID = (games.Count + 1).ToString();
                 // May want to change this to a better way for getting game id
-                user.GameID = (games.Count + 1).ToString();
+                user.GameID = GameID;
                 pendingUsers.Add(user);
 
                 // No game exists with user preferences, make new game
                 Game game = new Game();
                 game.GameState = "pending";
+                game.GameID = GameID;
 
                 pendingTimeLimits.Add(setGame.TimeLimit);
 
@@ -203,16 +205,23 @@ namespace Boggle
 
                 if (game.Player1.UserToken == PlayWordDetails.UserToken)
                 {
-                    game.Player1.Words.Add(word);
                     // Add score here
-                    int score = GetWordScore(word, game.BoggleBoard, game.Player1.Words);
+                    int score = GetWordScore(word, game.BoggleBoard, game.Player1.WordsPlayed.Keys.ToList());
+                    if (!game.Player1.WordsPlayed.ContainsKey(word))
+                    {
+                        game.Player1.WordsPlayed.Add(word, score);
+                    }
                     game.Player1.Score += score;
                     return score;
                 }
                 else
                 {
-                    game.Player2.Words.Add(word);
-                    int score = GetWordScore(word, game.BoggleBoard, game.Player2.Words);
+                    int score = GetWordScore(word, game.BoggleBoard, game.Player2.WordsPlayed.Keys.ToList());
+                    if (!game.Player2.WordsPlayed.ContainsKey(word))
+                    {
+                        game.Player2.WordsPlayed.Add(word, score);
+                    }
+
                     game.Player2.Score += score;
                     return score;
                 }
@@ -235,7 +244,7 @@ namespace Boggle
             }
 
             // Check if word is legal
-            string contents = File.ReadAllText("./dictionary.txt");
+            string contents = File.ReadAllText(Environment.CurrentDirectory + "/dictionary.txt");
             if (contents.Contains(word))
             {
                 if (word.Length < 3)

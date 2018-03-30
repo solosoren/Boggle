@@ -11,13 +11,17 @@ namespace Boggle
 
     public class User
     {
-
         public string Nickname { get; set; }
         public string UserToken { get; set; }
         public int Score { get; set; }
         public bool IsInGame { get; set; }
         public string GameID { get; set; }
-        public List<string> Words { get; set; }
+        public Dictionary<string, int> WordsPlayed { get; set; }
+
+        public User()
+        {
+            WordsPlayed = new Dictionary<string, int>();
+        }
 
         public User BriefUser()
         {
@@ -38,7 +42,7 @@ namespace Boggle
         public User CompletedLongUser()
         {
             User user = ActiveLongUser();
-            user.Words = this.Words;
+            user.WordsPlayed = this.WordsPlayed;
 
             return user;
         }
