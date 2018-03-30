@@ -71,16 +71,14 @@ namespace Boggle
         [DataMember(EmitDefaultValue = false)]
         public User Player2 { get; set; }
 
-        [DataMember(EmitDefaultValue = false)]
         public BoggleBoard BoggleBoard { get; set; }
 
-        public string board
+        [DataMember (EmitDefaultValue = false)]
+        public string board { get; set; }
+
+        public Game()
         {
-            get
-            {
-                return BoggleBoard.ToString();
-            }
-            set { }
+            BoggleBoard = new BoggleBoard();
         }
 
         [DataMember(EmitDefaultValue = false)]
@@ -116,7 +114,7 @@ namespace Boggle
         {
             Game game = new Game();
             game.GameState = GameState;
-            game.board = board;
+            game.board = BoggleBoard.ToString();
             game.TimeLimit = TimeLimit;
             game.TimeLeft = TimeLeft;
 

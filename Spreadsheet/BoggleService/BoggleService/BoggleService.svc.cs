@@ -104,7 +104,6 @@ namespace Boggle
                     user.GameID = newGame.GameID;
                     newGame.Player2 = user;
 
-                    newGame.BoggleBoard = new BoggleBoard();
                     newGame.TimeLimit = (pendingTimeLimits.First() + setGame.TimeLimit) / 2;
                     newGame.SetStartTime();
                     newGame.GameID = newGame.Player1.GameID;
