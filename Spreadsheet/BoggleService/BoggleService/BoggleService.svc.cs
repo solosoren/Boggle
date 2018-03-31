@@ -70,6 +70,11 @@ namespace Boggle
         {
             lock (sync)
             {
+                if (setGame.UserToken == null)
+                {
+                    SetStatus(Forbidden);
+                    return null;
+                }
                 if (!users.ContainsKey(setGame.UserToken))
                 {
                     SetStatus(Forbidden);
