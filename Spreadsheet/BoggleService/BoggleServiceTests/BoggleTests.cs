@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System;
 using System.Dynamic;
+using System.IO;
 
 namespace Boggle
 {
@@ -106,9 +107,36 @@ namespace Boggle
             GameID = response.Data;
             Assert.AreEqual(Accepted, response.Status);
 
-            TestCreateUser2AndJoinGame();
+            dynamic = new ExpandoObject();
+            dynamic.Nickname = "dan";
+
+            r = client.DoPostAsync("users", dynamic).Result;
+            UserToken2 = r.Data;
+            Assert.AreEqual(Created, r.Status);
+
+            d = new ExpandoObject();
+            d.UserToken = UserToken2;
+            d.TimeLimit = 45;
+
+            response = client.DoPostAsync("games", d).Result;
+            Assert.AreEqual(Created, response.Status);
 
             TestGameStatus();
+
+            using (StreamReader words = new StreamReader("C:\\Users\\Soren\\source\\repos\\NelsonAndKumar2\\Spreadsheet\\BoggleService\\BoggleService\\dictionary.txt"))
+            {
+                while (!words.EndOfStream)
+                {
+                    string word = words.ReadLine();
+                    d = new ExpandoObject();
+                    d.UserToken = UserToken1;
+                    d.Word = word;
+
+                    string url = "games/" + GameID;
+                    Response res = client.DoPutAsync(d, url).Result;
+                }
+                
+            }
         }
 
         [TestMethod]
@@ -160,23 +188,6 @@ namespace Boggle
 
             Response r = client.DoPostAsync("users", dynamic).Result;
             Assert.AreEqual(Forbidden, r.Status);
-        }
-
-        private void TestCreateUser2AndJoinGame()
-        {
-            dynamic dynamic = new ExpandoObject();
-            dynamic.Nickname = "dan";
-
-            Response r = client.DoPostAsync("users", dynamic).Result;
-            UserToken2 = r.Data;
-            Assert.AreEqual(Created, r.Status);
-
-            dynamic d = new ExpandoObject();
-            d.UserToken = UserToken2;
-            d.TimeLimit = 45;
-
-            Response response = client.DoPostAsync("games", d).Result;
-            Assert.AreEqual(Created, response.Status);
         }
 
         [TestMethod]

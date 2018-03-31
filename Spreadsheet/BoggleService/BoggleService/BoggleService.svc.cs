@@ -210,6 +210,11 @@ namespace Boggle
                 if (game.Player1.UserToken == PlayWordDetails.UserToken)
                 {
                     // Add score here
+                    if (game.Player1.WordsPlayed == null)
+                    {
+                        game.Player1.WordsPlayed = new Dictionary<string, int>();
+                    }
+                    
                     int score = GetWordScore(word, game.BoggleBoard, game.Player1.WordsPlayed.Keys.ToList());
                     if (!game.Player1.WordsPlayed.ContainsKey(word))
                     {
@@ -248,7 +253,7 @@ namespace Boggle
             }
 
             // Check if word is legal
-            string contents = File.ReadAllText(Environment.CurrentDirectory + "/dictionary.txt");
+            string contents = File.ReadAllText("C:\\Users\\Soren\\source\\repos\\NelsonAndKumar2\\Spreadsheet\\BoggleService\\BoggleService\\dictionary.txt");
             if (contents.Contains(word))
             {
                 if (word.Length < 3)
