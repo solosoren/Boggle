@@ -257,6 +257,12 @@ namespace Boggle
         /// <returns></returns>
         private int GetWordScore(string word, BoggleBoard board, List<string> playerWordList)
         {
+
+            if (word.Length < 3)
+            {
+                return 0;
+            }
+
             // Check if word can be formed
             if (!board.CanBeFormed(word))
             {
@@ -264,14 +270,10 @@ namespace Boggle
             }
 
             // Check if word is legal
-            //string contents = File.ReadAllText("C:\\Users\\Soren\\source\\repos\\NelsonAndKumar2\\Spreadsheet\\BoggleService\\BoggleService\\dictionary.txt");
             string contents = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"/dictionary.txt");
+
             if (contents.Contains(word))
             {
-                if (word.Length < 3)
-                {
-                    return 0;
-                }
                 if (playerWordList.Contains(word))
                 {
                     return 0;

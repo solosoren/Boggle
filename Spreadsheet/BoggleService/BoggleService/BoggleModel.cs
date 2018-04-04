@@ -45,7 +45,6 @@ namespace Boggle
         public User ActiveLongUser()
         {
             User user = new User();
-            WordsPlayed = new Dictionary<string, int>();
             user.Nickname = this.Nickname;
             user.Score = this.Score;
 
@@ -55,6 +54,10 @@ namespace Boggle
         public User CompletedLongUser()
         {
             User user = ActiveLongUser();
+            if (this.WordsPlayed == null)
+            {
+                WordsPlayed = new Dictionary<string, int>();
+            }
             user.WordsPlayed = this.WordsPlayed;
 
             return user;
@@ -93,29 +96,9 @@ namespace Boggle
 
         [DataMember(EmitDefaultValue = false)]
         public string Board { get; set; }
-        
-        private int timeLeft;
 
         [DataMember(EmitDefaultValue = false)]
-        public int TimeLeft
-        {
-            get
-            {
-                return timeLeft;
-            }
-            private set
-            {
-                int left = (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
-                if (GameState == "Completed" || left < 0)
-                {
-                    timeLeft = 0;
-                }
-                else
-                {
-                    timeLeft = left;
-                }
-            }
-        }
+        public int TimeLeft { get; set; }
 
         public Game()
         {
@@ -130,8 +113,20 @@ namespace Boggle
         public Game BriefGame()
         {
             Game game = new Game();
-            game.GameState = GameState;
+
+            int left = (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
+            if (GameState == "completed" || left <= 0)
+            {
+                TimeLeft = 0;
+                GameState = "completed";
+            }
+            else
+            {
+                TimeLeft = left;
+            }
+
             game.TimeLeft = TimeLeft;
+            game.GameState = GameState;
             game.Player1 = Player1.BriefUser();
             game.Player2 = Player2.BriefUser();
             return game;
@@ -140,13 +135,27 @@ namespace Boggle
         public Game ActiveStatusLong()
         {
             Game game = new Game();
-            game.GameState = GameState;
             game.Board = BoggleBoard.ToString();
             game.TimeLimit = TimeLimit;
-            game.TimeLeft = TimeLeft;
+
             game.Player1 = Player1.ActiveLongUser();
             game.Player2 = Player2.ActiveLongUser();
 
+            int left = (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
+            if (GameState == "completed" || left <= 0)
+            {
+                TimeLeft = 0;
+                GameState = "completed";
+                game.Player1 = Player1.CompletedLongUser();
+                game.Player2 = Player2.CompletedLongUser();
+            }
+            else
+            {
+                TimeLeft = left;
+            }
+
+            game.TimeLeft = TimeLeft;
+            game.GameState = GameState;
             return game;
         }
 
