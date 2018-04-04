@@ -43,7 +43,7 @@ namespace Boggle
             return true;
         }
 
-        public string CreateUser(User user)
+        public User CreateUser(User user)
         {
             lock (sync)
             {
@@ -62,11 +62,11 @@ namespace Boggle
 
                 users.Add(userID, user);
                 SetStatus(Created);
-                return user.UserToken;
+                return user.CreatedUser();
             }
         }
 
-        public string JoinGame(SetGame setGame)
+        public SetGame JoinGame(SetGame setGame)
         {
             lock (sync)
             {
@@ -92,7 +92,7 @@ namespace Boggle
 
 
                 // Is user already in a game ?
-                if (user.IsInGame)
+                if (user.InGame())
                 {
                     SetStatus(Conflict);
                     return null;
@@ -109,7 +109,7 @@ namespace Boggle
                     user.GameID = newGame.GameID;
                     newGame.Player2 = user;
 
-                    newGame.TimeLimit = (pendingTimeLimits.First() + setGame.TimeLimit) / 2;
+                    newGame.TimeLimit = (pendingTimeLimits.First() + (setGame.TimeLimit ?? 0)) / 2;
                     newGame.SetStartTime();
                     newGame.GameID = newGame.Player1.GameID;
                     newGame.GameState = "active";
@@ -120,7 +120,8 @@ namespace Boggle
                     pendingTimeLimits.Remove(pendingTimeLimits.First());
 
                     SetStatus(Created);
-                    return newGame.GameID;
+                    SetGame sg = new SetGame(newGame.GameID);
+                    return sg;
                 }
 
                 user.IsInGame = true;
@@ -134,14 +135,15 @@ namespace Boggle
                 game.GameState = "pending";
                 game.GameID = GameID;
 
-                pendingTimeLimits.Add(setGame.TimeLimit);
+                pendingTimeLimits.Add(setGame.TimeLimit ?? 0);
 
 
                 games.Add(game.GameID, game);
                 pendingGames.Add(game);
 
                 SetStatus(Accepted);
-                return game.GameID;
+                SetGame set = new SetGame(game.GameID);
+                return set;
 
             }
         }
@@ -158,7 +160,7 @@ namespace Boggle
                 }
                 User user = users[cancelRequestDetails.UserToken];
 
-                if (!user.IsInGame)
+                if (!user.InGame())
                 {
                     SetStatus(Forbidden);
                     return;
@@ -181,7 +183,7 @@ namespace Boggle
             }
         }
 
-        public int PlayWord(string GameID, PlayWordDetails PlayWordDetails)
+        public PlayWordDetails PlayWord(string GameID, PlayWordDetails PlayWordDetails)
         {
             lock (sync)
             {
@@ -190,13 +192,13 @@ namespace Boggle
                 if (word == "" || word == null || word.Length > 30)
                 {
                     SetStatus(Forbidden);
-                    return 0;
+                    return null;
                 }
 
                 if (!games.ContainsKey(GameID) || !users.ContainsKey(PlayWordDetails.UserToken))
                 {
                     SetStatus(Forbidden);
-                    return 0;
+                    return null;
                 }
 
                 Game game = games[GameID];
@@ -204,7 +206,7 @@ namespace Boggle
                 if (game.GameState != "active")
                 {
                     SetStatus(Conflict);
-                    return 0;
+                    return null;
                 }
 
                 if (game.Player1.UserToken == PlayWordDetails.UserToken)
@@ -221,10 +223,17 @@ namespace Boggle
                         game.Player1.WordsPlayed.Add(word, score);
                     }
                     game.Player1.Score += score;
-                    return score;
+
+                    PlayWordDetails playWordDetails = new PlayWordDetails(score);
+                    return playWordDetails;
                 }
                 else
                 {
+                    if (game.Player2.WordsPlayed == null)
+                    {
+                        game.Player2.WordsPlayed = new Dictionary<string, int>();
+                    }
+
                     int score = GetWordScore(word, game.BoggleBoard, game.Player2.WordsPlayed.Keys.ToList());
                     if (!game.Player2.WordsPlayed.ContainsKey(word))
                     {
@@ -232,7 +241,9 @@ namespace Boggle
                     }
 
                     game.Player2.Score += score;
-                    return score;
+
+                    PlayWordDetails playWordDetails = new PlayWordDetails(score);
+                    return playWordDetails;
                 }
             }
         }
@@ -253,7 +264,8 @@ namespace Boggle
             }
 
             // Check if word is legal
-            string contents = File.ReadAllText("C:\\Users\\Soren\\source\\repos\\NelsonAndKumar2\\Spreadsheet\\BoggleService\\BoggleService\\dictionary.txt");
+            //string contents = File.ReadAllText("C:\\Users\\Soren\\source\\repos\\NelsonAndKumar2\\Spreadsheet\\BoggleService\\BoggleService\\dictionary.txt");
+            string contents = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"/dictionary.txt");
             if (contents.Contains(word))
             {
                 if (word.Length < 3)
@@ -316,8 +328,7 @@ namespace Boggle
                 if (game.GameState == "active")
                 {
                     SetStatus(OK);
-                    game = game.ActiveStatusLong();
-                    return game;
+                    return game.ActiveStatusLong();
                 }
                 else
                 {
