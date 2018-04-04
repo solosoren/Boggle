@@ -17,18 +17,22 @@ namespace Boggle
         [DataMember(EmitDefaultValue = false)]
         public string UserToken { get; set; }
         [DataMember(EmitDefaultValue = false)]
-        public int Score { get; set; }
+        public int? Score { get; set; }
         [DataMember(EmitDefaultValue = false)]
-        public bool IsInGame { get; set; }
+        public bool IsInGame { private get; set; }
         [DataMember(EmitDefaultValue = false)]
         public string GameID { get; set; }
 
         [DataMember(EmitDefaultValue = false)]
         public Dictionary<string, int> WordsPlayed { get; set; }
 
-        public User()
+        public User() { }
+
+        public User CreatedUser()
         {
-            WordsPlayed = new Dictionary<string, int>();
+            User user = new User();
+            user.UserToken = this.UserToken;
+            return user;
         }
 
         public User BriefUser()
@@ -41,6 +45,7 @@ namespace Boggle
         public User ActiveLongUser()
         {
             User user = new User();
+            WordsPlayed = new Dictionary<string, int>();
             user.Nickname = this.Nickname;
             user.Score = this.Score;
 
@@ -53,6 +58,11 @@ namespace Boggle
             user.WordsPlayed = this.WordsPlayed;
 
             return user;
+        }
+
+        public bool InGame()
+        {
+            return IsInGame;
         }
     }
 
@@ -82,25 +92,34 @@ namespace Boggle
         public BoggleBoard BoggleBoard { get; set; }
 
         [DataMember(EmitDefaultValue = false)]
-        public string board { get; set; }
-
-        public Game()
-        {
-            BoggleBoard = new BoggleBoard();
-        }
+        public string Board { get; set; }
+        
+        private int timeLeft;
 
         [DataMember(EmitDefaultValue = false)]
         public int TimeLeft
         {
             get
             {
-                if (GameState == "Completed")
-                {
-                    return 0;
-                }
-                return (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
+                return timeLeft;
             }
-            set { }
+            private set
+            {
+                int left = (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
+                if (GameState == "Completed" || left < 0)
+                {
+                    timeLeft = 0;
+                }
+                else
+                {
+                    timeLeft = left;
+                }
+            }
+        }
+
+        public Game()
+        {
+            BoggleBoard = new BoggleBoard();
         }
 
         public void SetStartTime()
@@ -112,7 +131,7 @@ namespace Boggle
         {
             Game game = new Game();
             game.GameState = GameState;
-            game.TimeLeft = this.TimeLeft;
+            game.TimeLeft = TimeLeft;
             game.Player1 = Player1.BriefUser();
             game.Player2 = Player2.BriefUser();
             return game;
@@ -122,10 +141,9 @@ namespace Boggle
         {
             Game game = new Game();
             game.GameState = GameState;
-            game.board = BoggleBoard.ToString();
+            game.Board = BoggleBoard.ToString();
             game.TimeLimit = TimeLimit;
             game.TimeLeft = TimeLeft;
-
             game.Player1 = Player1.ActiveLongUser();
             game.Player2 = Player2.ActiveLongUser();
 
@@ -143,10 +161,25 @@ namespace Boggle
 
     }
 
+    [DataContract]
     public class SetGame
     {
+        [DataMember(EmitDefaultValue = false)]
         public string UserToken { get; set; }
-        public int TimeLimit { get; set; }
+
+        [DataMember(EmitDefaultValue = false)]
+        public int? TimeLimit { get; set; }
+ 
+        [DataMember]
+        public string GameID { get; set; }
+        
+        public SetGame(string GameID)
+        {
+            UserToken = null;
+            TimeLimit = null;
+            this.GameID = GameID;
+        }
+        
     }
 
     public class CancelRequestDetails
@@ -154,10 +187,22 @@ namespace Boggle
         public string UserToken { get; set; }
     }
 
+    [DataContract]
     public class PlayWordDetails
     {
+        [DataMember(EmitDefaultValue = false)]
         public string UserToken { get; set; }
+
+        [DataMember(EmitDefaultValue = false)]
         public string Word { get; set; }
+
+        [DataMember]
+        public int Score { get; set; }
+
+        public PlayWordDetails(int score)
+        {
+            Score = score;
+        }
     }
 
 }
