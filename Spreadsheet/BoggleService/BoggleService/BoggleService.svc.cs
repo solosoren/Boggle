@@ -52,7 +52,7 @@ namespace Boggle
             return true;
         }
 
-        public User CreateUser(User user)
+        public string CreateUser(User user)
         {
             if (!IsNicknameValid(user.Nickname))
             {
@@ -77,13 +77,18 @@ namespace Boggle
                         string userID = Guid.NewGuid().ToString();
 
                         command.Parameters.AddWithValue("@UserID", userID);
-                        command.Parameters.AddWithValue("@Nickname", user);
+                        command.Parameters.AddWithValue("@Nickname", user.Nickname);
+
+                        if (command.ExecuteNonQuery() != 1)
+                        {
+                            throw new Exception("Query failed unexpectedly");
+                        }
 
                         SetStatus(Created);
 
                         // To avoid rollback after control has left the scope
                         transaction.Commit();
-                        return user.CreatedUser();
+                        return userID;
                     }
                 }
             }

@@ -12,7 +12,7 @@ namespace Boggle
         /// Returns the Token of the new User
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/users")]
-        User CreateUser(User user);
+        string CreateUser(User user);
 
         /// <summary>
         /// Returns the string ID of the new game
