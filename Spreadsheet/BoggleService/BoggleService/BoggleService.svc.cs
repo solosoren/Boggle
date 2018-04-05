@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -149,7 +150,7 @@ namespace Boggle
 
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            if (!reader.HasRows)
+                            if (reader.HasRows)
                             {
                                 SetStatus(Conflict);
                                 reader.Close();
@@ -171,7 +172,7 @@ namespace Boggle
                             if (!reader.HasRows)
                             {
                                 using (SqlCommand addCommand = new SqlCommand(
-                                    "insert into Games(Player1) values (@Player1) output inserted.GameID",
+                                    "insert into Games(Player1) output inserted.GameID  values (@Player1)",
                                     connection,
                                     transaction))
                                 {
@@ -184,12 +185,14 @@ namespace Boggle
 
                                     string gameID = addCommand.ExecuteScalar().ToString();
                                     SetStatus(Accepted);
+                                    reader.Close();
                                     transaction.Commit();
                                     return gameID;
                                 }
                             }
                             else
                             {
+
                                 // reader consists of gameID and player1
                                 // need to set Player2, Board, TimeLimit, StartTime
                                 using (SqlCommand joinGameCommand = new SqlCommand(
@@ -202,10 +205,13 @@ namespace Boggle
                                     joinGameCommand.Parameters.AddWithValue("@Player2", setGame.UserToken);
                                     joinGameCommand.Parameters.AddWithValue("@Board", game.Board);
                                     joinGameCommand.Parameters.AddWithValue("@TimeLimit", setGame.TimeLimit);
-                                    joinGameCommand.Parameters.AddWithValue("@StartTime", game.GetStartTime());
-                                    joinGameCommand.Parameters.AddWithValue("@GameID", reader["GameID"].ToString());
+                                    joinGameCommand.Parameters.AddWithValue("@StartTime", DateTime.Now);
+                                    reader.Read();
+                                    string id = reader["GameID"].ToString();
+                                    joinGameCommand.Parameters.AddWithValue("@GameID", id);
 
-                                    if (command.ExecuteNonQuery() == 0)
+                                    reader.Close();
+                                    if (joinGameCommand.ExecuteNonQuery() == 0)
                                     {
                                         SetStatus(Forbidden);
                                     }
@@ -213,8 +219,8 @@ namespace Boggle
                                     {
                                         SetStatus(Created);
                                     }
-
-                                    return reader["GameID"].ToString();
+                                    transaction.Commit();
+                                    return id;
                                 }
                             }
                         }
@@ -234,7 +240,7 @@ namespace Boggle
 
                     // Transaction for databse commands
                     using (SqlTransaction transaction = connection.BeginTransaction())
-                    { 
+                    {
                         using (SqlCommand command = new SqlCommand(
                             "select * from Games where Player1.UserID = @UserID and Player2.UserID = null",
                             connection,
@@ -269,7 +275,7 @@ namespace Boggle
                         }
 
                         SetStatus(OK);
-                        transaction.Commit();                           
+                        transaction.Commit();
                     }
                 }
             }
@@ -562,7 +568,7 @@ namespace Boggle
             return words;
         }
 
-    
+
     }
 
 }
