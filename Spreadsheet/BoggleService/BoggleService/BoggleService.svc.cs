@@ -94,88 +94,134 @@ namespace Boggle
             }
         }
 
-        public SetGame JoinGame(SetGame setGame)
+        public string JoinGame(SetGame setGame)
         {
-            lock (sync)
+
+            if (setGame.UserToken == null)
             {
-                if (setGame.UserToken == null)
+                SetStatus(Forbidden);
+                return null;
+            }
+
+            if (setGame.TimeLimit < 5 || setGame.TimeLimit > 120)
+            {
+                SetStatus(Forbidden);
+                return null;
+            }
+
+            using (SqlConnection connection = new SqlConnection(BoggleDB))
+            {
+                connection.Open();
+
+                // Transaction for databse commands
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    SetStatus(Forbidden);
-                    return null;
+                    // SQL command to run
+                    // To check if user ID is valid
+                    using (SqlCommand command = new SqlCommand(
+                        "select UserID from Users where UserID = @UserID",
+                        connection,
+                        transaction))
+                    {
+                        command.Parameters.AddWithValue("@UserID", setGame.UserToken);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // User ID is invalid
+                            if (!reader.HasRows)
+                            {
+                                SetStatus(Forbidden);
+                                reader.Close();
+                                transaction.Commit();
+                                return null;
+                            }
+                        }
+                    }
+
+                    // SQL command to run
+                    // To check if user is in game
+                    using (SqlCommand command = new SqlCommand(
+                        "select * from Games where Games.Player1 = @UserID or Games.Player2 = @UserID",
+                        connection,
+                        transaction))
+                    {
+                        command.Parameters.AddWithValue("@UserID", setGame.UserToken);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (!reader.HasRows)
+                            {
+                                SetStatus(Conflict);
+                                reader.Close();
+                                transaction.Commit();
+                                return null;
+                            }
+                        }
+                    }
+
+                    // If there is a user waiting with the same time limit, add current user to game
+                    using (SqlCommand command = new SqlCommand(
+                        "select * from Games where Games.Player2 is NULL",
+                        connection,
+                        transaction))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // No pending games to join, make a new pending game
+                            if (!reader.HasRows)
+                            {
+                                using (SqlCommand addCommand = new SqlCommand(
+                                    "insert into Games(Player1) values (@Player1) output inserted.GameID",
+                                    connection,
+                                    transaction))
+                                {
+                                    addCommand.Parameters.AddWithValue("@Player1", setGame.UserToken);
+
+                                    if (addCommand.ExecuteNonQuery() != 1)
+                                    {
+                                        throw new Exception("Query failed unexpectedly");
+                                    }
+
+                                    string gameID = addCommand.ExecuteScalar().ToString();
+                                    SetStatus(Accepted);
+                                    transaction.Commit();
+                                    return gameID;
+                                }
+                            }
+                            else
+                            {
+                                // reader consists of gameID and player1
+                                // need to set Player2, Board, TimeLimit, StartTime
+                                using (SqlCommand joinGameCommand = new SqlCommand(
+                                    "update Games set Player2 = @Player2, Board = @Board, TimeLimit = @TimeLimit," +
+                                    " StartTime = @StartTime where GameID = @GameID",
+                                    connection,
+                                    transaction))
+                                {
+                                    Game game = new Game();
+                                    joinGameCommand.Parameters.AddWithValue("@Player2", setGame.UserToken);
+                                    joinGameCommand.Parameters.AddWithValue("@Board", game.Board);
+                                    joinGameCommand.Parameters.AddWithValue("@TimeLimit", setGame.TimeLimit);
+                                    joinGameCommand.Parameters.AddWithValue("@StartTime", game.GetStartTime());
+                                    joinGameCommand.Parameters.AddWithValue("@GameID", reader["GameID"].ToString());
+
+                                    if (command.ExecuteNonQuery() == 0)
+                                    {
+                                        SetStatus(Forbidden);
+                                    }
+                                    else
+                                    {
+                                        SetStatus(Created);
+                                    }
+
+                                    return reader["GameID"].ToString();
+                                }
+                            }
+                        }
+                    }
                 }
-                if (!users.ContainsKey(setGame.UserToken))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-
-                User user = users[setGame.UserToken];
-
-                if (!IsNicknameValid(user.Nickname) || setGame.TimeLimit < 5 ||
-                    setGame.TimeLimit > 120)
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-
-
-                // Is user already in a game ?
-                if (user.InGame())
-                {
-                    SetStatus(Conflict);
-                    return null;
-                }
-
-                // If there is a user waiting with the same time limit, add current user to game
-                if (pendingGames.Count != 0)
-                {
-                    Game newGame = pendingGames.First();
-
-                    // start pending game
-                    newGame.Player1 = pendingUsers.First();
-                    user.IsInGame = true;
-                    user.GameID = newGame.GameID;
-                    newGame.Player2 = user;
-
-                    newGame.TimeLimit = (pendingTimeLimits.First() + (setGame.TimeLimit ?? 0)) / 2;
-                    newGame.SetStartTime();
-                    newGame.GameID = newGame.Player1.GameID;
-                    newGame.GameState = "active";
-
-                    // Remove game from pendingGame
-                    pendingGames.Remove(newGame);
-                    pendingUsers.Remove(pendingUsers.First());
-                    pendingTimeLimits.Remove(pendingTimeLimits.First());
-
-                    SetStatus(Created);
-                    SetGame sg = new SetGame(newGame.GameID);
-                    return sg;
-                }
-
-                user.IsInGame = true;
-                string GameID = (games.Count + 1).ToString();
-                // May want to change this to a better way for getting game id
-                user.GameID = GameID;
-                pendingUsers.Add(user);
-
-                // No game exists with user preferences, make new game
-                Game game = new Game();
-                game.GameState = "pending";
-                game.GameID = GameID;
-
-                pendingTimeLimits.Add(setGame.TimeLimit ?? 0);
-
-
-                games.Add(game.GameID, game);
-                pendingGames.Add(game);
-
-                SetStatus(Accepted);
-                SetGame set = new SetGame(game.GameID);
-                return set;
-
             }
         }
-
 
         public void CancelJoinRequest(CancelRequestDetails cancelRequestDetails)
         {

@@ -18,7 +18,7 @@ namespace Boggle
         /// Returns the string ID of the new game
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/games")]
-        SetGame JoinGame(SetGame setGame);
+        string JoinGame(SetGame setGame);
 
         /// <summary>
         /// Cancel join game

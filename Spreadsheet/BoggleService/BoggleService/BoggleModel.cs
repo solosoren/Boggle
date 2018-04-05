@@ -118,6 +118,7 @@ namespace Boggle
         public Game()
         {
             BoggleBoard = new BoggleBoard();
+            Board = BoggleBoard.ToString();
         }
 
         public void SetStartTime()
