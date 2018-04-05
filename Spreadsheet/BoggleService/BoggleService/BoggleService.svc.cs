@@ -188,6 +188,7 @@ namespace Boggle
             lock (sync)
             {
                 string word = PlayWordDetails.Word.Trim();
+                PlayedWord playedWord = new PlayedWord(word);
 
                 if (word == "" || word == null || word.Length > 30)
                 {
@@ -195,17 +196,17 @@ namespace Boggle
                     return null;
                 }
 
-                if (!games.ContainsKey(GameID) || !users.ContainsKey(PlayWordDetails.UserToken))
+                Game game = games[GameID];
+
+                if (game.GameState != "active" || (int)(game.GetStartTime().AddSeconds((double)game.TimeLimit) - DateTime.Now).TotalSeconds <= 0)
                 {
-                    SetStatus(Forbidden);
+                    SetStatus(Conflict);
                     return null;
                 }
 
-                Game game = games[GameID];
-
-                if (game.GameState != "active")
+                if (!games.ContainsKey(GameID) || !users.ContainsKey(PlayWordDetails.UserToken) || (game.Player1.UserToken != PlayWordDetails.UserToken && game.Player2.UserToken != PlayWordDetails.UserToken))
                 {
-                    SetStatus(Conflict);
+                    SetStatus(Forbidden);
                     return null;
                 }
 
@@ -214,35 +215,47 @@ namespace Boggle
                     // Add score here
                     if (game.Player1.WordsPlayed == null)
                     {
-                        game.Player1.WordsPlayed = new Dictionary<string, int>();
+                        game.Player1.WordsPlayed = new List<PlayedWord>();
                     }
-                    
-                    int score = GetWordScore(word, game.BoggleBoard, game.Player1.WordsPlayed.Keys.ToList());
-                    if (!game.Player1.WordsPlayed.ContainsKey(word))
-                    {
-                        game.Player1.WordsPlayed.Add(word, score);
-                    }
-                    game.Player1.Score += score;
 
-                    PlayWordDetails playWordDetails = new PlayWordDetails(score);
+                    List<string> words = new List<string>();
+                    foreach (PlayedWord played in game.Player1.WordsPlayed)
+                    {
+                        words.Add(played.Word);
+                    }
+
+                    playedWord.Score = GetWordScore(word, game.BoggleBoard, words);
+                    if (!game.Player1.WordsPlayed.Contains(playedWord))
+                    {
+                        game.Player1.WordsPlayed.Add(playedWord);
+                    }
+                    game.Player1.Score += playedWord.Score;
+
+                    PlayWordDetails playWordDetails = new PlayWordDetails(playedWord.Score);
                     return playWordDetails;
                 }
                 else
                 {
                     if (game.Player2.WordsPlayed == null)
                     {
-                        game.Player2.WordsPlayed = new Dictionary<string, int>();
+                        game.Player2.WordsPlayed = new List<PlayedWord>();
                     }
 
-                    int score = GetWordScore(word, game.BoggleBoard, game.Player2.WordsPlayed.Keys.ToList());
-                    if (!game.Player2.WordsPlayed.ContainsKey(word))
+                    List<string> words = new List<string>();
+                    foreach (PlayedWord played in game.Player2.WordsPlayed)
                     {
-                        game.Player2.WordsPlayed.Add(word, score);
+                        words.Add(played.Word);
                     }
 
-                    game.Player2.Score += score;
+                    playedWord.Score = GetWordScore(word, game.BoggleBoard, words);
+                    if (!game.Player2.WordsPlayed.Contains(playedWord))
+                    {
+                        game.Player2.WordsPlayed.Add(playedWord);
+                    }
 
-                    PlayWordDetails playWordDetails = new PlayWordDetails(score);
+                    game.Player2.Score += playedWord.Score;
+
+                    PlayWordDetails playWordDetails = new PlayWordDetails(playedWord.Score);
                     return playWordDetails;
                 }
             }
@@ -257,7 +270,7 @@ namespace Boggle
         /// <returns></returns>
         private int GetWordScore(string word, BoggleBoard board, List<string> playerWordList)
         {
-
+            PlayedWord playedWord = new PlayedWord(word);
             if (word.Length < 3)
             {
                 return 0;
@@ -274,7 +287,7 @@ namespace Boggle
 
             if (contents.Contains(word))
             {
-                if (playerWordList.Contains(word))
+                if (playerWordList.Contains(playedWord.Word))
                 {
                     return 0;
                 }

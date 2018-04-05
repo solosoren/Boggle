@@ -24,7 +24,7 @@ namespace Boggle
         public string GameID { get; set; }
 
         [DataMember(EmitDefaultValue = false)]
-        public Dictionary<string, int> WordsPlayed { get; set; }
+        public List<PlayedWord> WordsPlayed { get; set; }
 
         public User() { }
 
@@ -56,7 +56,7 @@ namespace Boggle
             User user = ActiveLongUser();
             if (this.WordsPlayed == null)
             {
-                WordsPlayed = new Dictionary<string, int>();
+                WordsPlayed = new List<PlayedWord>();
             }
             user.WordsPlayed = this.WordsPlayed;
 
@@ -66,6 +66,21 @@ namespace Boggle
         public bool InGame()
         {
             return IsInGame;
+        }
+    }
+
+    [DataContract]
+    public class PlayedWord
+    {
+        [DataMember]
+        public string Word;
+
+        [DataMember]
+        public int Score;
+
+        public PlayedWord(string word)
+        {
+            Word = word;
         }
     }
 
@@ -98,7 +113,7 @@ namespace Boggle
         public string Board { get; set; }
 
         [DataMember(EmitDefaultValue = false)]
-        public int TimeLeft { get; set; }
+        public int? TimeLeft { get; set; }
 
         public Game()
         {
@@ -110,11 +125,16 @@ namespace Boggle
             this.StartTime = DateTime.Now;
         }
 
+        public DateTime GetStartTime()
+        {
+            return StartTime;
+        }
+
         public Game BriefGame()
         {
             Game game = new Game();
 
-            int left = (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
+            int left = (int)(StartTime.AddSeconds((double)TimeLimit) - DateTime.Now).TotalSeconds;
             if (GameState == "completed" || left <= 0)
             {
                 TimeLeft = 0;
@@ -141,7 +161,7 @@ namespace Boggle
             game.Player1 = Player1.ActiveLongUser();
             game.Player2 = Player2.ActiveLongUser();
 
-            int left = (int)(StartTime - StartTime.AddSeconds((double)TimeLimit)).TotalSeconds;
+            int left = (int)(StartTime.AddSeconds((double)TimeLimit) - DateTime.Now).TotalSeconds;
             if (GameState == "completed" || left <= 0)
             {
                 TimeLeft = 0;
