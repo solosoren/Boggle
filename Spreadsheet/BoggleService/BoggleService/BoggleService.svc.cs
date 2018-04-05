@@ -223,37 +223,57 @@ namespace Boggle
             }
         }
 
+        // TODO: TEST
         public void CancelJoinRequest(CancelRequestDetails cancelRequestDetails)
         {
             lock (sync)
             {
-                if (!users.ContainsKey(cancelRequestDetails.UserToken))
+                using (SqlConnection connection = new SqlConnection(BoggleDB))
                 {
-                    SetStatus(Forbidden);
-                    return;
+                    connection.Open();
+
+                    // Transaction for databse commands
+                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    { 
+                        using (SqlCommand command = new SqlCommand(
+                            "select GameState from Games where Player1.UserID = @UserID or Player2.UserID = @UserID",
+                            connection,
+                            transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserID", cancelRequestDetails.UserToken);
+
+                            if (command.ExecuteNonQuery() != 1)
+                            {
+                                // user doesn't exist
+                                SetStatus(Forbidden);
+                                return;
+                            }
+
+                            if (command.ExecuteScalar().ToString() != "pending")
+                            {
+                                SetStatus(Forbidden);
+                                return;
+                            } 
+                        }
+
+                        using (SqlCommand command = new SqlCommand(
+                           "delete from Games where Player1.UserID = @UserID or Player2.UserID = @UserID",
+                           connection,
+                           transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserID", cancelRequestDetails.UserToken);
+
+                            if (command.ExecuteNonQuery() != 1)
+                            {
+                                throw new Exception("Query failed unexpectedly");
+                            }
+                        }
+                        
+
+                        SetStatus(OK);
+                        transaction.Commit();                           
+                    }
                 }
-                User user = users[cancelRequestDetails.UserToken];
-
-                if (!user.InGame())
-                {
-                    SetStatus(Forbidden);
-                    return;
-                }
-
-                if (games[user.GameID].GameState != "pending")
-                {
-                    SetStatus(Forbidden);
-                    return;
-                }
-
-                pendingGames.Remove(games[user.GameID]);
-                pendingUsers.Remove(user);
-                pendingTimeLimits.Remove(pendingTimeLimits.First());
-                games.Remove(user.GameID);
-                user.IsInGame = false;
-                user.GameID = null;
-
-                SetStatus(OK);
             }
         }
 
