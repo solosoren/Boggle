@@ -223,7 +223,7 @@ namespace Boggle
             }
         }
 
-        // TODO: TEST
+        // TODO: TEST & Add GameState to Game
         public void CancelJoinRequest(CancelRequestDetails cancelRequestDetails)
         {
             lock (sync)
@@ -236,7 +236,7 @@ namespace Boggle
                     using (SqlTransaction transaction = connection.BeginTransaction())
                     { 
                         using (SqlCommand command = new SqlCommand(
-                            "select GameState from Games where Player1.UserID = @UserID or Player2.UserID = @UserID",
+                            "select * from Games where Player1.UserID = @UserID and Player2.UserID = null",
                             connection,
                             transaction))
                         {
@@ -244,7 +244,7 @@ namespace Boggle
 
                             if (command.ExecuteNonQuery() != 1)
                             {
-                                // user doesn't exist
+                                // No pending game
                                 SetStatus(Forbidden);
                                 return;
                             }
@@ -257,7 +257,7 @@ namespace Boggle
                         }
 
                         using (SqlCommand command = new SqlCommand(
-                           "delete from Games where Player1.UserID = @UserID or Player2.UserID = @UserID",
+                           "delete from Games where Player1.UserID = @UserID",
                            connection,
                            transaction))
                         {
@@ -268,7 +268,6 @@ namespace Boggle
                                 throw new Exception("Query failed unexpectedly");
                             }
                         }
-                        
 
                         SetStatus(OK);
                         transaction.Commit();                           
