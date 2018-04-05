@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,6 +12,13 @@ namespace Boggle
 {
     public class BoggleService : IBoggleService
     {
+        // Connection string for the Database
+        private static string BoggleDB;
+        public BoggleService()
+        {
+            // Fetches connection string web.config
+            BoggleDB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+        }
 
         private readonly static Dictionary<String, User> users = new Dictionary<string, User>();
         // Games only contain active and completed
@@ -45,24 +54,38 @@ namespace Boggle
 
         public User CreateUser(User user)
         {
-            lock (sync)
+            if (!IsNicknameValid(user.Nickname))
             {
-                if (!IsNicknameValid(user.Nickname))
+                SetStatus(Forbidden);
+                return null;
+            }
+
+            // Connection to database
+            using (SqlConnection connection = new SqlConnection(BoggleDB))
+            {
+                connection.Open();
+
+                // Transaction for databse commands
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    SetStatus(Forbidden);
-                    return null;
+                    // SQL command to run
+                    using (SqlCommand command = new SqlCommand(
+                        "insert into Users (UserID, Nickname) values(@UserID, @Nickname)",
+                        connection,
+                        transaction))
+                    {
+                        string userID = Guid.NewGuid().ToString();
+
+                        command.Parameters.AddWithValue("@UserID", userID);
+                        command.Parameters.AddWithValue("@Nickname", user);
+
+                        SetStatus(Created);
+
+                        // To avoid rollback after control has left the scope
+                        transaction.Commit();
+                        return user.CreatedUser();
+                    }
                 }
-
-                string userID = Guid.NewGuid().ToString();
-
-                //Setup user object
-                user.UserToken = userID;
-                user.Score = 0;
-                user.IsInGame = false;
-
-                users.Add(userID, user);
-                SetStatus(Created);
-                return user.CreatedUser();
             }
         }
 
