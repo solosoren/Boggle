@@ -121,14 +121,30 @@ namespace Boggle
             Board = BoggleBoard.ToString();
         }
 
-        public void SetStartTime()
+        public void SetStartTime(DateTime startTime)
         {
-            this.StartTime = DateTime.Now;
+            if (startTime != null)
+            {
+                this.StartTime = DateTime.Now;
+            }
+            else
+            {
+                this.StartTime = startTime;
+            }
+
         }
 
         public DateTime GetStartTime()
         {
             return StartTime;
+        }
+
+        static public Game PendingGame()
+        {
+            Game game = new Game();
+            game.Board = null;
+            game.GameState = "pending";
+            return game;
         }
 
         public Game BriefGame()
@@ -146,6 +162,7 @@ namespace Boggle
                 TimeLeft = left;
             }
 
+            game.Board = null;
             game.TimeLeft = TimeLeft;
             game.GameState = GameState;
             game.Player1 = Player1.BriefUser();
@@ -153,7 +170,7 @@ namespace Boggle
             return game;
         }
 
-        public Game ActiveStatusLong()
+        public Game StatusLong()
         {
             Game game = new Game();
             game.Board = BoggleBoard.ToString();
@@ -177,15 +194,6 @@ namespace Boggle
 
             game.TimeLeft = TimeLeft;
             game.GameState = GameState;
-            return game;
-        }
-
-        public Game CompletedStatusLong()
-        {
-            Game game = ActiveStatusLong();
-            game.Player1 = Player1.CompletedLongUser();
-            game.Player2 = Player2.CompletedLongUser();
-
             return game;
         }
 

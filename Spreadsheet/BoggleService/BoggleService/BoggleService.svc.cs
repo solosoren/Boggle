@@ -242,18 +242,17 @@ namespace Boggle
                         {
                             command.Parameters.AddWithValue("@UserID", cancelRequestDetails.UserToken);
 
-                            if (command.ExecuteNonQuery() != 1)
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                // No pending game
-                                SetStatus(Forbidden);
-                                return;
+                                if (!reader.HasRows)
+                                {
+                                    // No pending game
+                                    SetStatus(Forbidden);
+                                    reader.Close();
+                                    transaction.Commit();
+                                    return;
+                                }
                             }
-
-                            if (command.ExecuteScalar().ToString() != "pending")
-                            {
-                                SetStatus(Forbidden);
-                                return;
-                            } 
                         }
 
                         using (SqlCommand command = new SqlCommand(
@@ -407,47 +406,163 @@ namespace Boggle
         }
 
 
+        // TODO: Test
         public Game GameStatus(string gameID, string brief)
         {
-            if (!games.ContainsKey(gameID))
-            {
-                SetStatus(Forbidden);
-                return null;
-            }
-            Game game = games[gameID];
 
-            if (pendingGames.Contains(game))
+            lock (sync)
             {
-                Game pendingGame = new Game();
-                pendingGame.GameState = "pending";
-                SetStatus(OK);
-                return pendingGame;
-            }
-            if (brief == "yes")
-            {
-                if (game.GameState == "active")
+                using (SqlConnection connection = new SqlConnection(BoggleDB))
                 {
-                    SetStatus(OK);
-                    return game.BriefGame();
-                }
-            }
-            if (brief != "yes")
-            {
-                if (game.GameState == "active")
-                {
-                    SetStatus(OK);
-                    return game.ActiveStatusLong();
-                }
-                else
-                {
-                    SetStatus(OK);
-                    return game.CompletedStatusLong();
-                }
+                    connection.Open();
 
+                    // Transaction for databse commands
+                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    {
+                        using (SqlCommand command = new SqlCommand(
+                            "select * from Games where GameID = @GameID",
+                            connection,
+                            transaction))
+                        {
+                            command.Parameters.AddWithValue("@GameID", gameID);
+
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                if (!reader.HasRows)
+                                {
+                                    // No game with that ID
+                                    SetStatus(Forbidden);
+                                    reader.Close();
+                                    transaction.Commit();
+                                    return null;
+                                }
+
+                                while (reader.Read())
+                                {
+                                    // pending
+                                    if (reader["Player2"] == null)
+                                    {
+                                        Game pendingGame = Game.PendingGame();
+                                        SetStatus(OK);
+                                        reader.Close();
+                                        transaction.Commit();
+                                        return pendingGame;
+                                    }
+
+                                    Game game = new Game();
+                                    game.TimeLimit = (int)reader["TimeLimit"]; ;
+                                    game.SetStartTime((DateTime)reader["StartTime"]);
+
+                                    bool isCompleted = false;
+                                    game.GameState = "active";
+                                    int left = (int)(game.GetStartTime().AddSeconds((double)game.TimeLimit) - DateTime.Now).TotalSeconds;
+                                    if (left <= 0)
+                                    {
+                                        isCompleted = true;
+                                        game.GameState = "completed";
+                                    }
+
+                                    string player1ID = (string)reader["Player1"];
+                                    string player2ID = (string)reader["Player2"];
+                                    User player1 = GetPlayer(player1ID, connection, transaction, brief, isCompleted);
+                                    User player2 = GetPlayer(player2ID, connection, transaction, brief, isCompleted);
+                                    game.Player1 = player1;
+                                    game.Player2 = player2;
+
+                                    SetStatus(OK);
+                                    reader.Close();
+                                    transaction.Commit();
+
+                                    if (brief == "yes")
+                                    {
+                                        return game.BriefGame();
+                                    }
+                                    game.Board = (string)reader["Board"];
+                                    return game.StatusLong();
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             SetStatus(Forbidden);
             return null;
         }
+
+        /// <summary>
+        /// Returns the User from the DataBase
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
+        /// <param name="brief">If "yes" then only score is set</param>
+        /// <param name="isCompleted">If false then only score and nickname is set otherwise score, nickname, and words are set</param>
+        /// <returns></returns>
+        private User GetPlayer(string userID, SqlConnection connection, SqlTransaction transaction, string brief, Boolean isCompleted)
+        {
+            User player = new User();
+            using (SqlCommand command = new SqlCommand(
+                            "select * from Users where UserID = @UserID",
+                            connection, transaction))
+            {
+                command.Parameters.AddWithValue("@UserID", userID);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        throw new Exception("Query failed unexpectedly");
+                    }
+
+                    player.Score = (int)reader["Score"];
+
+                    if (brief != "yes")
+                    {
+                        player.Nickname = reader["Nickname"].ToString();
+                    }
+
+                    if (isCompleted)
+                    {
+                        player.WordsPlayed = GetWords(userID, connection, transaction);
+                    }
+                }
+            }
+
+            return player;
+        }
+
+        /// <summary>
+        /// Returns the Played words for the UserID Given
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        private List<PlayedWord> GetWords(string userID, SqlConnection connection, SqlTransaction transaction)
+        {
+            List<PlayedWord> words = new List<PlayedWord>();
+            using (SqlCommand command = new SqlCommand(
+                            "select * from Words where UserID = @UserID",
+                            connection, transaction))
+            {
+                command.Parameters.AddWithValue("@UserID", userID);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        PlayedWord word = new PlayedWord(reader["Word"].ToString());
+                        word.Score = (int)reader["Score"];
+                        words.Add(word);
+                    }
+                }
+            }
+
+            return words;
+        }
+
+    
     }
+
 }
