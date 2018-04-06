@@ -30,7 +30,7 @@ namespace Boggle
         /// Returns a score for the played word
         /// </summary>
         [WebInvoke(Method = "PUT", UriTemplate = "/games/{GameID}")]
-        PlayWordDetails PlayWord(string GameID, PlayWordDetails PlayWordDetails);
+        int? PlayWord(string GameID, PlayWordDetails PlayWordDetails);
 
         /// <summary>
         /// Returns the GameState

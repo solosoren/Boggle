@@ -281,80 +281,126 @@ namespace Boggle
             }
         }
 
-        public PlayWordDetails PlayWord(string GameID, PlayWordDetails PlayWordDetails)
+        public int? PlayWord(string GameID, PlayWordDetails PlayWordDetails)
         {
-            lock (sync)
+            string word = PlayWordDetails.Word.Trim();
+            PlayedWord playedWord = new PlayedWord(word);
+
+            if (word == "" || word == null || word.Length > 30)
             {
-                string word = PlayWordDetails.Word.Trim();
-                PlayedWord playedWord = new PlayedWord(word);
+                SetStatus(Forbidden);
+                return null;
+            }
 
-                if (word == "" || word == null || word.Length > 30)
+
+            using (SqlConnection connection = new SqlConnection(BoggleDB))
+            {
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-
-                Game game = games[GameID];
-
-                if (game.GameState != "active" || (int)(game.GetStartTime().AddSeconds((double)game.TimeLimit) - DateTime.Now).TotalSeconds <= 0)
-                {
-                    SetStatus(Conflict);
-                    return null;
-                }
-
-                if (!games.ContainsKey(GameID) || !users.ContainsKey(PlayWordDetails.UserToken) || (game.Player1.UserToken != PlayWordDetails.UserToken && game.Player2.UserToken != PlayWordDetails.UserToken))
-                {
-                    SetStatus(Forbidden);
-                    return null;
-                }
-
-                if (game.Player1.UserToken == PlayWordDetails.UserToken)
-                {
-                    // Add score here
-                    if (game.Player1.WordsPlayed == null)
+                    // Check if game exists
+                    using (SqlCommand command = new SqlCommand(
+                            "select * from Games where Games.GameID = @GameID",
+                            connection,
+                            transaction))
                     {
-                        game.Player1.WordsPlayed = new List<PlayedWord>();
+                        command.Parameters.AddWithValue("@GameID", GameID);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (!reader.HasRows)
+                            {
+                                SetStatus(Forbidden);
+                                reader.Close();
+                                transaction.Commit();
+                                return null;
+                            }
+
+                            // Game exists, check if it is active
+                            reader.Read();
+                            if (reader["Player2"] == null || ((DateTime)reader["StartTime"] - DateTime.Now).TotalSeconds <= 0)
+                            {
+                                SetStatus(Conflict);
+                                reader.Close();
+                                transaction.Commit();
+                                return null;
+                            }
+                        }
                     }
 
-                    List<string> words = new List<string>();
-                    foreach (PlayedWord played in game.Player1.WordsPlayed)
+                    // Check if user exists in game
+                    using (SqlCommand command = new SqlCommand(
+                            "select * from Games where GameID = @GameID",
+                            connection,
+                            transaction))
                     {
-                        words.Add(played.Word);
+                        command.Parameters.AddWithValue("@GameID", GameID);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            reader.Read();
+
+                            // User is in this game
+                            if (reader["Player1"].ToString() == PlayWordDetails.UserToken ||
+                                reader["Player2"].ToString() == PlayWordDetails.UserToken)
+                            {
+                                BoggleBoard board = new BoggleBoard(reader["Board"].ToString());
+                                reader.Close();
+
+                                List<string> words = new List<string>();
+
+                                // Get all words
+                                using (SqlCommand wordCommand = new SqlCommand(
+                                    "select Word from Words where Player = @Player",
+                                    connection,
+                                    transaction))
+                                {
+                                    wordCommand.Parameters.AddWithValue("@Player", PlayWordDetails.UserToken);
+
+                                    // Get list of words played
+                                    using (SqlDataReader wordReader = wordCommand.ExecuteReader())
+                                    {
+                                        while (wordReader.Read())
+                                        {
+                                            words.Add(reader["Word"].ToString());
+                                        }
+                                        wordReader.Close();
+                                    }
+
+                                    int score = GetWordScore(PlayWordDetails.Word, board, words);
+
+                                    // Add word to word table
+                                    using (SqlCommand addWordCommand = new SqlCommand(
+                                        "insert into Words (Word, GameID, Player, Score) " +
+                                        "values(@Word, @GameID, @Player, @Score)",
+                                        connection,
+                                        transaction))
+                                    {
+                                        addWordCommand.Parameters.AddWithValue("@Word", PlayWordDetails.Word);
+                                        addWordCommand.Parameters.AddWithValue("@GameID", GameID);
+                                        addWordCommand.Parameters.AddWithValue("@Player", PlayWordDetails.UserToken);
+                                        addWordCommand.Parameters.AddWithValue("@Score", score);
+
+                                        if (command.ExecuteNonQuery() != 1)
+                                        {
+                                            throw new Exception("Query failed unexpectedly");
+                                        }
+                                        SetStatus(OK);
+                                        transaction.Commit();
+                                        return score;
+                                    }
+                                }
+                            }
+
+                            // User is not in this game
+                            else
+                            {
+                                SetStatus(Forbidden);
+                                reader.Close();
+                                transaction.Commit();
+                                return null;
+                            }
+                        }
                     }
-
-                    playedWord.Score = GetWordScore(word, game.BoggleBoard, words);
-                    if (!game.Player1.WordsPlayed.Contains(playedWord))
-                    {
-                        game.Player1.WordsPlayed.Add(playedWord);
-                    }
-                    game.Player1.Score += playedWord.Score;
-
-                    PlayWordDetails playWordDetails = new PlayWordDetails(playedWord.Score);
-                    return playWordDetails;
-                }
-                else
-                {
-                    if (game.Player2.WordsPlayed == null)
-                    {
-                        game.Player2.WordsPlayed = new List<PlayedWord>();
-                    }
-
-                    List<string> words = new List<string>();
-                    foreach (PlayedWord played in game.Player2.WordsPlayed)
-                    {
-                        words.Add(played.Word);
-                    }
-
-                    playedWord.Score = GetWordScore(word, game.BoggleBoard, words);
-                    if (!game.Player2.WordsPlayed.Contains(playedWord))
-                    {
-                        game.Player2.WordsPlayed.Add(playedWord);
-                    }
-
-                    game.Player2.Score += playedWord.Score;
-
-                    PlayWordDetails playWordDetails = new PlayWordDetails(playedWord.Score);
-                    return playWordDetails;
                 }
             }
         }
