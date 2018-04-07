@@ -405,6 +405,7 @@ namespace Boggle
             }
         }
 
+
         /// <summary>
         /// Returns score of given word whilist accounting for words played
         /// </summary>
@@ -492,7 +493,7 @@ namespace Boggle
                                 while (reader.Read())
                                 {
                                     // pending
-                                    if (reader["Player2"] == null)
+                                    if (reader["Player2"].ToString() == "")
                                     {
                                         Game pendingGame = Game.PendingGame();
                                         SetStatus(OK);
@@ -502,7 +503,7 @@ namespace Boggle
                                     }
 
                                     Game game = new Game();
-                                    game.TimeLimit = (int)reader["TimeLimit"]; ;
+                                    game.TimeLimit = (int)reader["TimeLimit"];
                                     game.SetStartTime((DateTime)reader["StartTime"]);
 
                                     bool isCompleted = false;
@@ -521,15 +522,18 @@ namespace Boggle
                                     game.Player1 = player1;
                                     game.Player2 = player2;
 
+                                    if (brief == "yes")
+                                    {
+                                        SetStatus(OK);
+                                        reader.Close();
+                                        transaction.Commit();
+                                        return game.BriefGame();
+                                    }
+
+                                    game.Board = (string)reader["Board"];
                                     SetStatus(OK);
                                     reader.Close();
                                     transaction.Commit();
-
-                                    if (brief == "yes")
-                                    {
-                                        return game.BriefGame();
-                                    }
-                                    game.Board = (string)reader["Board"];
                                     return game.StatusLong();
                                 }
                             }
@@ -567,16 +571,31 @@ namespace Boggle
                         throw new Exception("Query failed unexpectedly");
                     }
 
-                    player.Score = (int)reader["Score"];
-
-                    if (brief != "yes")
+                    player.Score = 0;
+                    List<PlayedWord> words = GetWords(userID, connection, transaction);
+                    if (words.Count() > 0)
                     {
-                        player.Nickname = reader["Nickname"].ToString();
+                        foreach (PlayedWord word in words)
+                        {
+                            player.Score += word.Score;
+                        }
+                        if (isCompleted)
+                        {
+                            player.WordsPlayed = words;
+                        }
                     }
 
-                    if (isCompleted)
+                    while (reader.Read())
                     {
-                        player.WordsPlayed = GetWords(userID, connection, transaction);
+                        if (reader["Nickname"] == null)
+                        {
+                            string s = "null";
+                        }
+                        if (brief != "yes")
+                        {
+                            string s = (string)reader["Nickname"];
+                            player.Nickname = reader["Nickname"].ToString();
+                        }
                     }
                 }
             }
@@ -595,7 +614,7 @@ namespace Boggle
         {
             List<PlayedWord> words = new List<PlayedWord>();
             using (SqlCommand command = new SqlCommand(
-                            "select * from Words where UserID = @UserID",
+                            "select * from Words where Player = @UserID",
                             connection, transaction))
             {
                 command.Parameters.AddWithValue("@UserID", userID);

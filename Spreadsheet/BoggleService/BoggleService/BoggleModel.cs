@@ -123,7 +123,7 @@ namespace Boggle
 
         public void SetStartTime(DateTime startTime)
         {
-            if (startTime != null)
+            if (startTime == null)
             {
                 this.StartTime = DateTime.Now;
             }
