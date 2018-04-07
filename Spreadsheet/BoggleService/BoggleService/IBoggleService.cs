@@ -12,13 +12,13 @@ namespace Boggle
         /// Returns the Token of the new User
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/users")]
-        string CreateUser(User user);
+        User CreateUser(User user);
 
         /// <summary>
         /// Returns the string ID of the new game
         /// </summary>
         [WebInvoke(Method = "POST", UriTemplate = "/games")]
-        string JoinGame(SetGame setGame);
+        SetGame JoinGame(SetGame setGame);
 
         /// <summary>
         /// Cancel join game
@@ -30,7 +30,7 @@ namespace Boggle
         /// Returns a score for the played word
         /// </summary>
         [WebInvoke(Method = "PUT", UriTemplate = "/games/{GameID}")]
-        int? PlayWord(string GameID, PlayWordDetails PlayWordDetails);
+        PlayWordDetails PlayWord(string GameID, PlayWordDetails PlayWordDetails);
 
         /// <summary>
         /// Returns the GameState

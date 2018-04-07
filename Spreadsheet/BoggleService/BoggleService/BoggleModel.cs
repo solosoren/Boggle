@@ -14,12 +14,13 @@ namespace Boggle
     {
         [DataMember(EmitDefaultValue = false)]
         public string Nickname { get; set; }
+
         [DataMember(EmitDefaultValue = false)]
         public string UserToken { get; set; }
+
         [DataMember(EmitDefaultValue = false)]
         public int? Score { get; set; }
-        [DataMember(EmitDefaultValue = false)]
-        public bool IsInGame { private get; set; }
+
         [DataMember(EmitDefaultValue = false)]
         public string GameID { get; set; }
 
@@ -28,10 +29,10 @@ namespace Boggle
 
         public User() { }
 
-        public User CreatedUser()
+        public static User CreatedUser(string userToken)
         {
             User user = new User();
-            user.UserToken = this.UserToken;
+            user.UserToken = userToken;
             return user;
         }
 
@@ -63,10 +64,6 @@ namespace Boggle
             return user;
         }
 
-        public bool InGame()
-        {
-            return IsInGame;
-        }
     }
 
     [DataContract]

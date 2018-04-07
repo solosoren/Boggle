@@ -53,7 +53,7 @@ namespace Boggle
             return true;
         }
 
-        public string CreateUser(User user)
+        public User CreateUser(User user)
         {
             if (!IsNicknameValid(user.Nickname))
             {
@@ -89,13 +89,14 @@ namespace Boggle
 
                         // To avoid rollback after control has left the scope
                         transaction.Commit();
-                        return userID;
+
+                        return User.CreatedUser(userID);
                     }
                 }
             }
         }
 
-        public string JoinGame(SetGame setGame)
+        public SetGame JoinGame(SetGame setGame)
         {
 
             if (setGame.UserToken == null)
@@ -172,22 +173,24 @@ namespace Boggle
                             if (!reader.HasRows)
                             {
                                 using (SqlCommand addCommand = new SqlCommand(
-                                    "insert into Games(Player1) output inserted.GameID  values (@Player1)",
+                                    "insert into Games(Player1, TimeLimit) output inserted.GameID  values (@Player1, @TimeLimit)",
                                     connection,
                                     transaction))
                                 {
                                     addCommand.Parameters.AddWithValue("@Player1", setGame.UserToken);
+                                    addCommand.Parameters.AddWithValue("@TimeLimit", setGame.TimeLimit);
 
-                                    if (addCommand.ExecuteNonQuery() != 1)
+                                    string ID = addCommand.ExecuteScalar().ToString();
+                                    if (ID == null)
                                     {
                                         throw new Exception("Query failed unexpectedly");
                                     }
 
-                                    string gameID = addCommand.ExecuteScalar().ToString();
                                     SetStatus(Accepted);
+                                    SetGame sg = new SetGame(ID);
                                     reader.Close();
                                     transaction.Commit();
-                                    return gameID;
+                                    return sg;
                                 }
                             }
                             else
@@ -201,16 +204,25 @@ namespace Boggle
                                     connection,
                                     transaction))
                                 {
+                                    reader.Read();
                                     Game game = new Game();
+                                    int? newTimeLimit = setGame.TimeLimit;
+                                    if (reader["TimeLimit"] != null)
+                                    {
+                                        newTimeLimit = ((int)reader["TimeLimit"] + newTimeLimit) / 2;
+                                    }
+                                    
+                                    string id = reader["GameID"].ToString();
+
                                     joinGameCommand.Parameters.AddWithValue("@Player2", setGame.UserToken);
                                     joinGameCommand.Parameters.AddWithValue("@Board", game.Board);
-                                    joinGameCommand.Parameters.AddWithValue("@TimeLimit", setGame.TimeLimit);
+                                    joinGameCommand.Parameters.AddWithValue("@TimeLimit", newTimeLimit);
                                     joinGameCommand.Parameters.AddWithValue("@StartTime", DateTime.Now);
-                                    reader.Read();
-                                    string id = reader["GameID"].ToString();
                                     joinGameCommand.Parameters.AddWithValue("@GameID", id);
 
                                     reader.Close();
+
+                                    SetGame sg = new SetGame(id);
                                     if (joinGameCommand.ExecuteNonQuery() == 0)
                                     {
                                         SetStatus(Forbidden);
@@ -220,7 +232,7 @@ namespace Boggle
                                         SetStatus(Created);
                                     }
                                     transaction.Commit();
-                                    return id;
+                                    return sg;
                                 }
                             }
                         }
@@ -242,7 +254,7 @@ namespace Boggle
                     using (SqlTransaction transaction = connection.BeginTransaction())
                     {
                         using (SqlCommand command = new SqlCommand(
-                            "select * from Games where Player1.UserID = @UserID and Player2.UserID = null",
+                            "select * from Games where Player1 = @UserID and Player2 is NULL",
                             connection,
                             transaction))
                         {
@@ -262,7 +274,7 @@ namespace Boggle
                         }
 
                         using (SqlCommand command = new SqlCommand(
-                           "delete from Games where Player1.UserID = @UserID",
+                           "delete from Games where Player1 = @UserID",
                            connection,
                            transaction))
                         {
@@ -281,7 +293,7 @@ namespace Boggle
             }
         }
 
-        public int? PlayWord(string GameID, PlayWordDetails PlayWordDetails)
+        public PlayWordDetails PlayWord(string GameID, PlayWordDetails PlayWordDetails)
         {
             string word = PlayWordDetails.Word.Trim();
             PlayedWord playedWord = new PlayedWord(word);
@@ -292,112 +304,113 @@ namespace Boggle
                 return null;
             }
 
-
-            using (SqlConnection connection = new SqlConnection(BoggleDB))
+            lock (sync)
             {
-                using (SqlTransaction transaction = connection.BeginTransaction())
+                using (SqlConnection connection = new SqlConnection(BoggleDB))
                 {
-                    // Check if game exists
-                    using (SqlCommand command = new SqlCommand(
-                            "select * from Games where Games.GameID = @GameID",
-                            connection,
-                            transaction))
+                    connection.Open();
+                    using (SqlTransaction transaction = connection.BeginTransaction())
                     {
-                        command.Parameters.AddWithValue("@GameID", GameID);
-
-                        using (SqlDataReader reader = command.ExecuteReader())
+                        // Check if game exists
+                        using (SqlCommand command = new SqlCommand(
+                                "select * from Games where Games.GameID = @GameID",
+                                connection,
+                                transaction))
                         {
-                            if (!reader.HasRows)
+                            command.Parameters.AddWithValue("@GameID", GameID);
+
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                SetStatus(Forbidden);
-                                reader.Close();
-                                transaction.Commit();
-                                return null;
-                            }
-
-                            // Game exists, check if it is active
-                            reader.Read();
-                            if (reader["Player2"] == null || ((DateTime)reader["StartTime"] - DateTime.Now).TotalSeconds <= 0)
-                            {
-                                SetStatus(Conflict);
-                                reader.Close();
-                                transaction.Commit();
-                                return null;
-                            }
-                        }
-                    }
-
-                    // Check if user exists in game
-                    using (SqlCommand command = new SqlCommand(
-                            "select * from Games where GameID = @GameID",
-                            connection,
-                            transaction))
-                    {
-                        command.Parameters.AddWithValue("@GameID", GameID);
-
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            reader.Read();
-
-                            // User is in this game
-                            if (reader["Player1"].ToString() == PlayWordDetails.UserToken ||
-                                reader["Player2"].ToString() == PlayWordDetails.UserToken)
-                            {
-                                BoggleBoard board = new BoggleBoard(reader["Board"].ToString());
-                                reader.Close();
-
-                                List<string> words = new List<string>();
-
-                                // Get all words
-                                using (SqlCommand wordCommand = new SqlCommand(
-                                    "select Word from Words where Player = @Player",
-                                    connection,
-                                    transaction))
+                                if (!reader.HasRows)
                                 {
-                                    wordCommand.Parameters.AddWithValue("@Player", PlayWordDetails.UserToken);
+                                    SetStatus(Forbidden);
+                                    reader.Close();
+                                    transaction.Commit();
+                                    return null;
+                                }
 
-                                    // Get list of words played
-                                    using (SqlDataReader wordReader = wordCommand.ExecuteReader())
-                                    {
-                                        while (wordReader.Read())
-                                        {
-                                            words.Add(reader["Word"].ToString());
-                                        }
-                                        wordReader.Close();
-                                    }
+                                // Game exists, Pending
+                                reader.Read();
+                                if (reader["Player2"].ToString() == "")
+                                {
+                                    SetStatus(Conflict);
+                                    reader.Close();
+                                    transaction.Commit();
+                                    return null;
+                                }
 
-                                    int score = GetWordScore(PlayWordDetails.Word, board, words);
+                                // completed
+                                DateTime start = (DateTime)reader["StartTime"];
+                                int timeLimit = (int)reader["TimeLimit"];
+                                if ((start.AddSeconds((double)timeLimit) - DateTime.Now).TotalSeconds <= 0) 
+                                {
+                                    SetStatus(Conflict);
+                                    reader.Close();
+                                    transaction.Commit();
+                                    return null;
+                                }
+                                
 
-                                    // Add word to word table
-                                    using (SqlCommand addWordCommand = new SqlCommand(
-                                        "insert into Words (Word, GameID, Player, Score) " +
-                                        "values(@Word, @GameID, @Player, @Score)",
+                                // User is in this game
+                                if (reader["Player1"].ToString() == PlayWordDetails.UserToken ||
+                                    reader["Player2"].ToString() == PlayWordDetails.UserToken)
+                                {
+                                    BoggleBoard board = new BoggleBoard(reader["Board"].ToString());
+                                    reader.Close();
+
+                                    List<string> words = new List<string>();
+
+                                    // Get all words
+                                    using (SqlCommand wordCommand = new SqlCommand(
+                                        "select Word from Words where Player = @Player",
                                         connection,
                                         transaction))
                                     {
-                                        addWordCommand.Parameters.AddWithValue("@Word", PlayWordDetails.Word);
-                                        addWordCommand.Parameters.AddWithValue("@GameID", GameID);
-                                        addWordCommand.Parameters.AddWithValue("@Player", PlayWordDetails.UserToken);
-                                        addWordCommand.Parameters.AddWithValue("@Score", score);
+                                        wordCommand.Parameters.AddWithValue("@Player", PlayWordDetails.UserToken);
 
-                                        if (command.ExecuteNonQuery() != 1)
+                                        // Get list of words played
+                                        using (SqlDataReader wordReader = wordCommand.ExecuteReader())
                                         {
-                                            throw new Exception("Query failed unexpectedly");
+                                            while (wordReader.Read())
+                                            {
+                                                words.Add(wordReader["Word"].ToString());
+                                            }
+                                            wordReader.Close();
                                         }
-                                        SetStatus(OK);
-                                        transaction.Commit();
-                                        return score;
+
+                                        int score = GetWordScore(PlayWordDetails.Word, board, words);
+
+                                        // Add word to word table
+                                        using (SqlCommand addWordCommand = new SqlCommand(
+                                            "insert into Words (Word, GameID, Player, Score) " +
+                                            "values(@Word, @GameID, @Player, @Score)",
+                                            connection,
+                                            transaction))
+                                        {
+                                            addWordCommand.Parameters.AddWithValue("@Word", PlayWordDetails.Word);
+                                            addWordCommand.Parameters.AddWithValue("@GameID", GameID);
+                                            addWordCommand.Parameters.AddWithValue("@Player", PlayWordDetails.UserToken);
+                                            addWordCommand.Parameters.AddWithValue("@Score", score);
+
+                                            if (addWordCommand.ExecuteNonQuery() != 1)
+                                            {
+                                                throw new Exception("Query failed unexpectedly");
+                                            }
+                                            SetStatus(OK);
+                                            transaction.Commit();
+                                            return new PlayWordDetails(score);
+                                        }
                                     }
                                 }
-                            }
 
-                            // User is not in this game
-                            else
-                            {
-                                SetStatus(Forbidden);
-                                reader.Close();
-                                transaction.Commit();
-                                return null;
+                                // User is not in this game
+                                else
+                                {
+                                    SetStatus(Forbidden);
+                                    reader.Close();
+                                    transaction.Commit();
+                                    return null;
+                                }
                             }
                         }
                     }
@@ -458,18 +471,13 @@ namespace Boggle
 
         }
 
-
-        // TODO: Test
         public Game GameStatus(string gameID, string brief)
         {
-
             lock (sync)
             {
                 using (SqlConnection connection = new SqlConnection(BoggleDB))
                 {
                     connection.Open();
-
-                    // Transaction for databse commands
                     using (SqlTransaction transaction = connection.BeginTransaction())
                     {
                         using (SqlCommand command = new SqlCommand(
@@ -486,7 +494,6 @@ namespace Boggle
                                     // No game with that ID
                                     SetStatus(Forbidden);
                                     reader.Close();
-                                    transaction.Commit();
                                     return null;
                                 }
 
@@ -587,13 +594,8 @@ namespace Boggle
 
                     while (reader.Read())
                     {
-                        if (reader["Nickname"] == null)
-                        {
-                            string s = "null";
-                        }
                         if (brief != "yes")
                         {
-                            string s = (string)reader["Nickname"];
                             player.Nickname = reader["Nickname"].ToString();
                         }
                     }
