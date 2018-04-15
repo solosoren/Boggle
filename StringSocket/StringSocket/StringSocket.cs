@@ -56,11 +56,39 @@ namespace CustomNetworking
 
     public class StringSocket : IDisposable
     {
+
+        // Data structure for messages that'll be sent
+        private class Message
+        {
+            private string text;
+            private SendCallback callback;
+            object payload;
+
+            public Message(string text, SendCallback callback, object payload)
+            {
+                this.text = text;
+                this.callback = callback;
+                this.payload = payload;
+            }
+        }
+
         // Underlying socket
         private Socket socket;
 
         // Encoding used for sending and receiving
         private Encoding encoding;
+
+        private string textToSend;
+        private string textReceivedSoFar;
+        Queue<Message> messagesToSend;
+        Queue<Message> messagesReceived;
+
+        private Boolean isSending;
+        private Boolean isReceiving;
+
+        // For syncing
+        private object lockSend;
+        private object lockReceive;
 
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
@@ -72,7 +100,10 @@ namespace CustomNetworking
         {
             socket = s;
             encoding = e;
-            // TODO: Complete implementation of StringSocket
+            textToSend = "";
+            textReceivedSoFar = "";
+            messagesToSend = new Queue<Message>();
+            messagesReceived = new Queue<Message>();
         }
 
         /// <summary>
@@ -117,8 +148,19 @@ namespace CustomNetworking
         /// </summary>
         public void BeginSend(String s, SendCallback callback, object payload)
         {
-            // TODO: Implement BeginSend
+            lock (lockSend)
+            {
+                messagesToSend.Enqueue(new Message(s, callback, payload));
+
+                if (!isSending)
+                {
+                    isSending = true;
+                    
+                    // Make and implement send message helper method
+                }
+            }
         }
+
 
         /// <summary>
         /// We can read a string from the StringSocket by doing
