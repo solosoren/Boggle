@@ -11,15 +11,6 @@ using System.Threading;
 
 namespace CustomNetworking
 {
-    /// <summary>
-    /// The type of delegate that is called when a StringSocket send has completed.
-    /// </summary>
-    public delegate void SendCallback(bool wasSent, object payload);
-
-    /// <summary>
-    /// The type of delegate that is called when a receive has completed.
-    /// </summary>
-    public delegate void ReceiveCallback(String s, object payload);
 
     /// <summary> 
     /// A StringSocket is a wrapper around a Socket.  It provides methods that
@@ -56,20 +47,54 @@ namespace CustomNetworking
 
     public class StringSocket : IDisposable
     {
+        /// <summary>
+        /// The type of delegate that is called when a StringSocket send has completed.
+        /// </summary>
+        public delegate void SendCallback(bool wasSent, object payload);
+
+        /// <summary>
+        /// The type of delegate that is called when a receive has completed.
+        /// </summary>
+        public delegate void ReceiveCallback(String s, object payload);
 
         // Data structure for messages that'll be sent
         private class Message
         {
-            private string text;
-            private SendCallback callback;
-            object payload;
-
-            public Message(string text, SendCallback callback, object payload)
+            public Message(string text, StringSocket.SendCallback callback, object payload)
             {
-                this.text = text;
-                this.callback = callback;
-                this.payload = payload;
+                Text = text;
+                Callback = callback;
+                Payload = payload;
             }
+            /// <summary>
+            /// Constructs a new message object with the given parameters
+            /// </summary>
+            /// <param name="callback"></param>
+            /// <param name="payload"></param>
+            public Message(StringSocket.ReceiveCallback callback, object payload)
+            {
+                RecCallback = callback;
+                Payload = payload;
+            }
+
+            /// <summary>
+            /// Property to setup string that is either received or needing to be sent
+            /// </summary>
+            public string Text { get; set; }
+
+            /// <summary>
+            /// Property to setup SendCallback
+            /// </summary>
+            public SendCallback Callback { get; set; }
+
+            /// <summary>
+            /// Property to setup ReceiveCallback
+            /// </summary>
+            public StringSocket.ReceiveCallback RecCallback { get; set; }
+            /// <summary>
+            /// Property to setup Payload
+            /// </summary>
+            public object Payload { get; set; }
         }
 
         // Underlying socket
@@ -80,6 +105,7 @@ namespace CustomNetworking
 
         private string textToSend;
         private string textReceivedSoFar;
+
         Queue<Message> messagesToSend;
         Queue<Message> messagesReceived;
 
@@ -89,6 +115,9 @@ namespace CustomNetworking
         // For syncing
         private object lockSend;
         private object lockReceive;
+
+        // Received message but not dealt with yet.
+        private Message messageNotGotten;
 
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
@@ -155,7 +184,7 @@ namespace CustomNetworking
                 if (!isSending)
                 {
                     isSending = true;
-                    
+
                     // Make and implement send message helper method
                 }
             }
@@ -200,9 +229,101 @@ namespace CustomNetworking
         /// from buffering an unbounded number of incoming bytes beyond what is required to service
         /// the pending callbacks.
         /// </summary>
+        /// 
+
+        /// If length is negative or zero, this behaves identically to the first case.  If length
+        /// is positive, then it reads and decodes length bytes from the underlying Socket, yielding
+        /// a string s.  The parameters to the callback are s and the payload
         public void BeginReceive(ReceiveCallback callback, object payload, int length = 0)
         {
-            // TODO: Implement BeginReceive
+            lock (lockReceive)
+            {
+                //if (length <= 0)
+                //{
+                messagesReceived.Enqueue(new Message(callback, payload));
+
+                if (!isReceiving)
+                {
+                    isReceiving = true;
+                    try
+                    {
+                        MessageReceived();
+                    }
+                    catch (Exception e)
+                    {
+                        messageNotGotten.RecCallback(null, messageNotGotten.Payload);
+                    }
+                }
+                //}
+                //else
+                //{
+
+                //}
+
+            }
+
+        }
+
+        //Helper method to send all received callbacks and payloads
+        private void MessageReceived()
+        {
+            int index;
+            // Check data for new line chars if have more messages
+            if (messagesReceived.Count > 0)
+            {
+
+                if ((index = textReceivedSoFar.IndexOf('\n')) >= 0)
+                {
+                    textToSend = textReceivedSoFar.Substring(0, index);
+                    if (textToSend.EndsWith("\r"))
+                    {
+                        textToSend = textToSend.Substring(0, index - 1);
+                    }
+                    textReceivedSoFar = textReceivedSoFar.Substring(index + 1);
+                    messageNotGotten = messagesReceived.Dequeue();
+
+                    messageNotGotten.RecCallback(null, messageNotGotten.Payload);
+                    Thread thread = new Thread(() => messageNotGotten.RecCallback(textToSend, messageNotGotten.Payload));
+                    thread.Start();
+
+                }
+                byte[] buffer = new byte[1];
+                socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, MessageReceivedCallback, buffer);
+            }
+            else
+            {
+                isReceiving = false;
+            }
+        }
+
+
+        // Called when data has been received
+        private void MessageReceivedCallback(IAsyncResult ar)
+        {
+
+            int numOfBytes = socket.EndReceive(ar);
+
+            if (numOfBytes == 0)
+            {
+                // Nothing to do
+                socket.Close();
+            }
+            else
+            {
+                byte[] buffer = (byte[])(ar.AsyncState);
+
+                textReceivedSoFar += encoding.GetString(buffer, 0, numOfBytes);
+
+                try
+                {
+                    MessageReceived();
+                }
+                catch (Exception e)
+                {
+                    messageNotGotten.RecCallback(null, messageNotGotten.Payload);
+                }
+
+            }
         }
 
         /// <summary>
