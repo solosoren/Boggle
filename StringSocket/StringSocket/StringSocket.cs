@@ -73,11 +73,14 @@ namespace CustomNetworking
             /// </summary>
             /// <param name="callback"></param>
             /// <param name="payload"></param>
-            public Message(StringSocket.ReceiveCallback callback, object payload)
+            public Message(StringSocket.ReceiveCallback callback, object payload, int length)
             {
                 RecCallback = callback;
                 Payload = payload;
+                Length = length;
             }
+
+
 
             /// <summary>
             /// Property to setup string that is either received or needing to be sent
@@ -97,6 +100,13 @@ namespace CustomNetworking
             /// Property to setup Payload
             /// </summary>
             public object Payload { get; set; }
+
+            // for receive
+            public int Length
+            {
+                get;
+                set;
+            }
         }
 
         // Underlying socket
@@ -105,25 +115,21 @@ namespace CustomNetworking
         // Encoding used for sending and receiving
         private Encoding encoding;
 
-        private string textToSend;
         private string textReceivedSoFar;
 
-        private Message sendingMessage;
-        private byte[] pendingBytes = new byte[0];
-        private int pendingIndex = 0;
+        private byte[] sendingBytes;
+        private byte[] pendingBytes;
+        private char[] receiveChars;
+        private int amountToSend;
 
         Queue<Message> messagesToSend;
         Queue<Message> messagesReceived;
-
-        private Boolean isSending;
-        private Boolean isReceiving;
+        private LinkedList<string> receivedLines;
+        private Boolean isReceiving = true;
 
         // For syncing
         private readonly object lockSend = new object();
         private readonly object lockReceive = new object();
-
-        // Received message but not dealt with yet.
-        private Message messageNotGotten;
 
         /// <summary>
         /// Creates a StringSocket from a regular Socket, which should already be connected.  
@@ -135,9 +141,11 @@ namespace CustomNetworking
         {
             socket = s;
             encoding = e;
-            textToSend = "";
             textReceivedSoFar = "";
             messagesToSend = new Queue<Message>();
+            receivedLines = new LinkedList<string>();
+            pendingBytes = new byte[1024];
+            receiveChars = new char[1024];
             messagesReceived = new Queue<Message>();
         }
 
@@ -187,9 +195,8 @@ namespace CustomNetworking
             {
                 messagesToSend.Enqueue(new Message(s, callback, payload));
 
-                if (!isSending)
+                if (messagesToSend.Count == 1)
                 {
-                    isSending = true;
                     SendMessage();
                 }
             }
@@ -202,36 +209,12 @@ namespace CustomNetworking
         public void SendMessage()
         {
 
-            if (pendingIndex < pendingBytes.Length)
+            if (messagesToSend.Count > 0)
             {
-                try
-                {
-                    socket.BeginSend(pendingBytes, pendingIndex, pendingBytes.Length - pendingIndex,
-                                     SocketFlags.None, MessageSent, null);
-                }
-                catch (ObjectDisposedException) { }
-            }
-            else if (messagesToSend.Count > 0)
-            {
-                {
-                    sendingMessage = messagesToSend.Dequeue();
-                    pendingBytes = encoding.GetBytes(sendingMessage.Text);
-                    pendingIndex = 0;
-                    try
-                    {
-                        socket.BeginSend(pendingBytes, 0, pendingBytes.Length,
-                                         SocketFlags.None, MessageSent, null);
-                    }
-                    catch (ObjectDisposedException) { }
-                }
-            }
-            else
-            {
-                isSending = false;
-                
+                sendingBytes = encoding.GetBytes(messagesToSend.First().Text);
+                socket.BeginSend(sendingBytes, amountToSend = 0, sendingBytes.Length, SocketFlags.None, MessageSent, null);
             }
         }
-
 
         /// <summary>
         /// Checks whether whole string was sent. If so calls callback on message, if not finished sending the message.
@@ -240,31 +223,39 @@ namespace CustomNetworking
         public void MessageSent(IAsyncResult ar)
         {
             int numOfBytes = socket.EndSend(ar);
+            amountToSend += numOfBytes;
 
-            lock (lockSend)
+
+            if (numOfBytes == 0)
             {
-                if (numOfBytes == 0)
+                lock (lockSend)
                 {
-                    if (pendingIndex < pendingBytes.Length)
+                    while (messagesToSend.Count > 0)
                     {
-                        Thread thread = new Thread(() => sendingMessage.Callback(false, sendingMessage.Payload));
-                        thread.Start();
-                        socket.Close();
+                        Message req = messagesToSend.Dequeue();
+                        ThreadPool.QueueUserWorkItem(delegate
+                        {
+                            req.Callback(false, req.Payload);
+                        });
                     }
                 }
-                else if (numOfBytes == pendingBytes.Length && messagesToSend.Count == 0)
+            }
+            else if (amountToSend == sendingBytes.Length)
+            {
+                lock (lockSend)
                 {
-                    Thread thread = new Thread(() => sendingMessage.Callback(true, sendingMessage.Payload));
-                    thread.Start();
-                    SendMessage();
-                }
-                else
-                {
-                    pendingIndex += numOfBytes;
+                    Message req2 = messagesToSend.Dequeue();
+                    ThreadPool.QueueUserWorkItem(delegate
+                    {
+                        req2.Callback(true, req2.Payload);
+                    });
                     SendMessage();
                 }
             }
-            Debug.WriteLine("We out here");
+            else
+            {
+                socket.BeginSend(sendingBytes, amountToSend, sendingBytes.Length - amountToSend, SocketFlags.None, MessageSent, null);
+            }
         }
 
 
@@ -315,28 +306,12 @@ namespace CustomNetworking
         {
             lock (lockReceive)
             {
-                //if (length <= 0)
-                //{
-                messagesReceived.Enqueue(new Message(callback, payload));
+                messagesReceived.Enqueue(new Message(callback, payload, length));
 
-                if (!isReceiving)
+                if (messagesReceived.Count == 1)
                 {
-                    isReceiving = true;
-                    try
-                    {
-                        MessageReceived();
-                    }
-                    catch (Exception e)
-                    {
-                        messageNotGotten.RecCallback(null, messageNotGotten.Payload);
-                    }
+                    MessageReceived();
                 }
-                //}
-                //else
-                //{
-
-                //}
-
             }
 
         }
@@ -344,64 +319,150 @@ namespace CustomNetworking
         //Helper method to send all received callbacks and payloads
         private void MessageReceived()
         {
-            int index;
-            // Check data for new line chars if have more messages
-            if (messagesReceived.Count > 0)
+            lock (lockReceive)
             {
-
-                if ((index = textReceivedSoFar.IndexOf('\n')) >= 0)
+                while (messagesReceived.Count() > 0)
                 {
-                    textToSend = textReceivedSoFar.Substring(0, index);
-                    if (textToSend.EndsWith("\r"))
+                    Message receiveRequest = messagesReceived.Peek();
+                    if (receiveRequest.Length <= 0)
                     {
-                        textToSend = textToSend.Substring(0, index - 1);
-
+                        if (receivedLines.Count <= 0)
+                        {
+                            break;
+                        }
+                        string line = receivedLines.First();
+                        receivedLines.RemoveFirst();
+                        Message message1 = messagesReceived.Dequeue();
+                        ThreadPool.QueueUserWorkItem(delegate
+                        {
+                            message1.RecCallback(line, message1.Payload);
+                        });
                     }
-                    textReceivedSoFar = textReceivedSoFar.Substring(index + 1);
-                    messageNotGotten = messagesReceived.Dequeue();
-
-                    messageNotGotten.RecCallback(null, messageNotGotten.Payload);
-                    Thread thread = new Thread(() => messageNotGotten.RecCallback(textToSend, messageNotGotten.Payload));
-                    thread.Start();
-
+                    else
+                    {
+                        receiveRequest = messagesReceived.Peek();
+                        string relay = reBuild(receiveRequest.Length);
+                        if (relay == null)
+                        {
+                            break;
+                        }
+                        Message message2 = messagesReceived.Dequeue();
+                        ThreadPool.QueueUserWorkItem(delegate
+                        {
+                            message2.RecCallback(relay, message2.Payload);
+                        });
+                    }
                 }
-                byte[] buffer = new byte[1];
-                socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, MessageReceivedCallback, buffer);
-            }
-            else
-            {
-                isReceiving = false;
+                if (messagesReceived.Count > 0)
+                {
+                    if (isReceiving)
+                    {
+                        socket.BeginReceive(pendingBytes, 0, pendingBytes.Length, SocketFlags.None, MessageReceivedCallback, null);
+                    }
+                    else
+                    {
+                        while (messagesReceived.Count > 0)
+                        {
+                            Message message3 = messagesReceived.Dequeue();
+                            ThreadPool.QueueUserWorkItem(delegate
+                            {
+                                message3.RecCallback(null, message3.Payload);
+                            });
+                        }
+                    }
+                }
             }
         }
 
+        private string reBuild(int length)
+        {
+            int num = encoding.GetByteCount(textReceivedSoFar);
+            foreach (string receivedLine in receivedLines)
+            {
+                if (num >= length)
+                {
+                    break;
+                }
+                num += encoding.GetByteCount(receivedLine) + encoding.GetByteCount("\n");
+            }
+            if (num < length)
+            {
+                return null;
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            int counter = 0;
+            while (receivedLines.Count > 0)
+            {
+                string text = receivedLines.First();
+                int byteCount = encoding.GetByteCount(text) + encoding.GetByteCount("\n");
+                if (counter + byteCount > length)
+                {
+                    break;
+                }
+                counter += byteCount;
+                stringBuilder.Append(text).Append("\n");
+            }
+            if (receivedLines.Count > 0)
+            {
+                string text2 = receivedLines.First();
+                receivedLines.RemoveFirst();
+                int split1 = Split(text2, length - counter);
+                stringBuilder.Append(text2.Substring(0, split1));
+                receivedLines.AddFirst(text2.Substring(split1));
+            }
+            else
+            {
+                int split2 = Split(textReceivedSoFar, length - counter);
+                stringBuilder.Append(textReceivedSoFar.Substring(0, split2));
+                textReceivedSoFar = textReceivedSoFar.Substring(split2);
+            }
+            return stringBuilder.ToString();
+        }
+
+        private int Split(string line, int bytes)
+        {
+            int num = 0;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                int byteCount = encoding.GetByteCount(c.ToString());
+                if (bytes - byteCount >= 0)
+                {
+                    bytes = bytes - byteCount;
+                    num++;
+                }
+                if (bytes == 0)
+                {
+                    break;
+                }
+            }
+            return num;
+        }
 
         // Called when data has been received
         private void MessageReceivedCallback(IAsyncResult ar)
         {
-
-            int numOfBytes = socket.EndReceive(ar);
-
-            if (numOfBytes == 0)
+            int num = socket.EndReceive(ar);
+            if (num == 0)
             {
-                // Nothing to do
-                socket.Close();
+                isReceiving = false;
+                MessageReceived();
             }
             else
             {
-                byte[] buffer = (byte[])(ar.AsyncState);
-
-                textReceivedSoFar += encoding.GetString(buffer, 0, numOfBytes);
-
-                try
+                int chars = encoding.GetDecoder().GetChars(pendingBytes, 0, num, receiveChars, 0, false);
+                textReceivedSoFar += new string(receiveChars, 0, chars);
+                int num2 = 0;
+                int num3;
+                while ((num3 = textReceivedSoFar.IndexOf('\n', num2)) >= 0)
                 {
-                    MessageReceived();
+                    receivedLines.AddLast(textReceivedSoFar.Substring(num2, num3 - num2));
+                    num2 = num3 + 1;
                 }
-                catch (Exception e)
-                {
-                    messageNotGotten.RecCallback(null, messageNotGotten.Payload);
-                }
-
+                textReceivedSoFar = textReceivedSoFar.Substring(num2);
+                MessageReceived();
             }
+
         }
 
         /// <summary>
