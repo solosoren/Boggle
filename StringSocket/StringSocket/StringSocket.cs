@@ -73,6 +73,7 @@ namespace CustomNetworking
             /// </summary>
             /// <param name="callback"></param>
             /// <param name="payload"></param>
+            /// <param name="length"></param>
             public Message(StringSocket.ReceiveCallback callback, object payload, int length)
             {
                 RecCallback = callback;
@@ -341,7 +342,7 @@ namespace CustomNetworking
                     else
                     {
                         receiveRequest = messagesReceived.Peek();
-                        string relay = reBuild(receiveRequest.Length);
+                        string relay = convertToAbstract(receiveRequest.Length);
                         if (relay == null)
                         {
                             break;
@@ -374,7 +375,7 @@ namespace CustomNetworking
             }
         }
 
-        private string reBuild(int length)
+        private string convertToAbstract(int length)
         {
             int num = encoding.GetByteCount(textReceivedSoFar);
             foreach (string receivedLine in receivedLines)
@@ -442,15 +443,15 @@ namespace CustomNetworking
         // Called when data has been received
         private void MessageReceivedCallback(IAsyncResult ar)
         {
-            int num = socket.EndReceive(ar);
-            if (num == 0)
+            int numOfBytes = socket.EndReceive(ar);
+            if (numOfBytes == 0)
             {
                 isReceiving = false;
                 MessageReceived();
             }
             else
             {
-                int chars = encoding.GetDecoder().GetChars(pendingBytes, 0, num, receiveChars, 0, false);
+                int chars = encoding.GetDecoder().GetChars(pendingBytes, 0, numOfBytes, receiveChars, 0, false);
                 textReceivedSoFar += new string(receiveChars, 0, chars);
                 int num2 = 0;
                 int num3;
