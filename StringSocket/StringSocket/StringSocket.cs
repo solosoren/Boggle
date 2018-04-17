@@ -9,6 +9,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CustomNetworking
 {
@@ -196,7 +197,7 @@ namespace CustomNetworking
 
 
         /// <summary>
-        /// 
+        /// Sends the Message. Calls the callback Message Sent when message is sent.
         /// </summary>
         public void SendMessage()
         {
@@ -233,7 +234,7 @@ namespace CustomNetworking
 
 
         /// <summary>
-        /// 
+        /// Checks whether whole string was sent. If so calls callback on message, if not finished sending the message.
         /// </summary>
         /// <param name="ar"></param>
         public void MessageSent(IAsyncResult ar)
@@ -246,15 +247,16 @@ namespace CustomNetworking
                 {
                     if (pendingIndex < pendingBytes.Length)
                     {
-                        Thread thread  = new Thread(() => sendingMessage.Callback(false, sendingMessage.Payload));
+                        Thread thread = new Thread(() => sendingMessage.Callback(false, sendingMessage.Payload));
                         thread.Start();
+                        socket.Close();
                     }
-                    socket.Close();
                 }
                 else if (numOfBytes == pendingBytes.Length && messagesToSend.Count == 0)
                 {
                     Thread thread = new Thread(() => sendingMessage.Callback(true, sendingMessage.Payload));
                     thread.Start();
+                    SendMessage();
                 }
                 else
                 {
@@ -262,6 +264,7 @@ namespace CustomNetworking
                     SendMessage();
                 }
             }
+            Debug.WriteLine("We out here");
         }
 
 
