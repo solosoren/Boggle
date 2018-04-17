@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CustomNetworking
 {
@@ -106,6 +107,10 @@ namespace CustomNetworking
         private string textToSend;
         private string textReceivedSoFar;
 
+        private Message sendingMessage;
+        private byte[] pendingBytes = new byte[0];
+        private int pendingIndex = 0;
+
         Queue<Message> messagesToSend;
         Queue<Message> messagesReceived;
 
@@ -113,8 +118,8 @@ namespace CustomNetworking
         private Boolean isReceiving;
 
         // For syncing
-        private object lockSend;
-        private object lockReceive;
+        private readonly object lockSend = new object();
+        private readonly object lockReceive = new object();
 
         // Received message but not dealt with yet.
         private Message messageNotGotten;
@@ -184,8 +189,77 @@ namespace CustomNetworking
                 if (!isSending)
                 {
                     isSending = true;
+                    SendMessage();
+                }
+            }
+        }
 
-                    // Make and implement send message helper method
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SendMessage()
+        {
+
+            if (pendingIndex < pendingBytes.Length)
+            {
+                try
+                {
+                    socket.BeginSend(pendingBytes, pendingIndex, pendingBytes.Length - pendingIndex,
+                                     SocketFlags.None, MessageSent, null);
+                }
+                catch (ObjectDisposedException) { }
+            }
+            else if (messagesToSend.Count > 0)
+            {
+                {
+                    sendingMessage = messagesToSend.Dequeue();
+                    pendingBytes = encoding.GetBytes(sendingMessage.Text);
+                    pendingIndex = 0;
+                    try
+                    {
+                        socket.BeginSend(pendingBytes, 0, pendingBytes.Length,
+                                         SocketFlags.None, MessageSent, null);
+                    }
+                    catch (ObjectDisposedException) { }
+                }
+            }
+            else
+            {
+                isSending = false;
+                
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ar"></param>
+        public void MessageSent(IAsyncResult ar)
+        {
+            int numOfBytes = socket.EndSend(ar);
+
+            lock (lockSend)
+            {
+                if (numOfBytes == 0)
+                {
+                    if (pendingIndex < pendingBytes.Length)
+                    {
+                        Thread thread  = new Thread(() => sendingMessage.Callback(false, sendingMessage.Payload));
+                        thread.Start();
+                    }
+                    socket.Close();
+                }
+                else if (numOfBytes == pendingBytes.Length && messagesToSend.Count == 0)
+                {
+                    Thread thread = new Thread(() => sendingMessage.Callback(true, sendingMessage.Payload));
+                    thread.Start();
+                }
+                else
+                {
+                    pendingIndex += numOfBytes;
+                    SendMessage();
                 }
             }
         }
@@ -278,6 +352,7 @@ namespace CustomNetworking
                     if (textToSend.EndsWith("\r"))
                     {
                         textToSend = textToSend.Substring(0, index - 1);
+
                     }
                     textReceivedSoFar = textReceivedSoFar.Substring(index + 1);
                     messageNotGotten = messagesReceived.Dequeue();
