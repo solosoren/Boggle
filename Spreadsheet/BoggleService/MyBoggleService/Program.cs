@@ -1,9 +1,12 @@
-﻿using System;
+﻿using CustomNetworking;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace MyBoggleService
 {
@@ -11,17 +14,91 @@ namespace MyBoggleService
     {
         static void Main(string[] args)
         {
-            HttpStatusCode status;
-            User initialUser = new User { Nickname = "Joe" };
-            BoggleService service = new BoggleService();
-            User user = service.CreateUser(initialUser, out status);
-            Console.WriteLine(user.UserToken);
-            Console.WriteLine(status.ToString());
-
-            // This is our way of preventing the main thread from
-            // exiting while the server is in use
+            StringSocketListener server = new StringSocketListener(60000, Encoding.UTF8);
+            server.Start();
+            server.BeginAcceptStringSocket(ConnectionMade, server);
             Console.ReadLine();
-            
+        }
+
+        private static void ConnectionMade(StringSocket ss, object payload)
+        {
+            StringSocketListener server = (StringSocketListener)payload;
+            server.BeginAcceptStringSocket(ConnectionMade, server);
+            new RequestHandler(ss);
+        }
+
+        private class RequestHandler
+        {
+            private StringSocket ss;
+
+            private string firstLine;
+
+            private int contentLength;
+
+            // TODO: Regex for other service calls
+            private static readonly Regex makeUserPattern = new Regex(@"^POST /BoggleService.svc/users HTTP");
+            private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (\d+)", RegexOptions.IgnoreCase);
+
+            public RequestHandler(StringSocket ss)
+            {
+                this.ss = ss;
+                this.contentLength = 0;
+                ss.BeginReceive(ReadLines, null);
+            }
+
+            private void ReadLines(String line, object p)
+            {
+                if (line.Trim().Length == 0 && contentLength > 0)
+                {
+                    ss.BeginReceive(ProcessRequest, null, contentLength);
+                }
+                else if (line.Trim().Length == 0)
+                {
+                    ProcessRequest(null);
+                }
+                else if (firstLine != null)
+                {
+                    Match m = contentLengthPattern.Match(line);
+                    if (m.Success)
+                    {
+                        contentLength = int.Parse(m.Groups[1].ToString());
+                    }
+                    ss.BeginReceive(ReadLines, null);
+                }
+                else
+                {
+                    firstLine = line;
+                    ss.BeginReceive(ReadLines, null);
+                }
+
+            }
+
+
+            private void ProcessRequest(string line, object p = null)
+            {
+                if (makeUserPattern.IsMatch(firstLine))
+                {
+                    CreateUserRequest(line);
+                }
+            }
+
+            private void CreateUserRequest(string line)
+            {
+                // Check
+                Name n = JsonConvert.DeserializeObject<Name>(line);
+                User u = new User(n);
+                User user = new BoggleService().CreateUser(u, out HttpStatusCode status);
+                string result = "HTTP/1.1" + (int)status + " " + status + "\r\n";
+
+                // Success Code
+                if ((int)status / 100 == 2)
+                {
+                    string res = JsonConvert.SerializeObject(user);
+                    result += "Content-Length: " + Encoding.UTF8.GetByteCount(res) + "\r\n";
+                    result += res;
+                }
+                ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
+            }
         }
     }
 }

@@ -23,7 +23,13 @@ namespace MyBoggleService
         [DataMember(EmitDefaultValue = false)]
         public List<PlayedWord> WordsPlayed { get; set; }
 
+        
         public User() { }
+
+        public User(Name name)
+        {
+            Nickname = name.Nickname;
+        }
 
         public static User CreatedUser(string userToken)
         {
@@ -59,7 +65,13 @@ namespace MyBoggleService
 
             return user;
         }
+    }
 
+    [DataContract]
+    public class Name
+    {
+        [DataMember]
+        public string Nickname { get; set; }
     }
 
     [DataContract]
