@@ -83,7 +83,12 @@ namespace MyBoggleService
 
             private void ProcessRequest(string line, object p = null)
             {
-                if (makeUserPattern.IsMatch(firstLine))
+                Console.WriteLine(line);
+                if (!line.Contains("}"))
+                {
+                    ss.BeginReceive(ProcessRequest, null, contentLength);
+                }
+                else if (makeUserPattern.IsMatch(firstLine))
                 {
                     CreateUserRequest(line);
                 }
