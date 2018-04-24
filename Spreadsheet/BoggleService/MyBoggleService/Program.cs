@@ -48,14 +48,19 @@ namespace MyBoggleService
 
             private void ReadLines(String line, object p)
             {
+                // End of request
                 if (line.Trim().Length == 0 && contentLength > 0)
                 {
                     ss.BeginReceive(ProcessRequest, null, contentLength);
                 }
+
+                // No object at end of Request
                 else if (line.Trim().Length == 0)
                 {
                     ProcessRequest(null);
                 }
+
+                // Middle Line: looking for contentLength
                 else if (firstLine != null)
                 {
                     Match m = contentLengthPattern.Match(line);
@@ -65,6 +70,8 @@ namespace MyBoggleService
                     }
                     ss.BeginReceive(ReadLines, null);
                 }
+
+                // First Line
                 else
                 {
                     firstLine = line;
