@@ -88,7 +88,7 @@ namespace MyBoggleService
                 {
                     ss.BeginReceive(ProcessRequest, null, contentLength);
                 }
-                else if (makeUserPattern.IsMatch(firstLine))
+                if (makeUserPattern.IsMatch(firstLine))
                 {
                     CreateUserRequest(line);
                 }
@@ -100,7 +100,7 @@ namespace MyBoggleService
                 Name n = JsonConvert.DeserializeObject<Name>(line);
                 User u = new User(n);
                 User user = new BoggleService().CreateUser(u, out HttpStatusCode status);
-                string result = "HTTP/1.1" + (int)status + " " + status + "\r\n";
+                string result = "HTTP/1.1 " + (int)status + " " + status + "\r\n";
 
                 // Success Code
                 if ((int)status / 100 == 2)
