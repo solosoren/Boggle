@@ -35,11 +35,14 @@ namespace MyBoggleService
 
             private int contentLength;
 
+            private string gameID;
+
             // TODO: Regex for other service calls
             private static readonly Regex createUserPattern = new Regex(@"^POST /BoggleService.svc/users HTTP");
             private static readonly Regex joinGamePattern = new Regex(@"^POST /BoggleService.svc/games HTTP");
             private static readonly Regex gameStatusPattern = new Regex(@"^GET /BoggleService.svc/games/(.+) HTTP");
-
+            private static readonly Regex cancelRequestPattern = new Regex(@"^PUT /BoggleService.svc/games HTTP");
+            private static readonly Regex playWordPattern = new Regex(@"^PUT /BoggleService.svc/games/(.\d+) HTTP");
             private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (\d+)", RegexOptions.IgnoreCase);
 
             public RequestHandler(SS ss)
@@ -100,7 +103,18 @@ namespace MyBoggleService
                 }
                 else if (gameStatusPattern.IsMatch(firstLine))
                 {
-                    JoinGameRequest(line);
+                    
+                }
+                else if (cancelRequestPattern.IsMatch(firstLine))
+                {
+                    CancelRequest(line);
+                }
+                else if (playWordPattern.IsMatch(firstLine))
+                {
+                    var v = playWordPattern.Match(firstLine);
+                    gameID = v.Groups[1].ToString();
+
+                    PlayWordRequest(line);
                 }
             }
 
@@ -122,11 +136,6 @@ namespace MyBoggleService
                 ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
             }
 
-            private void GetStatusRequest(string line)
-            {
-                
-            }
-
             // Serializes the object to send and creates result string
             private string CreateResult(object o, HttpStatusCode status)
             {
@@ -144,6 +153,28 @@ namespace MyBoggleService
                     result += "\r\n";
                 }
                 return result;
+            }
+
+            private void GetStatusRequest(string line)
+            {
+
+            }
+
+            private void CancelRequest(string line)
+            {
+                CancelRequestDetails cRD = JsonConvert.DeserializeObject<CancelRequestDetails>(line);
+                new BoggleService().CancelJoinRequest(cRD, out HttpStatusCode status);
+
+                String result = CreateResult(null, status);
+                ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
+            }
+
+            private void PlayWordRequest(string line)
+            {
+                PlayWordDetails playWordDetails = JsonConvert.DeserializeObject<PlayWordDetails>(line);
+                PlayWordDetails wordDetail = new BoggleService().PlayWord(gameID, playWordDetails, out HttpStatusCode status);
+                string result = CreateResult(wordDetail, status);
+                ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
             }
         }
     }
