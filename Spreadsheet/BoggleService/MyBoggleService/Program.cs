@@ -116,7 +116,8 @@ namespace MyBoggleService
                 }
                 else
                 {
-                    // send stats 403 Forbidden?
+                    //TODO: Figure out what status code. I think 500 for internal issues. Otherwise code never stops
+                    Console.WriteLine("Some Status");
                 }
             }
 
