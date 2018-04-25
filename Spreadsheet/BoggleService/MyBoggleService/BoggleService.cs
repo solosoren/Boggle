@@ -452,7 +452,7 @@ namespace MyBoggleService
             }
 
             // Check if word is legal
-            string contents = File.ReadAllText(@"/dictionary.txt");
+            string contents = File.ReadAllText("dictionary.txt");
 
             if (contents.Contains(word))
             {
