@@ -210,10 +210,6 @@ Backup*/
 UpgradeLog*.XML
 UpgradeLog*.htm
 
-# SQL Server files
-# *.mdf
-# *.ldf
-
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
@@ -259,5 +255,5 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-/Spreadsheet/BoggleService/MyBoggleService/BoggleDB.mdf
-/Spreadsheet/BoggleService/MyBoggleService/BoggleDB_log.ldf
+#/Spreadsheet/BoggleService/MyBoggleService/BoggleDB.mdf
+#/Spreadsheet/BoggleService/MyBoggleService/BoggleDB_log.ldf
