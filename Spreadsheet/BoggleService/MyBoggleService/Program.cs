@@ -38,6 +38,7 @@ namespace MyBoggleService
             // TODO: Regex for other service calls
             private static readonly Regex createUserPattern = new Regex(@"^POST /BoggleService.svc/users HTTP");
             private static readonly Regex joinGamePattern = new Regex(@"^POST /BoggleService.svc/games HTTP");
+            private static readonly Regex gameStatusPattern = new Regex(@"^GET /BoggleService.svc/games/(.+) HTTP");
 
             private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (\d+)", RegexOptions.IgnoreCase);
 
@@ -97,6 +98,10 @@ namespace MyBoggleService
                 {
                     JoinGameRequest(line);
                 }
+                else if (gameStatusPattern.IsMatch(firstLine))
+                {
+                    
+                }
             }
 
             private void CreateUserRequest(string line)
@@ -126,7 +131,7 @@ namespace MyBoggleService
                 if ((int)status / 100 == 2)
                 {
                     string res = JsonConvert.SerializeObject(o);
-                    result += "Content-Length: " + Encoding.UTF8.GetByteCount(res) + "\r\n";
+                    result += "Content-Length: " + Encoding.UTF8.GetByteCount(res) + "\r\n\r\n";
                     result += res;
                 }
                 else
@@ -134,6 +139,11 @@ namespace MyBoggleService
                     result += "\r\n";
                 }
                 return result;
+            }
+
+            private void GetStatusRequest(string line)
+            {
+
             }
         }
     }
