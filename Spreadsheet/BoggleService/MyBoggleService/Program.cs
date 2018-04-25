@@ -14,22 +14,22 @@ namespace MyBoggleService
     {
         static void Main(string[] args)
         {
-            StringSocketListener server = new StringSocketListener(60000, Encoding.UTF8);
+            SSListener server = new SSListener(60000, Encoding.UTF8);
             server.Start();
-            server.BeginAcceptStringSocket(ConnectionMade, server);
+            server.BeginAcceptSS(ConnectionMade, server);
             Console.ReadLine();
         }
 
-        private static void ConnectionMade(StringSocket ss, object payload)
+        private static void ConnectionMade(SS ss, object payload)
         {
-            StringSocketListener server = (StringSocketListener)payload;
-            server.BeginAcceptStringSocket(ConnectionMade, server);
+            SSListener server = (SSListener)payload;
+            server.BeginAcceptSS(ConnectionMade, server);
             new RequestHandler(ss);
         }
 
         private class RequestHandler
         {
-            private StringSocket ss;
+            private SS ss;
 
             private string firstLine;
 
@@ -41,7 +41,7 @@ namespace MyBoggleService
 
             private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (\d+)", RegexOptions.IgnoreCase);
 
-            public RequestHandler(StringSocket ss)
+            public RequestHandler(SS ss)
             {
                 this.ss = ss;
                 this.contentLength = 0;
@@ -128,6 +128,10 @@ namespace MyBoggleService
                     string res = JsonConvert.SerializeObject(o);
                     result += "Content-Length: " + Encoding.UTF8.GetByteCount(res) + "\r\n";
                     result += res;
+                }
+                else
+                {
+                    result += "\r\n";
                 }
                 return result;
             }
