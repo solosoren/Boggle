@@ -40,10 +40,10 @@ namespace MyBoggleService
             // TODO: Regex for other service calls
             private static readonly Regex createUserPattern = new Regex(@"^POST /BoggleService.svc/users/? HTTP");
             private static readonly Regex joinGamePattern = new Regex(@"^POST /BoggleService.svc/games/? HTTP");
-            private static readonly Regex gameStatusPattern = new Regex(@"^GET /BoggleService.svc/games/(.\d+)(\?brief=(.*))?/? HTTP");
+            private static readonly Regex gameStatusPattern = new Regex(@"^GET /BoggleService.svc/games/(.+\d+)(\?brief=(.*))?/? HTTP");
             private static readonly Regex cancelRequestPattern = new Regex(@"^PUT /BoggleService.svc/games/? HTTP");
-            private static readonly Regex playWordPattern = new Regex(@"^PUT /BoggleService.svc/games/(.\d+)/? HTTP");
-            private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (\d+)", RegexOptions.IgnoreCase);
+            private static readonly Regex playWordPattern = new Regex(@"^PUT /BoggleService.svc/games/(.+\d+)/? HTTP");
+            private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (.+\d+)", RegexOptions.IgnoreCase);
 
             public RequestHandler(SS ss)
             {
@@ -113,6 +113,10 @@ namespace MyBoggleService
                     gameID = v.Groups[1].ToString();
 
                     PlayWordRequest(line);
+                }
+                else
+                {
+                    // send stats 403 Forbidden?
                 }
             }
 

@@ -535,15 +535,20 @@ namespace MyBoggleService
 
                                     string player1ID = (string)reader["Player1"];
                                     string player2ID = (string)reader["Player2"];
-                                    User player1 = GetPlayer(player1ID, connection, transaction, brief, isCompleted);
-                                    User player2 = GetPlayer(player2ID, connection, transaction, brief, isCompleted);
+
+                                    if (brief == "yes")
+                                    {
+                                        reader.Close();
+                                    }
+
+                                    User player1 = GetPlayer(player1ID, brief, isCompleted);
+                                    User player2 = GetPlayer(player2ID, brief, isCompleted);
                                     game.Player1 = player1;
                                     game.Player2 = player2;
 
                                     if (brief == "yes")
                                     {
                                         status = OK;
-                                        reader.Close();
                                         transaction.Commit();
                                         return game.BriefGame();
                                     }
@@ -573,41 +578,51 @@ namespace MyBoggleService
         /// <param name="brief">If "yes" then only score is set</param>
         /// <param name="isCompleted">If false then only score and nickname is set otherwise score, nickname, and words are set</param>
         /// <returns></returns>
-        private User GetPlayer(string userID, SqlConnection connection, SqlTransaction transaction, string brief, Boolean isCompleted)
+        private User GetPlayer(string userID, string brief, Boolean isCompleted)
         {
             User player = new User();
-            using (SqlCommand command = new SqlCommand(
+
+            using (SqlConnection connection = new SqlConnection(BoggleDB))
+            {
+                connection.Open();
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    using (SqlCommand command = new SqlCommand(
                             "select * from Users where UserID = @UserID",
                             connection, transaction))
-            {
-                command.Parameters.AddWithValue("@UserID", userID);
-
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (!reader.HasRows)
                     {
-                        throw new Exception("Query failed unexpectedly");
-                    }
+                        command.Parameters.AddWithValue("@UserID", userID);
 
-                    player.Score = 0;
-                    List<PlayedWord> words = GetWords(userID, connection, transaction);
-                    if (words.Count() > 0)
-                    {
-                        foreach (PlayedWord word in words)
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            player.Score += word.Score;
-                        }
-                        if (isCompleted)
-                        {
-                            player.WordsPlayed = words;
-                        }
-                    }
+                            if (!reader.HasRows)
+                            {
+                                throw new Exception("Query failed unexpectedly");
+                            }
 
-                    while (reader.Read())
-                    {
-                        if (brief != "yes")
-                        {
-                            player.Nickname = reader["Nickname"].ToString();
+                            player.Score = 0;
+                            List<PlayedWord> words = GetWords(userID);
+                            if (words.Count() > 0)
+                            {
+                                foreach (PlayedWord word in words)
+                                {
+                                    player.Score += word.Score;
+                                }
+                                if (isCompleted)
+                                {
+                                    player.WordsPlayed = words;
+                                }
+                            }
+
+                            while (reader.Read())
+                            {
+                                if (brief != "yes")
+                                {
+                                    player.Nickname = reader["Nickname"].ToString();
+                                }
+                            }
+                            reader.Close();
+                            transaction.Commit();
                         }
                     }
                 }
@@ -623,26 +638,35 @@ namespace MyBoggleService
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private List<PlayedWord> GetWords(string userID, SqlConnection connection, SqlTransaction transaction)
+        private List<PlayedWord> GetWords(string userID)
         {
             List<PlayedWord> words = new List<PlayedWord>();
-            using (SqlCommand command = new SqlCommand(
-                            "select * from Words where Player = @UserID",
-                            connection, transaction))
+            using (SqlConnection connection = new SqlConnection(BoggleDB))
             {
-                command.Parameters.AddWithValue("@UserID", userID);
-
-                using (SqlDataReader reader = command.ExecuteReader())
+                connection.Open();
+                using (SqlTransaction transaction = connection.BeginTransaction())
                 {
-                    while (reader.Read())
+                    
+                    using (SqlCommand command = new SqlCommand(
+                                    "select * from Words where Player = @UserID",
+                                    connection, transaction))
                     {
-                        PlayedWord word = new PlayedWord(reader["Word"].ToString());
-                        word.Score = (int)reader["Score"];
-                        words.Add(word);
+                        command.Parameters.AddWithValue("@UserID", userID);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                PlayedWord word = new PlayedWord(reader["Word"].ToString());
+                                word.Score = (int)reader["Score"];
+                                words.Add(word);
+                            }
+                            reader.Close();
+                            transaction.Commit();
+                        }
                     }
                 }
             }
-
             return words;
         }
 
