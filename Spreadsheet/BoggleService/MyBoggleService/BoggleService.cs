@@ -170,26 +170,9 @@ namespace MyBoggleService
                             // No pending games to join, make a new pending game
                             if (!reader.HasRows)
                             {
-                                using (SqlCommand addCommand = new SqlCommand(
-                                    "insert into Games(Player1, TimeLimit) output inserted.GameID  values (@Player1, @TimeLimit)",
-                                    connection,
-                                    transaction))
-                                {
-                                    addCommand.Parameters.AddWithValue("@Player1", setGame.UserToken);
-                                    addCommand.Parameters.AddWithValue("@TimeLimit", setGame.TimeLimit);
-
-                                    string ID = addCommand.ExecuteScalar().ToString();
-                                    if (ID == null)
-                                    {
-                                        throw new Exception("Query failed unexpectedly");
-                                    }
-
-                                    status = Accepted;
-                                    SetGame sg = new SetGame(ID);
-                                    reader.Close();
-                                    transaction.Commit();
-                                    return sg;
-                                }
+                                reader.Close();
+                                transaction.Commit();
+                                return CreatePendingGame(setGame, out status);
                             }
                             else
                             {
@@ -234,6 +217,36 @@ namespace MyBoggleService
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        private SetGame CreatePendingGame(SetGame setGame, out HttpStatusCode status)
+        {
+            using (SqlConnection connection = new SqlConnection(BoggleDB))
+            {
+                connection.Open();
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    using (SqlCommand addCommand = new SqlCommand(
+                                        "insert into Games(Player1, TimeLimit) output inserted.GameID  values (@Player1, @TimeLimit)",
+                                        connection,
+                                        transaction))
+                    {
+                        addCommand.Parameters.AddWithValue("@Player1", setGame.UserToken);
+                        addCommand.Parameters.AddWithValue("@TimeLimit", setGame.TimeLimit);
+
+                        string ID = addCommand.ExecuteScalar().ToString();
+                        if (ID == null)
+                        {
+                            throw new Exception("Query failed unexpectedly");
+                        }
+
+                        status = Accepted;
+                        SetGame sg = new SetGame(ID);
+                        transaction.Commit();
+                        return sg;
                     }
                 }
             }
