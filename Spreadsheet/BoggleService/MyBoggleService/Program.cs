@@ -40,7 +40,7 @@ namespace MyBoggleService
             // TODO: Regex for other service calls
             private static readonly Regex createUserPattern = new Regex(@"^POST /BoggleService.svc/users HTTP");
             private static readonly Regex joinGamePattern = new Regex(@"^POST /BoggleService.svc/games HTTP");
-            private static readonly Regex gameStatusPattern = new Regex(@"^GET /BoggleService.svc/games/(.+) HTTP");
+            private static readonly Regex gameStatusPattern = new Regex(@"^GET /BoggleService.svc/games/(.\d+)(\?brief=(.*))? HTTP");
             private static readonly Regex cancelRequestPattern = new Regex(@"^PUT /BoggleService.svc/games HTTP");
             private static readonly Regex playWordPattern = new Regex(@"^PUT /BoggleService.svc/games/(.\d+) HTTP");
             private static readonly Regex contentLengthPattern = new Regex(@"^content-length: (\d+)", RegexOptions.IgnoreCase);
@@ -88,11 +88,6 @@ namespace MyBoggleService
 
             private void ProcessRequest(string line, object p = null)
             {
-                Console.WriteLine(line);
-                //if (!line.Contains("}"))
-                //{
-                //    ss.BeginReceive(ProcessRequest, null, contentLength);
-                //}
                 if (createUserPattern.IsMatch(firstLine))
                 {
                     CreateUserRequest(line);
@@ -103,7 +98,10 @@ namespace MyBoggleService
                 }
                 else if (gameStatusPattern.IsMatch(firstLine))
                 {
-                    
+                    var v = gameStatusPattern.Match(firstLine);
+                    gameID = v.Groups[1].ToString();
+
+                    GetGameStatusRequest(line);
                 }
                 else if (cancelRequestPattern.IsMatch(firstLine))
                 {
@@ -136,28 +134,16 @@ namespace MyBoggleService
                 ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
             }
 
-            // Serializes the object to send and creates result string
-            private string CreateResult(object o, HttpStatusCode status)
+            private void GetGameStatusRequest(string line)
             {
-                string result = "HTTP/1.1 " + (int)status + " " + status + "\r\n";
-
-                // Success Code
-                if ((int)status / 100 == 2)
+                string brief = "no";
+                if (firstLine.Contains("yes"))
                 {
-                    string res = JsonConvert.SerializeObject(o);
-                    result += "Content-Length: " + Encoding.UTF8.GetByteCount(res) + "\r\n\r\n";
-                    result += res;
+                    brief = "yes";
                 }
-                else
-                {
-                    result += "\r\n";
-                }
-                return result;
-            }
-
-            private void GetStatusRequest(string line)
-            {
-
+                Game game = new BoggleService().GameStatus(gameID, brief, out HttpStatusCode status);
+                string result = CreateResult(game, status);
+                ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
             }
 
             private void CancelRequest(string line)
@@ -175,6 +161,25 @@ namespace MyBoggleService
                 PlayWordDetails wordDetail = new BoggleService().PlayWord(gameID, playWordDetails, out HttpStatusCode status);
                 string result = CreateResult(wordDetail, status);
                 ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
+            }
+
+            // Serializes the object to send and creates result string
+            private string CreateResult(object o, HttpStatusCode status)
+            {
+                string result = "HTTP/1.1 " + (int)status + " " + status + "\r\n";
+
+                // Success Code
+                if ((int)status / 100 == 2)
+                {
+                    string res = JsonConvert.SerializeObject(o);
+                    result += "Content-Length: " + Encoding.UTF8.GetByteCount(res) + "\r\n\r\n";
+                    result += res;
+                }
+                else
+                {
+                    result += "\r\n";
+                }
+                return result;
             }
         }
     }
