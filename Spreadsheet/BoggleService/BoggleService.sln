@@ -9,7 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBoggleService", "MyBoggle
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SS", "SS", "{9428C0A3-B931-45E2-B469-5DD293749FD1}"
 	ProjectSection(SolutionItems) = preProject
-		MyBoggleService\bin\Debug\StringSocket.dll = MyBoggleService\bin\Debug\StringSocket.dll
 		MyBoggleService\bin\Debug\StringSocket.pdb = MyBoggleService\bin\Debug\StringSocket.pdb
 		..\..\StringSocket\StringSocket\bin\Debug\StringSocket.XML = ..\..\StringSocket\StringSocket\bin\Debug\StringSocket.XML
 	EndProjectSection
