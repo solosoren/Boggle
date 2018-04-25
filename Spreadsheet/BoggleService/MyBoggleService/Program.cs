@@ -100,7 +100,7 @@ namespace MyBoggleService
                 }
                 else if (gameStatusPattern.IsMatch(firstLine))
                 {
-                    
+                    JoinGameRequest(line);
                 }
             }
 
@@ -122,6 +122,11 @@ namespace MyBoggleService
                 ss.BeginSend(result, (x, y) => { ss.Shutdown(System.Net.Sockets.SocketShutdown.Both); }, null);
             }
 
+            private void GetStatusRequest(string line)
+            {
+                
+            }
+
             // Serializes the object to send and creates result string
             private string CreateResult(object o, HttpStatusCode status)
             {
@@ -139,11 +144,6 @@ namespace MyBoggleService
                     result += "\r\n";
                 }
                 return result;
-            }
-
-            private void GetStatusRequest(string line)
-            {
-
             }
         }
     }
