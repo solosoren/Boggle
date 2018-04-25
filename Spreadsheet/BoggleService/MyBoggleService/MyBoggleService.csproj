@@ -76,10 +76,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BoggleDB.mdf" />
-    <Content Include="BoggleDB_log.ldf">
-      <DependentUpon>BoggleDB.mdf</DependentUpon>
-    </Content>
     <Content Include="dictionary.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
