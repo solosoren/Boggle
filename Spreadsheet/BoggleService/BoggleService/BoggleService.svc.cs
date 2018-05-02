@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -99,7 +100,27 @@ namespace Boggle
         public SetGame JoinGame(SetGame setGame)
         {
 
-            if (setGame.UserToken == null)
+            //using (SqlConnection connection = new SqlConnection(BoggleDB))
+            //{
+            //    connection.Open();
+
+            //    // Transaction for databse commands
+            //    using (SqlTransaction transaction = connection.BeginTransaction())
+            //    {
+            //        using (SqlCommand addCommand = new SqlCommand(
+            //                        "insert into Games(Player1) output inserted.GameID  values (@Player1)",
+            //                        connection,
+            //                        transaction))
+            //        {
+            //            addCommand.Parameters.AddWithValue("@Player1", setGame.UserToken);
+
+            //            string ID = addCommand.ExecuteScalar().ToString();
+            //            transaction.Commit();
+            //        }
+            //    }
+            //}
+
+                if (setGame.UserToken == null)
             {
                 SetStatus(Forbidden);
                 return null;
@@ -207,7 +228,7 @@ namespace Boggle
                                     reader.Read();
                                     Game game = new Game();
                                     int? newTimeLimit = setGame.TimeLimit;
-                                    if (reader["TimeLimit"] != null)
+                                    if (reader["TimeLimit"] != DBNull.Value)
                                     {
                                         newTimeLimit = ((int)reader["TimeLimit"] + newTimeLimit) / 2;
                                     }
