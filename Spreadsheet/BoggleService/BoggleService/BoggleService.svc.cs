@@ -227,7 +227,7 @@ namespace Boggle
                                 {
                                     reader.Read();
                                     Game game = new Game();
-                                    int? newTimeLimit = setGame.TimeLimit;
+                                    int newTimeLimit = setGame.TimeLimit ?? 0;
                                     if (reader["TimeLimit"] != DBNull.Value)
                                     {
                                         newTimeLimit = ((int)reader["TimeLimit"] + newTimeLimit) / 2;
