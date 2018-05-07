@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boogle Client", "PS8\Boogle Client.csproj", "{7E548D43-BD29-4C8B-96FD-64E867B2DA72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boggle Client", "Client\Boggle Client.csproj", "{4AA712C1-E03B-402D-8A58-D34B5E1916AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7E548D43-BD29-4C8B-96FD-64E867B2DA72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E548D43-BD29-4C8B-96FD-64E867B2DA72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E548D43-BD29-4C8B-96FD-64E867B2DA72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E548D43-BD29-4C8B-96FD-64E867B2DA72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AA712C1-E03B-402D-8A58-D34B5E1916AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AA712C1-E03B-402D-8A58-D34B5E1916AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AA712C1-E03B-402D-8A58-D34B5E1916AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AA712C1-E03B-402D-8A58-D34B5E1916AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
